@@ -32,13 +32,27 @@ LOG_CONFIG[LOG_ARCHIVE] = false;
 var log = Helper.Debug.log(LOG_CONFIG);
 
 // Consts
-var BASE_NAME = "Neuroscape_",
-    baseURL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Projects/Hifi/Scripts/Neuroscape/",
+var baseURL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Projects/Hifi/Scripts/hifi-content/Prototyping/Neuroscape/Neuroscape_Main.js",
     DEBUG = false,
     DISTANCE_IN_FRONT = 1,
     LEFT = "Left",
     RIGHT = "Right",
-    drumPadModelURL = "http://hifi-content.s3-us-west-1.amazonaws.com/rebecca/DrumKit/Models/Drum_Stick.obj";
+    drumPadModelURL = "http://hifi-content.s3-us-west-1.amazonaws.com/rebecca/DrumKit/Models/Drum_Stick.obj",
+    BASE_NAME = "Neuroscape_",
+    ORB = BASE_NAME + "Orb",
+    STICK_LEFT = BASE_NAME + "Drum_Stick_Left",
+    STICK_LEFT_HEAD = BASE_NAME + "Drum_Stick_Left_Head",
+    STICK_RIGHT = BASE_NAME + "Drum_Stick_Right",
+    STICK_RIGHT_HEAD = BASE_NAME + "Drum_Stick_Right_Head",
+    PAD_LEFT = BASE_NAME + "Drum_Pad_Right",
+    PAD_RIGHT = BASE_NAME + "Drum_Pad_Right",
+    BOUNDARY_LEFT = BASE_NAME + "Boundary_Left",
+    BOUNDARY_LEFT_TOP = BASE_NAME + "Boundary_Left_Top",
+    BOUNDARY_LEFT_BOTTOM = BASE_NAME + "Boundary_Left_Bottom",
+    BOUNDARY_RIGHT = BASE_NAME + "Boundary_Right",
+    BOUNDARY_RIGHT_TOP = BASE_NAME + "Boundary_Right_Top",
+    BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
+    DATA_WINDOW = BASE_NAME + "Data_Window";
 
 // Init
 
@@ -91,7 +105,8 @@ function createBoundaryBoxes() {
             boundaryPosition,
             avatarOrientation,
             vec(BOUNDARY_WIDTH, BOUNDARY_HEIGHT, BOUNDARY_DEPTH),
-            color
+            color,
+            true
         );
         allOverlays[name] = overlayID;
     });
@@ -171,14 +186,16 @@ function createBoundaryDecoratorBoxes() {
             boundaryPosition,
             avatarOrientation,
             vec(BOUNDARY_WIDTH, BOUNDARY_HEIGHT, BOUNDARY_DEPTH),
-            color
+            color,
+            false
         );
         overlayID2 = createBoxOverlay(
             name2,
             boundaryPosition2,
             avatarOrientation,
             vec(BOUNDARY_WIDTH, BOUNDARY_HEIGHT, BOUNDARY_DEPTH),
-            color
+            color,
+            false
         );
 
         allOverlays[name] = overlayID;
@@ -186,14 +203,15 @@ function createBoundaryDecoratorBoxes() {
     });
 }
 
-function createBoxOverlay(name, position, rotation, dimensions, color) {
+function createBoxOverlay(name, position, rotation, dimensions, color, isSolid) {
     var properties = {
         name: name,
         position: position,
         rotation: rotation,
         dimensions: dimensions,
         color: color,
-        visible: true
+        visible: true,
+        isSolid: isSolid
     };
     var id = Overlays.addOverlay("cube", properties);
     return id;
@@ -238,12 +256,16 @@ function createDrumSticks() {
         MODEL_WIDTH = 0.0131,
         MODEL_HEIGHT = 0.4544,
         MODEL_DEPTH = 0.0131,
+        SPHERE_WIDTH = MODEL_WIDTH * 2.0,
         GRABBABLE = true;
 
     // Init
     var name,
+        nameHead,
         overlayID,
+        overlayIDHead,
         stickPosition,
+        headPosition,
         rotation,
         localOffset = {},
         worldOffset = {},
@@ -264,6 +286,10 @@ function createDrumSticks() {
                 worldOffset,
                 avatarPosition
             );
+            headPosition = Vec3.sum(
+                stickPosition,
+                vec(0, -MODEL_HEIGHT / 2, 0)
+            )
         } else {
             localOffset = vec(-DISTANCE_RIGHT, 0, 0);
             worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
@@ -271,9 +297,14 @@ function createDrumSticks() {
                 worldOffset,
                 avatarPosition
             );
+            headPosition = Vec3.sum(
+                stickPosition,
+                vec(0, -MODEL_HEIGHT / 2, 0)
+            );
         }
 
         name = BASE_NAME + "Drum_Stick_" + side;
+        nameHead = BASE_NAME + "Drum_Stick_Head" + side;
         rotation = Quat.fromPitchYawRollDegrees(0, 0, 0);
         overlayID = createSphereOverlay(
             name,
@@ -283,7 +314,17 @@ function createDrumSticks() {
             makeColor(255, 255, 255),
             GRABBABLE
         );
+        overlayIDHead = createSphereOverlay(
+            name,
+            headPosition,
+            rotation,
+            vec(SPHERE_WIDTH, SPHERE_WIDTH, SPHERE_WIDTH),
+            makeColor(255, 255, 255),
+            GRABBABLE,
+            overlayID
+        );
         allOverlays[name] = overlayID;
+        allOverlays[nameHead] = overlayIDHead;
     });
     /* Scratch
         userData.equipHotspots = [{
@@ -303,7 +344,7 @@ function createDrumSticks() {
     */
 }
 
-function createSphereOverlay(name, position, rotation, dimensions, color, grabbable) {
+function createSphereOverlay(name, position, rotation, dimensions, color, grabbable, parentID) {
     var properties = {
         name: name,
         position: position,
@@ -311,7 +352,9 @@ function createSphereOverlay(name, position, rotation, dimensions, color, grabba
         dimensions: dimensions,
         color: color,
         visible: true,
-        grabbable: true
+        grabbable: true,
+        alpha: 1.0,
+        parentID: parentID
     };
     var id = Overlays.addOverlay("sphere", properties);
     return id;
@@ -320,7 +363,7 @@ function createSphereOverlay(name, position, rotation, dimensions, color, grabba
 function createDrumPads() {
     // Const
     var DISTANCE_RIGHT = 0.20,
-        DISTANCE_FORWARD = 0.30,
+        DISTANCE_FORWARD = -0.30,
         MODEL_WIDTH = 0.3,
         MODEL_HEIGHT = 0.2,
         MODEL_DEPTH = 0.3;
@@ -374,12 +417,67 @@ function createDrumPadOverlay(name, position, dimensions, rotation, url) {
     return id;
 }
 
+function createDataWindow(){
+    // Consts
+    var WINDOW_WIDTH = 1,
+        WINDOW_HEIGHT = 1,
+        WINDOW_DEPTH = 0.3,
+        DISTANCE_LEFT = 0,
+        DISTANCE_HEIGHT = 0.15,
+        DISTANCE_BACK = -1.0,
+        OVERLAY_LINE_HEIGHT = 0.075,
+        OVERLAY_BACKGROUND_ALPHA = 0.85,
+        DEFAULT_TEXT = "LOADING!";
+
+    // Init
+    var name,
+        overlayID,
+        windowPosition,
+        localOffset = {},
+        worldOffset = {};
+
+    // Main
+    localOffset = {x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK};
+    worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
+    windowPosition = Vec3.sum(
+        centerPlacement,
+        worldOffset
+    );
+    name = DATA_WINDOW;
+    overlayID = createText3dOverlay(
+        name,
+        windowPosition,
+        avatarOrientation,
+        vec(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_DEPTH),
+        OVERLAY_LINE_HEIGHT,
+        OVERLAY_BACKGROUND_ALPHA,
+        DEFAULT_TEXT
+    );
+    allOverlays[name] = overlayID;
+}
+
+function createText3dOverlay(name, position, rotation, dimensions, lineHeight, backgroundAlpha, defaultText){
+    var properties = {
+        name: name,
+        position: position,
+        rotation: rotation,
+        dimensions: dimensions,
+        isFacingAvatar: false,
+        lineHeight: lineHeight,
+        backgroundAlpha: backgroundAlpha,
+        text: defaultText
+    };
+    var id = Overlays.addOverlay("text3d", properties);
+    return id;
+}
+
 // Main
 createBoundaryBoxes();
 createBoundaryDecoratorBoxes();
 createOrb();
 createDrumSticks();
 createDrumPads();
+createDataWindow();
 
 // Cleanup
 function scriptEnding() {
@@ -390,6 +488,4 @@ function scriptEnding() {
 
 Script.scriptEnding.connect(scriptEnding);
 
-module.exports = {
-    allOverlays: allOverlays
-};
+module.exports = allOverlays;

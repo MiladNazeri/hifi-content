@@ -11,5 +11,5 @@ module.exports = {
     BOUNDARY_LEFT_BOTTOM: BASE_NAME + "Boundary_Left_Bottom",
     BOUNDARY_RIGHT: BASE_NAME + "Boundary_Right",
     BOUNDARY_RIGHT_TOP: BASE_NAME + "Boundary_Right_Top",
-    BOUNDARY_RIGHT_BOTTOM: BASE_NAME + "Boundary_Right_Bottom",
+    BOUNDARY_RIGHT_BOTTOM: BASE_NAME + "Boundary_Right_Bottom"
 };

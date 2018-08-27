@@ -9,9 +9,9 @@
 
 (function () {
     // Dependencies 
-    Script.require("../../../../Utilities/Polyfills.js")();
+    Script.require("../../../Utilities/Polyfills.js")();
 
-    var Helper = Script.require("../../../../Utilities/Helper.js?" + Date.now());
+    var Helper = Script.require("../../../Utilities/Helper.js?" + Date.now());
 
     // Log Setup
     var LOG_CONFIG = {},
@@ -34,7 +34,20 @@
         SAVE_JSON = "saveJSON",
         UPDATE_MESSAGE = "updateMessage",
         RESTART_GAME = "restart_game",
-        UPDATE_UI = "update_ui";
+        UPDATE_UI = "update_ui",
+        BASE_NAME = "Neuroscape_",
+        ORB = BASE_NAME + "Orb",
+        STICK_LEFT = BASE_NAME + "Drum_Stick_Left",
+        STICK_RIGHT = BASE_NAME + "Drum_Stick_Right",
+        PAD_LEFT = BASE_NAME + "Drum_Pad_Right",
+        PAD_RIGHT = BASE_NAME + "Drum_Pad_Right",
+        BOUNDARY_LEFT = BASE_NAME + "Boundary_Left",
+        BOUNDARY_LEFT_TOP = BASE_NAME + "Boundary_Left_Top",
+        BOUNDARY_LEFT_BOTTOM = BASE_NAME + "Boundary_Left_Bottom",
+        BOUNDARY_RIGHT = BASE_NAME + "Boundary_Right",
+        BOUNDARY_RIGHT_TOP = BASE_NAME + "Boundary_Right_Top",
+        BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
+        DATA_WINDOW = BASE_NAME + "Data_Window";
 
     // Init
     var isAppActive = false,
@@ -53,7 +66,9 @@
                 gameEnding: false
             }
         },
-        settings = Object.assign({}, defaultSettings);
+        settings = Object.assign({}, defaultSettings),
+        allOverlays = {},
+        gameManager = {};
 
 
     // Helper Functions
@@ -71,11 +86,11 @@
 
     // Procedural Functions
     function updatePlayerName(playerName) {
-        var message = JSON.stringify({
-            type: UPDATE_PLAYER_NAME,
-            value: playerName
-        })
-        Messages.sendMessage(MESSAGE_CHANNEL, message);
+        // var message = JSON.stringify({
+        //     type: UPDATE_PLAYER_NAME,
+        //     value: playerName
+        // })
+        gameManager.updatePlayerName(playerName);
         settings.playerName = playerName;
         settings.ui.enterPlayerName = false;
     }
@@ -87,11 +102,7 @@
     }
 
     function restartGame() {
-        var message = JSON.stringify({
-            type: RESTART_GAME
-        });
-
-        Messages.sendMessage(MESSAGE_CHANNEL, message);
+        gameManager.restartGame();
         settings.playerName = "";
         settings.ui.enterPlayerName = true;
         settings.ui.showMessage = false;
@@ -153,7 +164,10 @@
         Messages.subscribe(MESSAGE_CHANNEL);
         Messages.messageReceived.connect(onMessageReceived);
 
-        Script.require("./Neuroscape_Spawner.js?" + Date.now());
+        allOverlays = Script.require("./Neuroscape_Spawner.js?" + Date.now());
+        gameManager = Script.require("./Neuroscape_Manager.js?" + Date.now())(allOverlays);
+        gameManager.init();
+        // gameManager.test();
 
     }
 
