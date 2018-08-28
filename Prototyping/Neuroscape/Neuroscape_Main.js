@@ -36,6 +36,7 @@
         RESTART_GAME = "restart_game",
         UPDATE_UI = "update_ui",
         BASE_NAME = "Neuroscape_",
+        STOP_GAME = "stop_game",
         ORB = BASE_NAME + "Orb",
         STICK_LEFT = BASE_NAME + "Drum_Stick_Left",
         STICK_RIGHT = BASE_NAME + "Drum_Stick_Right",
@@ -107,6 +108,14 @@
         settings.ui.enterPlayerName = true;
         settings.ui.showMessage = false;
         settings.ui.gameEnding = false;
+    }
+
+    function stopGame() {
+        gameManager.stopGame();
+        settings.playerName = "";
+        settings.ui.enterPlayerName = false;
+        settings.ui.showMessage = true;
+        settings.ui.gameEnding = true;
     }
 
     function saveJSON(gameData) {
@@ -246,6 +255,10 @@
                 break;
             case RESTART_GAME:
                 restartGame();
+                doUIUpdate();
+                break;
+            case STOP_GAME:
+                stopGame();
                 doUIUpdate();
                 break;
             case CLOSE_DIALOG_MESSAGE:

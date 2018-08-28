@@ -39,6 +39,7 @@ var BASE_NAME = "Neuroscape_",
     BOUNDARY_RIGHT_TOP = BASE_NAME + "Boundary_Right_Top",
     BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
     DATA_WINDOW = BASE_NAME + "Data_Window",
+    GAME_TYPE_WINDOW = BASE_NAME + "Game_Type_Window",
     MOUSE_PRESS = "Mouse_Press",
     DIRECTION_ONE = "directionOne",
     DIRECTION_TWO = "directionTwo",
@@ -47,8 +48,9 @@ var BASE_NAME = "Neuroscape_",
     CONTINUE_MESSAGE = "Hit the drum pad \nto continue\n",
     DONE_MESSAGE = "Thanks for playing",
     GET_READY_MESSAGE = "GET READY IN: ",
-    PLAY_MESSAGE = "Play the beat back",
-    LISTEN_MESSAGE = "Listen to the beat",
+    PLAY_MESSAGE = "Play the beat back\n",
+    LISTEN_MESSAGE = "Listen to the beat\n",
+    GAME_TYPE_MESSAGE = "Current Game Type: \n",
     ORB_ID = "orb",
     PLAYER_ID = "player",
     ON = "on",
@@ -71,9 +73,6 @@ var BASE_NAME = "Neuroscape_",
     SAVE_JSON = "saveJSON",
     BELL_SOUND_URL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Projects/Hifi/Scripts/Neuroscape/bell.wav?3",
     STICK_SOUND_URL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Projects/Hifi/Scripts/Neuroscape/drumstick.wav",
-    MESSAGE_CHANNEL = "messages.neuroscape",
-    UPDATE_MESSAGE = "updateMessage",
-    SAVE_JSON = "saveJSON",
     SLOW = 750,
     MEDIUM = 500,
     FAST = 350,
@@ -169,11 +168,6 @@ var allOverlays = {},
         Neuroscape_Orb: "Orb"
     },
     status = {
-        speed: currentMSSpeed,
-        level: currentLevel,
-        type: currentGameType,
-        av: currentAV,
-        beat: currentBeat,
         latency: currentLatency
     },
     collisionCollection = [],
@@ -203,15 +197,15 @@ function Level(level, speed, gameType, av) {
 
 function calculateLatency(collisionTime) {
     if (currentGameType === ON || currentGameType === CONTINUOUS) {
-        log(LOG_ENTER, "IN ON || CONTINUOUS")
+        log(LOG_ENTER, "IN ON || CONTINUOUS");
         currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * currentMSSpeed));
         prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * currentMSSpeed));
-        finalLatency = Math.min(currentLatency, prevLatency);
+        finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
     } else {
-        log(LOG_ENTER, "IN OFF")
+        log(LOG_ENTER, "IN OFF");
         currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * (currentMSSpeed) + currentMSSpeed / 2));
         prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * (currentMSSpeed) + currentMSSpeed / 2));
-        finalLatency = Math.min(currentLatency, prevLatency);
+        finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
     }
 
     log(LOG_VALUE, "collisionTime", collisionTime);
@@ -411,9 +405,10 @@ function prepNextLevel() {
     currentLevel = nextLevel.level;
     currentMSSpeed = nextLevel.speed;
     currentGameType = nextLevel.gameType;
-    log(LOG_ARCHIVE, "PReP LEVEL BEFOrE CurrenTAV", currentAV)
+    updateGameTypeText(currentGameType);
+    log(LOG_ARCHIVE, "PReP LEVEL BEFOrE CurrenTAV", currentAV);
     currentAV = nextLevel.av;
-    log(LOG_ARCHIVE, "PReP LEVEL AFTER CurrenTAV", currentAV)
+    log(LOG_ARCHIVE, "PReP LEVEL AFTER CurrenTAV", currentAV);
 
     msInPI = PI / currentMSSpeed;
 }
@@ -461,6 +456,7 @@ function startLevel() {
 
     isGameRunning = true;
     // Entities.callEntityClientMethod(activeClientID, childrenIDS[ORB], "moveDirection", [DIRECTION_ONE]);
+    totalDelta = 0;
     Script.setTimeout(self.stopLevel, currentDuration);
 }
 
@@ -531,14 +527,13 @@ function stopLevel() {
 
 function stopUpdate() {
     Script.update.disconnect(onUpdate);
-    totalDelta = 0;
 }
 
 function storeTempTypes() {
     tempGameType = currentGameType;
-    log(LOG_ARCHIVE, "storeTempTypes BEFOrE CurrenTAV", tempAV)
+    log(LOG_ARCHIVE, "storeTempTypes BEFOrE CurrenTAV", tempAV);
     tempAV = currentAV;
-    log(LOG_ARCHIVE, "storeTempTypes AFTER CurrenTAV", tempAV)
+    log(LOG_ARCHIVE, "storeTempTypes AFTER CurrenTAV", tempAV);
 
     currentGameType = DEFAULT_GAME_TYPE;
     currentAV = DEFAULT_AV;
@@ -572,6 +567,16 @@ function updateDataText(message) {
     }
 }
 
+function updateGameTypeText(gameType) {
+    var text = GAME_TYPE_MESSAGE + gameType;
+    
+    var properties = {
+        text: text
+    };
+
+    Overlays.editOverlay(allOverlays[GAME_TYPE_WINDOW], properties);
+}
+
 function updateOrbPosition(position) {
     var properties = {
         position: position
@@ -586,16 +591,21 @@ function updatePlayerName(playerName) {
     isNameEntered = true;
     var sendMessage = "Hi " + currentPlayerName + "!\n\n";
     sendMessage += STARTING_MESSAGE;
+    sendMessage += "\nNext Level: \n\t" + currentLevel;
+    sendMessage += "\nNext Speed: \n\t" + currentMSSpeed + "ms";
+    sendMessage += "\nNext Game Type: \n\t" + currentGameType;
+    sendMessage += "\nNext AV type: \n\t" + currentAV + "\n";
     updateDataText(sendMessage);
+    updateGameTypeText(currentGameType);
 }
 
 function updateStatus() {
     status = {
-        speed: currentMSSpeed,
-        level: currentLevel,
-        type: currentGameType,
-        av: currentAV,
-        beat: currentBeat,
+        // speed: currentMSSpeed,
+        // level: currentLevel,
+        // type: currentGameType,
+        // av: currentAV,
+        // beat: currentBeat,
         latency: finalLatency
     };
 }
@@ -608,13 +618,14 @@ function createLevelMap() {
         BASENAME = "Level_",
         gameTypes = [ON, OFF, CONTINUOUS],
         // gameTypes = [ON, OFF],
+        // gameTypes = [ON],
         // gameTypes = [CONTINUOUS],
         
-        // speeds = [SLOW, MEDIUM, FAST],
         speeds = [SLOW, MEDIUM, FAST],
+        // speeds = [SLOW],
 
         avs = [AUDIOVISUAL, AUDIO, VISUAL];
-        // avs = [AUDIOVISUAL,];
+        // avs = [AUDIOVISUAL];
 
     speeds.forEach(function (speed) {
         gameTypes.forEach(function (gameType) {
@@ -639,14 +650,14 @@ function handleCollision(collisionObject, orbPosition) {
         return;
     }
 
-    log(LOG_ARCHIVE, "isGameRunning", isGameRunning)
+    log(LOG_ARCHIVE, "isGameRunning", isGameRunning);
     if (!isGameRunning) {
         self.startGame();
         return;
     }
 
-    log(LOG_ARCHIVE, "isGamePaused", isGamePaused)
-    log(LOG_ARCHIVE, "isAllowedToUnPause", isAllowedToUnPause)
+    log(LOG_ARCHIVE, "isGamePaused", isGamePaused);
+    log(LOG_ARCHIVE, "isAllowedToUnPause", isAllowedToUnPause);
     if (isGamePaused && isAllowedToUnPause) {
         self.startLevel();
         isGamePaused = false;
@@ -654,11 +665,11 @@ function handleCollision(collisionObject, orbPosition) {
         return;
     }
 
-    log(LOG_ARCHIVE, "ABOUT TO CHECK CURRENT BEAT", currentBeat)
-    log(LOG_ARCHIVE, "isListenMode", isListenMode)
+    log(LOG_ARCHIVE, "ABOUT TO CHECK CURRENT BEAT", currentBeat);
+    log(LOG_ARCHIVE, "isListenMode", isListenMode);
 
     if (currentBeat <= 0 || (currentGameType === CONTINUOUS && isListenMode)) {
-        log(LOG_ARCHIVE, "CURRENT BEAT BELOW 0", currentBeat)
+        log(LOG_ARCHIVE, "CURRENT BEAT BELOW 0", currentBeat);
         return;
     } else {
         log(LOG_ARCHIVE, "About to record stick collision ");
@@ -685,18 +696,18 @@ function incrementBeat() {
             if (continuousBeatCounter <= 4) {
                 continuousBeatCounter++;
                 if (isListenMode) {
-                    log(LOG_ARCHIVE, "isListen Mode before CurrentAv", currentAV)
+                    log(LOG_ARCHIVE, "isListen Mode before CurrentAv", currentAV);
                     currentAV = tempAV;
-                    log(LOG_ARCHIVE, "isListen Mode after CurrentAv", currentAV)
+                    log(LOG_ARCHIVE, "isListen Mode after CurrentAv", currentAV);
 
                     changeOrbVisibility(VISIBILE);
                     sendMessage = "";
                     sendMessage += LISTEN_MESSAGE;
                     updateDataText(sendMessage);
                 } else {
-                    log(LOG_ARCHIVE, "is notListen mode Mode before CurrentAv", currentAV)
+                    log(LOG_ARCHIVE, "is notListen mode Mode before CurrentAv", currentAV);
                     currentAV = null;
-                    log(LOG_ARCHIVE, "is notListen mode Mode after CurrentAv", currentAV)
+                    log(LOG_ARCHIVE, "is notListen mode Mode after CurrentAv", currentAV);
 
                     changeOrbVisibility(!VISIBILE);
                     sendMessage = "";
@@ -715,12 +726,12 @@ function incrementBeat() {
         // This is handeling our Count Down Period
         sendMessage += GET_READY_MESSAGE + Math.abs(currentBeat);
         updateDataText(sendMessage);
-        log(LOG_ARCHIVE, "current Beat in Count down", currentBeat)
+        log(LOG_ARCHIVE, "current Beat in Count down", currentBeat);
         if (currentBeat === -1) {
             currentGameType = tempGameType;
-            log(LOG_ARCHIVE, "currentBeat === 0 before CurrentAv", currentAV)
+            log(LOG_ARCHIVE, "currentBeat === 0 before CurrentAv", currentAV);
             currentAV = tempAV;
-            log(LOG_ARCHIVE, "currentBeat === 0 after CurrentAv", currentAV)
+            log(LOG_ARCHIVE, "currentBeat === 0 after CurrentAv", currentAV);
         }
     }
 }
@@ -747,7 +758,7 @@ function init() {
     log(LOG_ARCHIVE, "UNIT_SCALAR", UNIT_SCALAR);
     sphereRadius = orbProperties.dimensions.x;
     totalMargin = UNIT_SCALAR * sphereRadius;
-    position = MyAvatar.position;
+    position = orbProperties.position;
     rotation = MyAvatar.orientation;
 
     currentMSSpeed = SLOW;
@@ -757,6 +768,22 @@ function init() {
     msInPI = PI / currentMSSpeed;
     this.createLevelMap();
     startUpdate();
+    Overlays.mousePressOnOverlay.connect(onOverlayMousePress);
+}
+
+function onOverlayMousePress(id, event){
+    if (id === allOverlays[PAD_LEFT] || id === allOverlays[PAD_RIGHT]){
+        var orbPosition,
+            newCollision;
+
+        orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
+        newCollision = {
+            time: totalDelta,
+            id: MOUSE_PRESS
+        };
+
+        self.handleCollision(newCollision, orbPosition);
+    }
 }
 
 function recordCollision(collisionObject) {
@@ -799,16 +826,19 @@ function recordCollision(collisionObject) {
     }
 
     self.updateStatus();
+    // if (currentGameType !== CONTINUOUS && isListenMode !== true) {
     if (currentGameType !== CONTINUOUS) {
         updateDataText(JSON.stringify(status));
     }
 }
 
-function runHandCheck(orbPosition) {
+function runHandCheck() {
     [LEFT, RIGHT].forEach(function(side){
-        var planeIntersection;
-        var correctCollisionTime;
-        var newCollision;
+        var planeIntersection,
+            correctCollisionTime,
+            newCollision,
+            orbPosition;
+
         if (side === RIGHT) {
             planeIntersection = findLinePlaneIntersectionCoords(
                 previousStickRightPoint, currentStickRightPoint, drumPadRightPointOnPlane, vec(0,1,0));
@@ -830,6 +860,7 @@ function runHandCheck(orbPosition) {
                         id: STICK_RIGHT
                     };
                     log(LOG_ARCHIVE, "newCollision", newCollision);
+                    orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
                     self.handleCollision(newCollision, orbPosition);
                     playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, RIGHT_HAND);
                     playSound(drumPadRightPointOnPlane, soundStick);
@@ -861,6 +892,7 @@ function runHandCheck(orbPosition) {
                         id: STICK_LEFT
                     };
                     log(LOG_ARCHIVE, "newCollision", newCollision);
+                    orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
                     self.handleCollision(newCollision, orbPosition);
                     playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, LEFT_HAND);
                     playSound(drumPadLeftPointOnPlane, soundStick);
@@ -897,8 +929,8 @@ function onUpdate(delta) {
     log(LOG_ARCHIVE, "previousStickRightPoint", previousStickRightPoint, 1000);
     log(LOG_ARCHIVE, "currentStickLeftPoint", currentStickLeftPoint, 1000);
     log(LOG_ARCHIVE, "currentStickRightPoint", currentStickRightPoint, 1000);
-    var orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
-    runHandCheck(orbPosition);
+
+    runHandCheck();
 
     if (!isGameRunning || isGamePaused) { 
         return; 
@@ -917,7 +949,7 @@ function onUpdate(delta) {
     if (currentBeat !== ceilTotalDeltaByTotalms - COUNT_IN) {
         currentBeat = ceilTotalDeltaByTotalms - COUNT_IN;
         self.incrementBeat();
-    };
+    }
 
     log(LOG_ARCHIVE, "ceilTotalDeltaByTotalms", ceilTotalDeltaByTotalms);
     // This will give you back the value of the expected beat before the current point in time
@@ -957,7 +989,7 @@ function onUpdate(delta) {
     // going towards where it should be at this point in time
     // Multiply this with adjusted cos amount to get a larger distance to travel
 
-    var localPos = { x: xCosAdjusted * UNIT_SCALAR, y: 0, z: -1 };
+    var localPos = { x: xCosAdjusted * UNIT_SCALAR, y: 0, z: 0 };
     // print(JSON.stringify((1 / Math.cos(cosAmount)))); 
 
     // rotate that vector by the direction the avatar is first facing 
@@ -999,7 +1031,6 @@ function onUpdate(delta) {
     previousTotalDelta = totalDelta;
     totalDelta += deltaInMs;
     updateOrbPosition(temporaryPosition);
-
 }
 
 function NeuroscapeManager(overlayList, context) {
@@ -1026,6 +1057,9 @@ function NeuroscapeManager(overlayList, context) {
     };
 }
 
-Script.scriptEnding.connect(stopUpdate);
+Script.scriptEnding.connect(function(){
+    stopUpdate();
+    Overlays.mousePressOnOverlay.disconnect(onOverlayMousePress);
+});
 
 module.exports = NeuroscapeManager;

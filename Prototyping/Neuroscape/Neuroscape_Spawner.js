@@ -34,7 +34,7 @@ var log = Helper.Debug.log(LOG_CONFIG);
 // Consts
 var baseURL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Projects/Hifi/Scripts/hifi-content/Prototyping/Neuroscape/Neuroscape_Main.js",
     DEBUG = false,
-    DISTANCE_IN_FRONT = 1,
+    DISTANCE_IN_FRONT = 2.0,
     LEFT = "Left",
     RIGHT = "Right",
     drumPadModelURL = "http://hifi-content.s3-us-west-1.amazonaws.com/rebecca/DrumKit/Models/Drum_Stick.obj",
@@ -52,7 +52,8 @@ var baseURL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Proje
     BOUNDARY_RIGHT = BASE_NAME + "Boundary_Right",
     BOUNDARY_RIGHT_TOP = BASE_NAME + "Boundary_Right_Top",
     BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
-    DATA_WINDOW = BASE_NAME + "Data_Window";
+    DATA_WINDOW = BASE_NAME + "Data_Window",
+    GAME_TYPE_WINDOW = BASE_NAME + "Game_Type_Window";
 
 // Init
 
@@ -253,6 +254,7 @@ function createOrb() {
 function createDrumSticks() {
     // Consts
     var DISTANCE_RIGHT = 0.52,
+        DISTANCE_FORWARD = -0.85,
         MODEL_WIDTH = 0.0131,
         MODEL_HEIGHT = 0.4544,
         MODEL_DEPTH = 0.0131,
@@ -280,7 +282,7 @@ function createDrumSticks() {
     // Main
     [LEFT, RIGHT].forEach(function (side) {
         if (side === RIGHT) {
-            localOffset = vec(DISTANCE_RIGHT, 0, 0);
+            localOffset = vec(DISTANCE_RIGHT, 0, DISTANCE_FORWARD);
             worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
             stickPosition = Vec3.sum(
                 worldOffset,
@@ -291,7 +293,7 @@ function createDrumSticks() {
                 vec(0, -MODEL_HEIGHT / 2, 0)
             )
         } else {
-            localOffset = vec(-DISTANCE_RIGHT, 0, 0);
+            localOffset = vec(-DISTANCE_RIGHT, 0, DISTANCE_FORWARD);
             worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
             stickPosition = Vec3.sum(
                 worldOffset,
@@ -363,7 +365,7 @@ function createSphereOverlay(name, position, rotation, dimensions, color, grabba
 function createDrumPads() {
     // Const
     var DISTANCE_RIGHT = 0.20,
-        DISTANCE_FORWARD = -0.30,
+        DISTANCE_FORWARD = -0.85,
         MODEL_WIDTH = 0.3,
         MODEL_HEIGHT = 0.2,
         MODEL_DEPTH = 0.3;
@@ -419,7 +421,7 @@ function createDrumPadOverlay(name, position, dimensions, rotation, url) {
 
 function createDataWindow(){
     // Consts
-    var WINDOW_WIDTH = 1,
+    var WINDOW_WIDTH = 1.5,
         WINDOW_HEIGHT = 1,
         WINDOW_DEPTH = 0.3,
         DISTANCE_LEFT = 0,
@@ -456,6 +458,45 @@ function createDataWindow(){
     allOverlays[name] = overlayID;
 }
 
+function createGameTypeWindow(){
+    // Consts
+    var WINDOW_WIDTH = 2.0,
+        WINDOW_HEIGHT = 0.3,
+        WINDOW_DEPTH = 0.3,
+        DISTANCE_LEFT = 0,
+        DISTANCE_HEIGHT = 1,
+        DISTANCE_BACK = -1.0,
+        OVERLAY_LINE_HEIGHT = 0.1,
+        OVERLAY_BACKGROUND_ALPHA = 0.85,
+        DEFAULT_TEXT = "NEUROSCAPE RHYTHM DIAGNOSTIC";
+
+    // Init
+    var name,
+        overlayID,
+        windowPosition,
+        localOffset = {},
+        worldOffset = {};
+
+    // Main
+    localOffset = {x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK};
+    worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
+    windowPosition = Vec3.sum(
+        centerPlacement,
+        worldOffset
+    );
+    name = GAME_TYPE_WINDOW;
+    overlayID = createText3dOverlay(
+        name,
+        windowPosition,
+        avatarOrientation,
+        vec(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_DEPTH),
+        OVERLAY_LINE_HEIGHT,
+        OVERLAY_BACKGROUND_ALPHA,
+        DEFAULT_TEXT
+    );
+    allOverlays[name] = overlayID;
+}
+
 function createText3dOverlay(name, position, rotation, dimensions, lineHeight, backgroundAlpha, defaultText){
     var properties = {
         name: name,
@@ -478,6 +519,7 @@ createOrb();
 createDrumSticks();
 createDrumPads();
 createDataWindow();
+createGameTypeWindow();
 
 // Cleanup
 function scriptEnding() {

@@ -7,7 +7,43 @@
         SAVE_JSON = "saveJSON",
         UPDATE_PLAYER_NAME = "update_player_name",
         RESTART_GAME = "restart_game",
+        STOP_GAME = "stop_game",
         EVENTBRIDGE_SETUP_DELAY = 50;
+
+    Vue.component('instructions', {
+        template:`
+            <div class="card">
+                <div class="card-body">
+                    <p>To interact with the game, grab the drum sticks and hit the drum pad with the spherical drumstick hit.  
+                        You will be presented with 27 levels where you must hit the drum pad to the beat. The different levels are a combination of the following configurations:</p>
+                    <p>
+                        Speed:
+                        <ul>
+                        <li>Slow</li>
+                        <li>Medium</li>
+                        <li>Fast</li>
+                        </ul>
+                    </p>
+                    <p>
+                        Audio-Visual Cues indicating where the beat is: 
+                        <ul>
+                        <li>Audio</li>
+                        <li>Video</li>
+                        <li>AudioVideo</li>
+                        </ul>
+                    </p>
+                    <p>
+                        Game Type:
+                        <ul>
+                        <li>On - Hit the pad on the beat</li>
+                        <li>Off - Hit the pad on syncopated eight note off beat</li>
+                        <li>Continuous - First listen to the beat with a cue, and then play it back without the cue</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        `
+    })
 
     Vue.component('restart-game', {
         methods: {
@@ -19,10 +55,25 @@
         },
         template:`
             <div class="card">
-                <div class="card-header">
-                </div>
                 <div class="card-body">
                     <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="restartGame()">Restart Game</button>
+                </div>
+            </div>
+        `
+    })
+
+    Vue.component('stop-game', {
+        methods: {
+            stopGame(){
+                EventBridge.emitWebEvent(JSON.stringify({
+                    type: STOP_GAME
+                }));
+            }
+        },
+        template:`
+            <div class="card">
+                <div class="card-body">
+                    <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="stopGame()">Stop Game</button>
                 </div>
             </div>
         `
@@ -48,8 +99,6 @@
         },
         template:`
             <div class="card">
-                <div class="card-header">
-                </div>
                 <div class="card-body">
                         Please Enter Your Name
                         <input id="enter-player-name" type="text" class="form-control" v-model="newPlayerName">
@@ -86,9 +135,6 @@
         },
         template:`
             <div class="card">
-                <div class="card-header">
-
-                </div>
                 <div class="card-body" v-html="formatedMessage">
                         {{formatedMessage}}
                 </div>

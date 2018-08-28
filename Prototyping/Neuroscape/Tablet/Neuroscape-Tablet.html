@@ -11,9 +11,11 @@
 
     <body>
         <div class="container" id="app">
-            <enter-player-name v-if="settings.ui.enterPlayerName"></enter-player-name>
-            <show-message v-if="settings.ui.showMessage" v-bind:message="settings.message"></show-message>
-            <restart-game v-if="settings.ui.gameEnding"></restart-game>
+            <enter-player-name v-if="settings.ui.enterPlayerName" class="mt-1"></enter-player-name>
+            <show-message v-if="settings.ui.showMessage" v-bind:message="settings.message" class="mt-1"></show-message>
+            <restart-game v-if="settings.ui.gameEnding" class="mt-1"></restart-game>
+            <stop-game v-if="settings.ui.stopRunningGame" class="mt-1"></stop-game>
+            <instructions class="mt-1"></instructions>
         </div>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
