@@ -322,7 +322,7 @@ function createDrumSticks() {
             rotation,
             vec(SPHERE_WIDTH, SPHERE_WIDTH, SPHERE_WIDTH),
             makeColor(255, 255, 255),
-            GRABBABLE,
+            false,
             overlayID
         );
         allOverlays[name] = overlayID;
