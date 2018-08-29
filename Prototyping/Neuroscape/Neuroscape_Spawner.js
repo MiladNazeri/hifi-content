@@ -27,7 +27,7 @@ var LOG_CONFIG = {},
 LOG_CONFIG[LOG_ENTER] = false;
 LOG_CONFIG[LOG_UPDATE] = false;
 LOG_CONFIG[LOG_ERROR] = false;
-LOG_CONFIG[LOG_VALUE] = false;
+LOG_CONFIG[LOG_VALUE] = true;
 LOG_CONFIG[LOG_ARCHIVE] = false;
 var log = Helper.Debug.log(LOG_CONFIG);
 
@@ -327,6 +327,10 @@ function createDrumSticks() {
         );
         allOverlays[name] = overlayID;
         allOverlays[nameHead] = overlayIDHead;
+
+        var rotation = Quat.angleAxis(90, Quat.getRight(MyAvatar.orientation));
+        log(LOG_VALUE, "rotation", rotation);
+        Overlays.editOverlay(overlayID,{ rotation: rotation });
     });
     /* Scratch
         userData.equipHotspots = [{
@@ -354,7 +358,7 @@ function createSphereOverlay(name, position, rotation, dimensions, color, grabba
         dimensions: dimensions,
         color: color,
         visible: true,
-        grabbable: true,
+        grabbable: grabbable,
         alpha: 1.0,
         parentID: parentID
     };

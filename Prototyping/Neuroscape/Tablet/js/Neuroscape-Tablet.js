@@ -181,7 +181,18 @@
             levels = gameDataBase.levels,
             POST_URL = "https://neuroscape.glitch.me/json/";
 
-            $.post(POST_URL, gameData);
+            $.post(POST_URL, gameData, function(data){
+                console.log("### POST TEST: Data Returned: " + data)
+            })
+                .done(function(){
+                    console.log("### POST TEST: finished on success")
+                })
+                .fail(function(){
+                    console.log("### POST TEST: finished on FAIL")
+                })
+                .always(function(){
+                    console.log("### POST TEST: ALL FINISHED")
+                })
         // if (levels.length < 3) {
         //     $.post(POST_URL, gameData);
         // } else {

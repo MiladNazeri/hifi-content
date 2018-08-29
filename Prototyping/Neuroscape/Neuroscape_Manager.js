@@ -17,10 +17,10 @@ var LOG_CONFIG = {},
     LOG_VALUE = Helper.Debug.LOG_VALUE,
     LOG_ARCHIVE = Helper.Debug.LOG_ARCHIVE;
 
-LOG_CONFIG[LOG_ENTER] = true;
-LOG_CONFIG[LOG_UPDATE] = true;
+LOG_CONFIG[LOG_ENTER] = false;
+LOG_CONFIG[LOG_UPDATE] = false;
 LOG_CONFIG[LOG_ERROR] = false;
-LOG_CONFIG[LOG_VALUE] = true;
+LOG_CONFIG[LOG_VALUE] = false;
 LOG_CONFIG[LOG_ARCHIVE] = false;
 var log = Helper.Debug.log(LOG_CONFIG);
 
@@ -616,16 +616,16 @@ function updateStatus() {
 function createLevelMap() {
     var levelCounter = 1,
         BASENAME = "Level_",
-        gameTypes = [ON, OFF, CONTINUOUS],
+        // gameTypes = [ON, OFF, CONTINUOUS],
         // gameTypes = [ON, OFF],
-        // gameTypes = [ON],
+        gameTypes = [ON],
         // gameTypes = [CONTINUOUS],
         
-        speeds = [SLOW, MEDIUM, FAST],
-        // speeds = [SLOW],
+        // speeds = [SLOW, MEDIUM, FAST],
+        speeds = [SLOW],
 
-        avs = [AUDIOVISUAL, AUDIO, VISUAL];
-        // avs = [AUDIOVISUAL];
+        // avs = [AUDIOVISUAL, AUDIO, VISUAL];
+        avs = [AUDIOVISUAL];
 
     speeds.forEach(function (speed) {
         gameTypes.forEach(function (gameType) {
@@ -1006,10 +1006,9 @@ function onUpdate(delta) {
     // if the current distance away is smaller then the acceptable range, and if you can play it becaues you aren't debounced, go for it
     // Lean towards being before the beat.  Don't allow another play sound check until a decent margin that is 90% of the current 
     // miliseconds per beat is at
-
     if (distanceAway < withInMargin) {
-        // print("distanceAway: ", distanceAway, "\n");
         if (canPlayAV) {
+            print("distanceAway: ", distanceAway, "\n");
             log(LOG_ARCHIVE, "currentAv", currentAV);
             if (currentAV === AUDIO) {
                 playSound(temporaryPosition, soundBell);
