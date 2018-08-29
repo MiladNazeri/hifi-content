@@ -470,6 +470,7 @@ function stopGame() {
     gameData.levels = allLevelsData;
     isGameRunning = false;
     isNameEntered = false;
+    finalLatency = 0;
 
     var sendMessage = DONE_MESSAGE + " " + currentPlayerName + "!";
 
@@ -478,7 +479,7 @@ function stopGame() {
         type: SAVE_JSON,
         value: gameData
     });
-    Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage);
+    Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage, true);
 
     currentPlayerName = null;
     // log(LOG_VALUE, "FINAL GAMEDATA", gameDataMessage);
@@ -563,7 +564,7 @@ function updateDataText(message) {
         value: text
     });
     if (message !== ENTER_NAME) {
-        Messages.sendMessage(MESSAGE_CHANNEL, tabletMessage);
+        Messages.sendMessage(MESSAGE_CHANNEL, tabletMessage, true);
     }
 }
 
@@ -616,16 +617,16 @@ function updateStatus() {
 function createLevelMap() {
     var levelCounter = 1,
         BASENAME = "Level_",
-        // gameTypes = [ON, OFF, CONTINUOUS],
+        gameTypes = [ON, OFF, CONTINUOUS],
         // gameTypes = [ON, OFF],
-        gameTypes = [ON],
+        // gameTypes = [ON],
         // gameTypes = [CONTINUOUS],
         
-        // speeds = [SLOW, MEDIUM, FAST],
-        speeds = [SLOW],
+        speeds = [SLOW, MEDIUM, FAST],
+        // speeds = [SLOW],
 
-        // avs = [AUDIOVISUAL, AUDIO, VISUAL];
-        avs = [AUDIOVISUAL];
+        avs = [AUDIOVISUAL, AUDIO, VISUAL];
+        // avs = [AUDIOVISUAL];
 
     speeds.forEach(function (speed) {
         gameTypes.forEach(function (gameType) {
@@ -1008,7 +1009,7 @@ function onUpdate(delta) {
     // miliseconds per beat is at
     if (distanceAway < withInMargin) {
         if (canPlayAV) {
-            print("distanceAway: ", distanceAway, "\n");
+            log(LOG_VALUE, "distanceAway: ", distanceAway);
             log(LOG_ARCHIVE, "currentAv", currentAV);
             if (currentAV === AUDIO) {
                 playSound(temporaryPosition, soundBell);

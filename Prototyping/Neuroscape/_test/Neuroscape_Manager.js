@@ -17,10 +17,10 @@ var LOG_CONFIG = {},
     LOG_VALUE = Helper.Debug.LOG_VALUE,
     LOG_ARCHIVE = Helper.Debug.LOG_ARCHIVE;
 
-LOG_CONFIG[LOG_ENTER] = true;
-LOG_CONFIG[LOG_UPDATE] = true;
+LOG_CONFIG[LOG_ENTER] = false;
+LOG_CONFIG[LOG_UPDATE] = false;
 LOG_CONFIG[LOG_ERROR] = false;
-LOG_CONFIG[LOG_VALUE] = true;
+LOG_CONFIG[LOG_VALUE] = false;
 LOG_CONFIG[LOG_ARCHIVE] = false;
 var log = Helper.Debug.log(LOG_CONFIG);
 
@@ -107,7 +107,7 @@ var DEBUG = false,
     continuousBeatCounter = 0,
     currentBeat = 0,
     currentMSSpeed = 0,
-    currentDuration = 15000,
+    currentDuration = 10000,
     currentAV = null,
     currentGameType = null,
     currentLevel = 1,
@@ -478,7 +478,7 @@ function stopGame() {
         type: SAVE_JSON,
         value: gameData
     });
-    Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage);
+    Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage, true);
 
     currentPlayerName = null;
     // log(LOG_VALUE, "FINAL GAMEDATA", gameDataMessage);
@@ -563,7 +563,7 @@ function updateDataText(message) {
         value: text
     });
     if (message !== ENTER_NAME) {
-        Messages.sendMessage(MESSAGE_CHANNEL, tabletMessage);
+        Messages.sendMessage(MESSAGE_CHANNEL, tabletMessage, true);
     }
 }
 
@@ -1006,10 +1006,9 @@ function onUpdate(delta) {
     // if the current distance away is smaller then the acceptable range, and if you can play it becaues you aren't debounced, go for it
     // Lean towards being before the beat.  Don't allow another play sound check until a decent margin that is 90% of the current 
     // miliseconds per beat is at
-
     if (distanceAway < withInMargin) {
-        // print("distanceAway: ", distanceAway, "\n");
         if (canPlayAV) {
+            log(LOG_VALUE, "distanceAway: ", distanceAway);
             log(LOG_ARCHIVE, "currentAv", currentAV);
             if (currentAV === AUDIO) {
                 playSound(temporaryPosition, soundBell);

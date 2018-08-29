@@ -35,9 +35,9 @@
                     <p>
                         Game Type:
                         <ul>
-                        <li>On - Hit the pad on the beat</li>
-                        <li>Off - Hit the pad on syncopated eight note off beat</li>
-                        <li>Continuous - First listen to the beat with a cue, and then play it back without the cue</li>
+                        <li>On - Hit the pad on the beat when the ball hits the edge of a wall</li>
+                        <li>Off - Hit the pad on syncopated eight note off beat when the ball is in the middle</li>
+                        <li>Continuous - First listen to the beat with a cue, and then play it back without the cue where you think the ball hit a wall</li>
                         </ul>
                     </p>
                 </div>
@@ -122,7 +122,7 @@
         },
         computed: {
             formatedMessage() {
-                console.log("FORMATTED MESSAGES")
+                // console.log("FORMATTED MESSAGES")
                 var newMessage = JSON.stringify(this.message)
                 .replace(/\\n/g, "<br>")
                 .replace(/\"/g, "")
