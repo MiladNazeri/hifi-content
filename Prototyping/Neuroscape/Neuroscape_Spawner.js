@@ -53,6 +53,7 @@ var baseURL = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Organize/O_Proje
     BOUNDARY_RIGHT_TOP = BASE_NAME + "Boundary_Right_Top",
     BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
     DATA_WINDOW = BASE_NAME + "Data_Window",
+    LATENCY_WINDOW = BASE_NAME + "Latency_Window",
     GAME_TYPE_WINDOW = BASE_NAME + "Game_Type_Window";
 
 // Init
@@ -330,7 +331,7 @@ function createDrumSticks() {
 
         var rotation = Quat.angleAxis(90, Quat.getRight(MyAvatar.orientation));
         log(LOG_VALUE, "rotation", rotation);
-        Overlays.editOverlay(overlayID,{ rotation: rotation });
+        Overlays.editOverlay(overlayID, { rotation: rotation });
     });
     /* Scratch
         userData.equipHotspots = [{
@@ -366,13 +367,13 @@ function createSphereOverlay(name, position, rotation, dimensions, color, grabba
     return id;
 }
 
-function createDrumPads() {
+function createDrumPad() {
     // Const
-    var DISTANCE_RIGHT = 0.20,
+    var DISTANCE_RIGHT = 0.0,
         DISTANCE_FORWARD = -0.85,
-        MODEL_WIDTH = 0.3,
+        MODEL_WIDTH = 0.75,
         MODEL_HEIGHT = 0.2,
-        MODEL_DEPTH = 0.3;
+        MODEL_DEPTH = 0.75;
 
     // Init
     var name,
@@ -382,33 +383,22 @@ function createDrumPads() {
         worldOffset = {};
 
     // Main
-    [LEFT, RIGHT].forEach(function (side) {
-        if (side === RIGHT) {
-            localOffset = vec(DISTANCE_RIGHT, 0, DISTANCE_FORWARD);
-            worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
-            modelPosition = Vec3.sum(
-                avatarPosition,
-                worldOffset
-            );
-        } else {
-            localOffset = vec(-DISTANCE_RIGHT, 0, DISTANCE_FORWARD);
-            worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
-            modelPosition = Vec3.sum(
-                avatarPosition,
-                worldOffset
-            );
-        }
+    localOffset = vec(DISTANCE_RIGHT, 0, DISTANCE_FORWARD);
+    worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
+    modelPosition = Vec3.sum(
+        avatarPosition,
+        worldOffset
+    );
 
-        name = BASE_NAME + "Drum_Pad_" + side;
-        overlayID = createDrumPadOverlay(
-            name,
-            modelPosition,
-            vec(MODEL_WIDTH, MODEL_HEIGHT, MODEL_DEPTH),
-            avatarOrientation,
-            drumPadModelURL
-        );
-        allOverlays[name] = overlayID;
-    });
+    name = BASE_NAME + "Drum_Pad";
+    overlayID = createDrumPadOverlay(
+        name,
+        modelPosition,
+        vec(MODEL_WIDTH, MODEL_HEIGHT, MODEL_DEPTH),
+        avatarOrientation,
+        drumPadModelURL
+    );
+    allOverlays[name] = overlayID;
 }
 
 function createDrumPadOverlay(name, position, dimensions, rotation, url) {
@@ -423,7 +413,7 @@ function createDrumPadOverlay(name, position, dimensions, rotation, url) {
     return id;
 }
 
-function createDataWindow(){
+function createDataWindow() {
     // Consts
     var WINDOW_WIDTH = 1.5,
         WINDOW_HEIGHT = 1,
@@ -443,7 +433,7 @@ function createDataWindow(){
         worldOffset = {};
 
     // Main
-    localOffset = {x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK};
+    localOffset = { x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK };
     worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
     windowPosition = Vec3.sum(
         centerPlacement,
@@ -462,7 +452,46 @@ function createDataWindow(){
     allOverlays[name] = overlayID;
 }
 
-function createGameTypeWindow(){
+function createLatencyWindow() {
+    // Consts
+    var WINDOW_WIDTH = 0.75,
+        WINDOW_HEIGHT = 0.35,
+        WINDOW_DEPTH = 0.15,
+        DISTANCE_LEFT = 0,
+        DISTANCE_HEIGHT = -0.75,
+        DISTANCE_BACK = -1.0,
+        OVERLAY_LINE_HEIGHT = 0.075,
+        OVERLAY_BACKGROUND_ALPHA = 0.85,
+        DEFAULT_TEXT = "Last Latency";
+
+    // Init
+    var name,
+        overlayID,
+        windowPosition,
+        localOffset = {},
+        worldOffset = {};
+
+    // Main
+    localOffset = { x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK };
+    worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
+    windowPosition = Vec3.sum(
+        centerPlacement,
+        worldOffset
+    );
+    name = LATENCY_WINDOW;
+    overlayID = createText3dOverlay(
+        name,
+        windowPosition,
+        avatarOrientation,
+        vec(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_DEPTH),
+        OVERLAY_LINE_HEIGHT,
+        OVERLAY_BACKGROUND_ALPHA,
+        DEFAULT_TEXT
+    );
+    allOverlays[name] = overlayID;
+}
+
+function createGameTypeWindow() {
     // Consts
     var WINDOW_WIDTH = 2.0,
         WINDOW_HEIGHT = 0.3,
@@ -482,7 +511,7 @@ function createGameTypeWindow(){
         worldOffset = {};
 
     // Main
-    localOffset = {x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK};
+    localOffset = { x: DISTANCE_LEFT, y: DISTANCE_HEIGHT, z: DISTANCE_BACK };
     worldOffset = Vec3.multiplyQbyV(avatarOrientation, localOffset);
     windowPosition = Vec3.sum(
         centerPlacement,
@@ -501,7 +530,7 @@ function createGameTypeWindow(){
     allOverlays[name] = overlayID;
 }
 
-function createText3dOverlay(name, position, rotation, dimensions, lineHeight, backgroundAlpha, defaultText){
+function createText3dOverlay(name, position, rotation, dimensions, lineHeight, backgroundAlpha, defaultText) {
     var properties = {
         name: name,
         position: position,
@@ -521,9 +550,10 @@ createBoundaryBoxes();
 createBoundaryDecoratorBoxes();
 createOrb();
 createDrumSticks();
-createDrumPads();
+createDrumPad();
 createDataWindow();
 createGameTypeWindow();
+createLatencyWindow();
 
 // Cleanup
 function scriptEnding() {

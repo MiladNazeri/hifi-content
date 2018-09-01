@@ -30,8 +30,7 @@ var BASE_NAME = "Neuroscape_",
     ORB = BASE_NAME + "Orb",
     STICK_LEFT = BASE_NAME + "Drum_Stick_Left",
     STICK_RIGHT = BASE_NAME + "Drum_Stick_Right",
-    PAD_LEFT = BASE_NAME + "Drum_Pad_Left",
-    PAD_RIGHT = BASE_NAME + "Drum_Pad_Right",
+    PAD = BASE_NAME + "Drum_Pad",
     BOUNDARY_LEFT = BASE_NAME + "Boundary_Left",
     BOUNDARY_LEFT_TOP = BASE_NAME + "Boundary_Left_Top",
     BOUNDARY_LEFT_BOTTOM = BASE_NAME + "Boundary_Left_Bottom",
@@ -40,6 +39,7 @@ var BASE_NAME = "Neuroscape_",
     BOUNDARY_RIGHT_BOTTOM = BASE_NAME + "Boundary_Right_Bottom",
     DATA_WINDOW = BASE_NAME + "Data_Window",
     GAME_TYPE_WINDOW = BASE_NAME + "Game_Type_Window",
+    LATENCY_WINDOW = BASE_NAME + "Latency_Window",
     MOUSE_PRESS = "Mouse_Press",
     DIRECTION_ONE = "directionOne",
     DIRECTION_TWO = "directionTwo",
@@ -49,8 +49,9 @@ var BASE_NAME = "Neuroscape_",
     DONE_MESSAGE = "Thanks for playing",
     GET_READY_MESSAGE = "GET READY IN: ",
     PLAY_MESSAGE = "Play the beat back\n",
-    LISTEN_MESSAGE = "Listen to the beat\n",
+    LISTEN_MESSAGE = "Observe the beat\n",
     GAME_TYPE_MESSAGE = "Current Game Type: \n",
+    LATENCY_MESSAGE = "Last Latency: \n",
     ORB_ID = "orb",
     PLAYER_ID = "player",
     ON = "on",
@@ -100,8 +101,7 @@ var DEBUG = false,
     isListenMode = false,
     isNameEntered = false,
     canPlayAV = true,
-    canHitLeftDrum = true,
-    canHitRightDrum = true,
+    canHitDrum = true,
     nextLevel = null,
     currentPlayerName = null,
     continuousBeatCounter = 0,
@@ -153,10 +153,8 @@ var allOverlays = {},
     orbProperties = {},
     boundryLeftProperties = {},
     boundryRightProperties = {},
-    drumPadLeftProperties = {},
-    drumPadRightProperties = {},
-    drumPadLeftPointOnPlane = {},
-    drumPadRightPointOnPlane = {},
+    drumPadProperties = {},
+    drumPadPointOnPlane = {},
     previousStickLeftPoint = {},
     currentStickLeftPoint = {},
     previousStickRightPoint = {},
@@ -183,7 +181,7 @@ var allOverlays = {},
 function CollisionRecord(duringBeat, collisionTime) {
     this.duringBeat = duringBeat;
     this.collisionTime = collisionTime;
-}   
+}
 
 function Level(level, speed, gameType, av) {
     this.level = level;
@@ -267,7 +265,7 @@ function findSphereHit(point, sphereRadius) {
 }
 
 function findSpherePointHit(sphereCenter, sphereRadius, point) {
-    return findSphereHit(VEC3.subtract(point,sphereCenter), sphereRadius);
+    return findSphereHit(VEC3.subtract(point, sphereCenter), sphereRadius);
 }
 
 function findLinePlaneIntersectionCoords(L0, L1, P0, N) {
@@ -301,7 +299,7 @@ function findLinePlaneIntersectionCoords(L0, L1, P0, N) {
     return NULL; // or some other invalid value that can signal failure
 }
 
-function getDrumStickPoint(){
+function getDrumStickPoint() {
     var propertiesLeft = Overlays.getProperties(allOverlays[STICK_LEFT], ["position", "dimensions", "rotation"]),
         propertiesRight = Overlays.getProperties(allOverlays[STICK_RIGHT], ["position", "dimensions", "rotation"]),
         offset = vec(0, -propertiesLeft.dimensions.y / 2, 0), // same for both
@@ -309,7 +307,7 @@ function getDrumStickPoint(){
         worldSpaceRight = VEC3.multiplyQbyV(propertiesRight.rotation, offset),
         worldSpacePointLeft = VEC3.sum(worldSpaceLeft, propertiesLeft.position),
         worldSpacePointRight = VEC3.sum(worldSpaceRight, propertiesRight.position);
-        
+
     previousStickLeftPoint = currentStickLeftPoint;
     previousStickRightPoint = currentStickRightPoint;
     currentStickLeftPoint = worldSpacePointLeft;
@@ -449,6 +447,7 @@ function startGame() {
 }
 
 function startLevel() {
+    updateLatencyText(0);
     log(LOG_ENTER, "START LEVEL");
     self.storeTempTypes();
 
@@ -487,7 +486,6 @@ function stopGame() {
 
 function stopLevel() {
     log(LOG_ENTER, "STOP LEVEL");
-
     updateOrbPosition(orbProperties.position);
     levelData = {
         level: currentLevel,
@@ -570,12 +568,22 @@ function updateDataText(message) {
 
 function updateGameTypeText(gameType) {
     var text = GAME_TYPE_MESSAGE + gameType;
-    
+
     var properties = {
         text: text
     };
 
     Overlays.editOverlay(allOverlays[GAME_TYPE_WINDOW], properties);
+}
+
+function updateLatencyText(latency) {
+    var text = LATENCY_MESSAGE + latency;
+
+    var properties = {
+        text: text
+    };
+
+    Overlays.editOverlay(allOverlays[LATENCY_WINDOW], properties);
 }
 
 function updateOrbPosition(position) {
@@ -621,12 +629,12 @@ function createLevelMap() {
         // gameTypes = [ON, OFF],
         // gameTypes = [ON],
         // gameTypes = [CONTINUOUS],
-        
+
         speeds = [SLOW, MEDIUM, FAST],
         // speeds = [SLOW],
 
         avs = [AUDIOVISUAL, AUDIO, VISUAL];
-        // avs = [AUDIOVISUAL];
+    // avs = [AUDIOVISUAL];
 
     speeds.forEach(function (speed) {
         gameTypes.forEach(function (gameType) {
@@ -684,6 +692,7 @@ function incrementBeat() {
     var sendMessage = "";
 
     if (currentBeat >= 0) {
+        updateDataText("Go!");
         // handles the post countdown period
         if (currentGameType === OFF) {
             targetTime = totalDelta + currentMSSpeed / 2;
@@ -691,8 +700,9 @@ function incrementBeat() {
             targetTime = totalDelta + currentMSSpeed;
         }
         if (currentGameType === ON || currentGameType === OFF) {
-            self.updateStatus();
-            updateDataText(JSON.stringify(status));
+            // self.updateStatus();
+            // updateDataText(JSON.stringify(status));
+            updateLatencyText(finalLatency);
         } else {
             if (continuousBeatCounter <= 4) {
                 continuousBeatCounter++;
@@ -743,19 +753,16 @@ function init() {
     orbProperties = Overlays.getProperties(allOverlays[ORB], ["dimensions", "position"]);
     boundryLeftProperties = Overlays.getProperties(allOverlays[BOUNDARY_LEFT], ["color", "position", "dimensions"]);
     boundryRightProperties = Overlays.getProperties(allOverlays[BOUNDARY_RIGHT], ["color", "position", "dimensions"]);
-    drumPadLeftProperties = Overlays.getProperties(allOverlays[PAD_LEFT], ["position", "dimensions"]);
-    drumPadRightProperties = Overlays.getProperties(allOverlays[PAD_RIGHT], ["position", "dimensions"]);
-
-    drumPadLeftPointOnPlane = Object.assign(
-        {}, drumPadLeftProperties.position, {y: drumPadLeftProperties.position.y + drumPadLeftProperties.dimensions.y / 2}); 
-    drumPadRightPointOnPlane = Object.assign(
-        {}, drumPadRightProperties.position, {y: drumPadRightProperties.position.y + drumPadRightProperties.dimensions.y / 2}); 
-    drumPadRadius = drumPadRightProperties.dimensions.x / 2;
+    drumPadProperties = Overlays.getProperties(allOverlays[PAD], ["position", "dimensions"]);
+    log(LOG_VALUE, "Drum pad", drumPadProperties);
+    drumPadPointOnPlane = Object.assign(
+        {}, drumPadProperties.position, { y: drumPadProperties.position.y + drumPadProperties.dimensions.y / 2 });
+    drumPadRadius = drumPadProperties.dimensions.x / 2;
     var distance = VEC3.distance(boundryRightProperties.position, boundryLeftProperties.position);
     log(LOG_ARCHIVE, "boundryRightProperties", boundryRightProperties);
 
     UNIT_SCALAR = (distance) / 2 - boundryRightProperties.dimensions.x * 2;
-    
+
     log(LOG_ARCHIVE, "UNIT_SCALAR", UNIT_SCALAR);
     sphereRadius = orbProperties.dimensions.x;
     totalMargin = UNIT_SCALAR * sphereRadius;
@@ -772,8 +779,8 @@ function init() {
     Overlays.mousePressOnOverlay.connect(onOverlayMousePress);
 }
 
-function onOverlayMousePress(id, event){
-    if (id === allOverlays[PAD_LEFT] || id === allOverlays[PAD_RIGHT]){
+function onOverlayMousePress(id, event) {
+    if (id === allOverlays[PAD]) {
         var orbPosition,
             newCollision;
 
@@ -829,84 +836,82 @@ function recordCollision(collisionObject) {
     self.updateStatus();
     // if (currentGameType !== CONTINUOUS && isListenMode !== true) {
     if (currentGameType !== CONTINUOUS) {
-        updateDataText(JSON.stringify(status));
+        updateLatencyText(finalLatency);
     }
 }
 
 function runHandCheck() {
-    [LEFT, RIGHT].forEach(function(side){
-        var planeIntersection,
-            correctCollisionTime,
-            newCollision,
-            orbPosition;
+    var planeIntersectionLeft,
+        planeIntersectionRight,
+        correctCollisionTime,
+        newCollision,
+        orbPosition;
 
-        if (side === RIGHT) {
-            planeIntersection = findLinePlaneIntersectionCoords(
-                previousStickRightPoint, currentStickRightPoint, drumPadRightPointOnPlane, vec(0,1,0));
-            if (planeIntersection !== NULL && planeIntersection <= 1 && planeIntersection >= 0 && canHitRightDrum) {
-                log(LOG_ARCHIVE, "R planeIntersection", planeIntersection);
-                log(LOG_ARCHIVE, "currentStickRightPoint", currentStickRightPoint);
-                log(LOG_ARCHIVE, "drumPadRightPointOnPlane", drumPadRightPointOnPlane);
-                if (currentStickRightPoint.y > drumPadRightPointOnPlane.y) {
-                    return;
-                }
+    planeIntersectionLeft = findLinePlaneIntersectionCoords(
+        previousStickLeftPoint, currentStickLeftPoint, drumPadPointOnPlane, vec(0, 1, 0));
+    planeIntersectionRight = findLinePlaneIntersectionCoords(
+        previousStickRightPoint, currentStickRightPoint, drumPadPointOnPlane, vec(0, 1, 0));
 
-                if (findSpherePointHit(drumPadRightPointOnPlane, drumPadRadius, currentStickRightPoint)){
-                    log(LOG_ARCHIVE, "previousTotalDelta", previousTotalDelta);
-                    log(LOG_ARCHIVE, "totalDelta", totalDelta);
-                    log(LOG_ARCHIVE, "planeIntersection", planeIntersection);
-                    correctCollisionTime = lerp(0, 1, previousTotalDelta, totalDelta, planeIntersection);
-                    newCollision = {
-                        time: correctCollisionTime,
-                        id: STICK_RIGHT
-                    };
-                    log(LOG_ARCHIVE, "newCollision", newCollision);
-                    orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
-                    self.handleCollision(newCollision, orbPosition);
-                    playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, RIGHT_HAND);
-                    playSound(drumPadRightPointOnPlane, soundStick);
-
-                    canHitRightDrum = false;
-                    Script.setTimeout(function(){
-                        canHitRightDrum = true;
-                    }, DRUM_HIT_TIMEOUT);
-                }
-            }
-        } else {
-            planeIntersection = findLinePlaneIntersectionCoords(
-                previousStickLeftPoint, currentStickLeftPoint, drumPadLeftPointOnPlane, vec(0,1,0));
-            if (planeIntersection !== NULL && planeIntersection <= 1 && planeIntersection >= 0 && canHitLeftDrum) {
-                if (currentStickLeftPoint.y > drumPadLeftPointOnPlane.y) {
-                    return;
-                }
-                log(LOG_ARCHIVE, "L planeIntersection", planeIntersection);
-                log(LOG_ARCHIVE, "currentStickLeftPoint", currentStickLeftPoint);
-                log(LOG_ARCHIVE, "drumPadLeftPointOnPlane", drumPadLeftPointOnPlane);
-
-                if (findSpherePointHit(drumPadLeftPointOnPlane, drumPadRadius, currentStickLeftPoint)){
-                    log(LOG_ARCHIVE, "previousTotalDelta", previousTotalDelta);
-                    log(LOG_ARCHIVE, "totalDelta", totalDelta);
-                    log(LOG_ARCHIVE, "planeIntersection", planeIntersection);
-                    correctCollisionTime = lerp(0, 1, previousTotalDelta, totalDelta, planeIntersection);
-                    newCollision = {
-                        time: correctCollisionTime,
-                        id: STICK_LEFT
-                    };
-                    log(LOG_ARCHIVE, "newCollision", newCollision);
-                    orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
-                    self.handleCollision(newCollision, orbPosition);
-                    playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, LEFT_HAND);
-                    playSound(drumPadLeftPointOnPlane, soundStick);
-
-                    canHitLeftDrum = false;
-                    Script.setTimeout(function(){
-                        canHitLeftDrum = true;
-                    }, DRUM_HIT_TIMEOUT);
-                }
-            }
+    // TODO - Generalize this more
+    if (planeIntersectionRight !== NULL && planeIntersectionRight <= 1 && planeIntersectionRight >= 0 && canHitDrum) {
+        log(LOG_ARCHIVE, "R planeIntersection", planeIntersectionRight);
+        log(LOG_ARCHIVE, "currentStickRightPoint", currentStickRightPoint);
+        log(LOG_ARCHIVE, "drumPadRightPointOnPlane", drumPadPointOnPlane);
+        if (currentStickRightPoint.y > drumPadPointOnPlane.y) {
+            return;
         }
-        
-    });
+
+        if (findSpherePointHit(drumPadPointOnPlane, drumPadRadius, currentStickRightPoint)) {
+            log(LOG_ARCHIVE, "previousTotalDelta", previousTotalDelta);
+            log(LOG_ARCHIVE, "totalDelta", totalDelta);
+            log(LOG_ARCHIVE, "planeIntersection", planeIntersectionRight);
+            correctCollisionTime = lerp(0, 1, previousTotalDelta, totalDelta, planeIntersectionRight);
+            newCollision = {
+                time: correctCollisionTime,
+                id: STICK_RIGHT
+            };
+            log(LOG_ARCHIVE, "newCollision", newCollision);
+            orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
+            self.handleCollision(newCollision, orbPosition);
+            playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, RIGHT_HAND);
+            playSound(drumPadPointOnPlane, soundStick);
+
+            canHitDrum = false;
+            Script.setTimeout(function () {
+                canHitDrum = true;
+            }, DRUM_HIT_TIMEOUT);
+        }
+    }
+
+    if (planeIntersectionLeft !== NULL && planeIntersectionLeft <= 1 && planeIntersectionLeft >= 0 && canHitDrum) {
+        log(LOG_ARCHIVE, "R planeIntersection", planeIntersectionLeft);
+        log(LOG_ARCHIVE, "currentStickRightPoint", currentStickLeftPoint);
+        log(LOG_ARCHIVE, "drumPadRightPointOnPlane", drumPadPointOnPlane);
+        if (currentStickLeftPoint.y > drumPadPointOnPlane.y) {
+            return;
+        }
+
+        if (findSpherePointHit(drumPadPointOnPlane, drumPadRadius, currentStickLeftPoint)) {
+            log(LOG_ARCHIVE, "previousTotalDelta", previousTotalDelta);
+            log(LOG_ARCHIVE, "totalDelta", totalDelta);
+            log(LOG_ARCHIVE, "planeIntersectionLeft", planeIntersectionLeft);
+            correctCollisionTime = lerp(0, 1, previousTotalDelta, totalDelta, planeIntersectionLeft);
+            newCollision = {
+                time: correctCollisionTime,
+                id: STICK_LEFT
+            };
+            log(LOG_ARCHIVE, "newCollision", newCollision);
+            orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
+            self.handleCollision(newCollision, orbPosition);
+            playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, RIGHT_HAND);
+            playSound(drumPadPointOnPlane, soundStick);
+
+            canHitDrum = false;
+            Script.setTimeout(function () {
+                canHitDrum = true;
+            }, DRUM_HIT_TIMEOUT);
+        }
+    }
 }
 
 function test() {
@@ -921,7 +926,7 @@ function onUpdate(delta) {
     // var overlayText = Overlays.getProperty(allOverlays[DATA_WINDOW],"text");
     // overlayText += "\nTotalDelta: " + totalDelta;
     // updateDataText(overlayText);
-    
+
     var deltaInMs = delta * 1000;
 
     getDrumStickPoint();
@@ -933,8 +938,8 @@ function onUpdate(delta) {
 
     runHandCheck();
 
-    if (!isGameRunning || isGamePaused) { 
-        return; 
+    if (!isGameRunning || isGamePaused) {
+        return;
     }
     // Entities.editEntity(testBox, {position: currentStickRightPoint});
     // Take the total delta count and divide it by the total time between beats, get that value rounded down
@@ -1057,7 +1062,7 @@ function NeuroscapeManager(overlayList, context) {
     };
 }
 
-Script.scriptEnding.connect(function(){
+Script.scriptEnding.connect(function () {
     stopUpdate();
     Overlays.mousePressOnOverlay.disconnect(onOverlayMousePress);
 });
