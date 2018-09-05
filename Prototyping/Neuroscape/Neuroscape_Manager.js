@@ -45,7 +45,7 @@ var BASE_NAME = "Neuroscape_",
     DIRECTION_TWO = "directionTwo",
     STARTING_MESSAGE = "Hit the drum pad to start",
     ENTER_NAME = "Please enter name\nin the Neuroscape tablet app",
-    CONTINUE_MESSAGE = "Hit the drum pad \nto continue\n",
+    CONTINUE_MESSAGE = "Hit the drum pad to continue\n",
     DONE_MESSAGE = "Thanks for playing",
     GET_READY_MESSAGE = "GET READY IN: ",
     PLAY_MESSAGE = "Play the beat back\n",
@@ -107,12 +107,13 @@ var DEBUG = false,
     continuousBeatCounter = 0,
     currentBeat = 0,
     currentMSSpeed = 0,
-    currentDuration = 15000,
+    currentDuration = 30000,
     currentAV = null,
     currentGameType = null,
     currentLevel = 1,
     currentLatency = 0,
     currentLevelStartTime = 0,
+    currentRoundLatency = [],
     tempAV = null,
     tempGameType = null,
     prevLatency = 0,
@@ -199,11 +200,13 @@ function calculateLatency(collisionTime) {
         currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * currentMSSpeed));
         prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * currentMSSpeed));
         finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
+        currentRoundLatency.push(+finalLatency);
     } else {
         log(LOG_ENTER, "IN OFF");
         currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * (currentMSSpeed) + currentMSSpeed / 2));
         prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * (currentMSSpeed) + currentMSSpeed / 2));
         finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
+        currentRoundLatency.push(+finalLatency);
     }
 
     log(LOG_VALUE, "collisionTime", collisionTime);
@@ -419,6 +422,8 @@ function reset() {
     prevLatency = 0;
     continuousBeatCounter = 0;
     changeOrbVisibility(VISIBILE);
+    currentRoundLatency = [];
+
 }
 
 function restartGame() {
@@ -487,6 +492,14 @@ function stopGame() {
 function stopLevel() {
     log(LOG_ENTER, "STOP LEVEL");
     updateOrbPosition(orbProperties.position);
+
+    var sum = 0;
+    var sumLatency = currentRoundLatency.reduce(function(prev, curr){
+        prev += curr;
+        return prev;
+    }, sum);
+    var averageLatency = (sumLatency / currentRoundLatency.length).toFixed(2);
+
     levelData = {
         level: currentLevel,
         speed: currentMSSpeed,
@@ -494,7 +507,8 @@ function stopLevel() {
         av: currentAV,
         startTime: currentLevelStartTime,
         stopTime: new Date(),
-        collisionData: collisionCollection
+        collisionData: collisionCollection,
+        averageLatency: averageLatency
     };
     log(LOG_ARCHIVE, "levelData", levelData);
     allLevelsData.push(levelData);
@@ -512,15 +526,16 @@ function stopLevel() {
         }, ALLOW_HIT_TO_UNPAUSE_TIME);
 
         self.prepNextLevel();
+
+        var sendMessage = "Average Latency for the round " + averageLatency + "\n";
+        sendMessage += CONTINUE_MESSAGE;
+        sendMessage += "\nNext Level:  \t" + currentLevel;
+        sendMessage += "\nNext Speed:  \t" + currentMSSpeed + "ms";
+        sendMessage += "\nNext Game Type:  \t" + currentGameType;
+        sendMessage += "\nNext AV type:  \t" + currentAV + "\n";
+        updateDataText(sendMessage);
         self.reset();
 
-        var sendMessage = "";
-        sendMessage += CONTINUE_MESSAGE;
-        sendMessage += "\nNext Level: \n\t" + currentLevel;
-        sendMessage += "\nNext Speed: \n\t" + currentMSSpeed + "ms";
-        sendMessage += "\nNext Game Type: \n\t" + currentGameType;
-        sendMessage += "\nNext AV type: \n\t" + currentAV + "\n";
-        updateDataText(sendMessage);
     }
 }
 
@@ -600,10 +615,10 @@ function updatePlayerName(playerName) {
     isNameEntered = true;
     var sendMessage = "Hi " + currentPlayerName + "!\n\n";
     sendMessage += STARTING_MESSAGE;
-    sendMessage += "\nNext Level: \n\t" + currentLevel;
-    sendMessage += "\nNext Speed: \n\t" + currentMSSpeed + "ms";
-    sendMessage += "\nNext Game Type: \n\t" + currentGameType;
-    sendMessage += "\nNext AV type: \n\t" + currentAV + "\n";
+    sendMessage += "\nNext Level:  \t" + currentLevel;
+    sendMessage += "\nNext Speed:  \t" + currentMSSpeed + "ms";
+    sendMessage += "\nNext Game Type:  \t" + currentGameType;
+    sendMessage += "\nNext AV type:  \t" + currentAV + "\n";
     updateDataText(sendMessage);
     updateGameTypeText(currentGameType);
 }
@@ -677,7 +692,7 @@ function handleCollision(collisionObject, orbPosition) {
     log(LOG_ARCHIVE, "ABOUT TO CHECK CURRENT BEAT", currentBeat);
     log(LOG_ARCHIVE, "isListenMode", isListenMode);
 
-    if (currentBeat <= 0 || (currentGameType === CONTINUOUS && isListenMode)) {
+    if (currentBeat < 0 || (currentGameType === CONTINUOUS && isListenMode)) {
         log(LOG_ARCHIVE, "CURRENT BEAT BELOW 0", currentBeat);
         return;
     } else {
@@ -694,43 +709,36 @@ function incrementBeat() {
     if (currentBeat >= 0) {
         updateDataText("Go!");
         // handles the post countdown period
-        if (currentGameType === OFF) {
-            targetTime = totalDelta + currentMSSpeed / 2;
-        } else {
-            targetTime = totalDelta + currentMSSpeed;
-        }
         if (currentGameType === ON || currentGameType === OFF) {
             // self.updateStatus();
             // updateDataText(JSON.stringify(status));
             updateLatencyText(finalLatency);
         } else {
-            if (continuousBeatCounter <= 4) {
-                continuousBeatCounter++;
-                if (isListenMode) {
-                    log(LOG_ARCHIVE, "isListen Mode before CurrentAv", currentAV);
-                    currentAV = tempAV;
-                    log(LOG_ARCHIVE, "isListen Mode after CurrentAv", currentAV);
+            continuousBeatCounter++;
+            if (isListenMode) {
+                log(LOG_ARCHIVE, "isListen Mode before CurrentAv", currentAV);
+                currentAV = tempAV;
+                log(LOG_ARCHIVE, "isListen Mode after CurrentAv", currentAV);
 
-                    changeOrbVisibility(VISIBILE);
-                    sendMessage = "";
-                    sendMessage += LISTEN_MESSAGE;
-                    updateDataText(sendMessage);
-                } else {
-                    log(LOG_ARCHIVE, "is notListen mode Mode before CurrentAv", currentAV);
-                    currentAV = null;
-                    log(LOG_ARCHIVE, "is notListen mode Mode after CurrentAv", currentAV);
+                changeOrbVisibility(VISIBILE);
+                sendMessage = "";
+                sendMessage += LISTEN_MESSAGE;
+                updateDataText(sendMessage);
+            } else {
+                log(LOG_ARCHIVE, "is notListen mode Mode before CurrentAv", currentAV);
+                currentAV = null;
+                log(LOG_ARCHIVE, "is notListen mode Mode after CurrentAv", currentAV);
 
-                    changeOrbVisibility(!VISIBILE);
-                    sendMessage = "";
-                    sendMessage += PLAY_MESSAGE;
-                    sendMessage += "\nLast latency: \n\t" + finalLatency + "\n";
-                    updateDataText(sendMessage);
-                }
+                changeOrbVisibility(!VISIBILE);
+                sendMessage = "";
+                sendMessage += PLAY_MESSAGE;
+                updateDataText(sendMessage);
+                updateLatencyText(finalLatency);
+            }
 
-                if (continuousBeatCounter === 4) {
-                    isListenMode = !isListenMode;
-                    continuousBeatCounter = 0;
-                }
+            if (continuousBeatCounter === 4) {
+                isListenMode = !isListenMode;
+                continuousBeatCounter = 0;
             }
         }
     } else {
