@@ -483,6 +483,7 @@ function stopGame() {
         type: SAVE_JSON,
         value: gameData
     });
+    console.log("### FINAL GAME DATA:\n", JSON.stringify(gameData));
     Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage, true);
 
     currentPlayerName = null;
@@ -649,7 +650,7 @@ function createLevelMap() {
         // speeds = [SLOW],
 
         avs = [AUDIOVISUAL, AUDIO, VISUAL];
-    // avs = [AUDIOVISUAL];
+        // avs = [AUDIOVISUAL];
 
     speeds.forEach(function (speed) {
         gameTypes.forEach(function (gameType) {
