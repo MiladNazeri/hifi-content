@@ -141,7 +141,8 @@ var DEBUG = false,
     // We use PI as our reference as it represents going from +1 to -1.  0 is the midway point between the walls.  
     // since our unit is in miliseconds, we divide pi by the number of miliseconds every time we change the speed
     msInPI = null,
-    self;
+    self,
+    url = "https://script.google.com/macros/s/AKfycbxlKDGTsWH86uIe1YNaHXTzLEyYS92GE6ZU8KOMf9XLsErfrgIQ/exec";
 
 // Collections
 // ////////////////////////////////////////////////////////////////////////////
@@ -252,6 +253,41 @@ function editColor(stick) {
 
     Overlays.editOverlay(allOverlays[stick], properties);
     getToWhite(stick, properties);
+}
+
+function encodeURLParams(params) {
+    var paramPairs = [];
+    for (var key in params) {
+        paramPairs.push(key + "=" + params[key]);
+    }
+    return paramPairs.join("&");
+}
+
+function makeCall(paramObject, timeOutTries){
+    var request = new XMLHttpRequest();
+    var SUCCESS = "Success";
+    var paramString = encodeURLParams(paramObject);
+    request.open('GET', url + "?" + paramString);
+    request.timeout = 10000;
+    request.ontimeout = function () {
+        console.log("### TIMEOUT");
+
+        if (timeOutTries >= 0) {
+            makeCall(paramObject, timeOutTries - 1);
+        }
+    };
+    request.onreadystatechange = function () { // called after load when readyState = 4
+
+        print("STATE CHANGED");
+        if (request.readyState === 4) {
+            if (request.response !== SUCCESS && timeOutTries >= 0) {
+                makeCall(paramObject, timeOutTries - 1);
+            } 
+        }
+
+    };
+    request.send();
+
 }
 
 function findSphereHit(point, sphereRadius) {
@@ -440,6 +476,16 @@ function startGame() {
     gameData.date = new Date();
     gameData.start = new Date();
 
+    var paramObject = {
+        name: currentPlayerName,
+        date: gameData.date,
+        start: gameData.start,
+        userName: AccountServices.username,
+        displayName: MyAvatar.displayName
+    };
+
+    makeCall(paramObject, 3);
+
     self.createLevelMap();
 
     isGameRunning = true;
@@ -476,6 +522,13 @@ function stopGame() {
     isNameEntered = false;
     finalLatency = 0;
 
+    var paramObject = {
+        name: currentPlayerName,
+        date: gameData.date,
+        stop: gameData.stop
+    };
+    makeCall(paramObject, 3);
+
     var sendMessage = DONE_MESSAGE + " " + currentPlayerName + "!";
 
     updateDataText(sendMessage);
@@ -511,6 +564,21 @@ function stopLevel() {
         collisionData: collisionCollection,
         averageLatency: averageLatency
     };
+    
+    var paramObject = {
+        name: currentPlayerName,
+        date: gameData.date,
+        level: levelData.level,
+        speed: levelData.speed,
+        gameType: levelData.gameType,
+        av: levelData.av,
+        startTime: levelData.startTime,
+        stopTime: levelData.stopTime,
+        averageLatency: levelData.averageLatency,
+        collisionData: JSON.stringify(collisionCollection)
+    };
+
+    makeCall(paramObject, 3);
     log(LOG_ARCHIVE, "levelData", levelData);
     allLevelsData.push(levelData);
     collisionCollection = [];
@@ -648,7 +716,6 @@ function createLevelMap() {
 
         speeds = [SLOW, MEDIUM, FAST],
         // speeds = [SLOW],
-
         avs = [AUDIOVISUAL, AUDIO, VISUAL];
         // avs = [AUDIOVISUAL];
 
