@@ -102,7 +102,7 @@ var DEBUG = false,
     isNameEntered = false,
     canPlayAV = true,
     canHitDrum = true,
-    nextLevel = null,
+    nextLevel = null, 
     currentPlayerName = null,
     continuousBeatCounter = 0,
     currentBeat = 0,
@@ -707,10 +707,11 @@ function updateStatus() {
 // ////////////////////////////////////////////////////////////////////////////
 
 function createLevelMap() {
+    print("entering create level map");
     var levelCounter = 1,
         BASENAME = "Level_",
-        gameTypes = [ON, OFF, CONTINUOUS],
-        // gameTypes = [ON, OFF],
+        // gameTypes = [ON, OFF, CONTINUOUS],
+        gameTypes = [OFF],
         // gameTypes = [ON],
         // gameTypes = [CONTINUOUS],
 
@@ -729,6 +730,7 @@ function createLevelMap() {
         });
     });
     levels = Object.keys(levelMap);
+    console.log(JSON.stringify(levelMap));
 }
 
 function handleCollision(collisionObject, orbPosition) {
@@ -850,6 +852,7 @@ function init() {
     currentGameType = ON;
     currentLevel = 1;
     msInPI = PI / currentMSSpeed;
+    console.log("About to run createLevelMap");
     this.createLevelMap();
     startUpdate();
     Overlays.mousePressOnOverlay.connect(onOverlayMousePress);

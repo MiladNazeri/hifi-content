@@ -4,7 +4,6 @@ Script.require("../../../Utilities/Polyfills.js")();
 
 var Helper = Script.require("../../../Utilities/Helper.js?" + Date.now()),
     clamp = Helper.Maths.clamp,
-    getProps = Helper.Entity.getProps,
     lerp = Helper.Maths.lerp,
     vec = Helper.Maths.vec;
 
@@ -23,6 +22,10 @@ LOG_CONFIG[LOG_ERROR] = false;
 LOG_CONFIG[LOG_VALUE] = true;
 LOG_CONFIG[LOG_ARCHIVE] = false;
 var log = Helper.Debug.log(LOG_CONFIG);
+
+// ~~~JUST FOR THE TEST
+// ////////////////////////////////////////////////////////////////////////////
+var testGameData = Script.require("./testGameData.js");
 
 // Consts
 // ////////////////////////////////////////////////////////////////////////////
@@ -77,6 +80,7 @@ var BASE_NAME = "Neuroscape_",
     SLOW = 750,
     MEDIUM = 525,
     FAST = 350,
+    COUNT_IN = 4,
     PI = Math.PI,
     UNIT_SCALAR = 1.0,
     COLOR_STEPS = 20,
@@ -90,39 +94,38 @@ var BASE_NAME = "Neuroscape_",
     RIGHT_HAND = 1,
     HIT_TIME = 100,
     DRUM_HIT_TIMEOUT = 150,
+    ALLOW_HIT_TO_UNPAUSE_TIME = 1000,
     VISIBILE = true;
 
 // Init
 // ////////////////////////////////////////////////////////////////////////////
 var DEBUG = false,
+    canPlayAV = true,
+    canHitDrum = true,
     isAllowedToUnPause = false,
     isGameRunning = false,
     isGamePaused = false,
     isListenMode = false,
     isNameEntered = false,
-    canPlayAV = true,
-    canHitDrum = true,
-    nextLevel = null,
-    currentPlayerName = null,
     continuousBeatCounter = 0,
-    currentBeat = 0,
-    currentMSSpeed = 0,
-    currentDuration = 11000,
     currentAV = null,
+    currentBeat = -COUNT_IN,
+    currentDuration = 30000,
     currentGameType = null,
     currentLevel = 1,
     currentLatency = 0,
     currentLevelStartTime = 0,
     currentLevelStartTimeEpoch = 0,
+    currentMSSpeed = 0,
+    currentPlayerName = null,
     currentRoundLatency = [],
+    finalLatency = 0,
+    prevLatency = 0,
+    nextLevel = null,
     tempAV = null,
     tempGameType = null,
-    prevLatency = 0,
-    finalLatency = 0,
     previousTotalDelta = 0,
     totalDelta = 0, // The total running gameclock every time Script.update is called
-    sphereRadius = null,
-    COUNT_IN = 4,
     distance = 0,
     milisecondsPerBeat = 0,
     milisecondsPerMeter = 0,
@@ -130,9 +133,9 @@ var DEBUG = false,
     previousTargetTime = 0,
     targetTime = 0,
     lastBeatCounted = 0,
-    ALLOW_HIT_TO_UNPAUSE_TIME = 1000,
     soundBell = SoundCache.getSound(BELL_SOUND_URL),
     soundStick = SoundCache.getSound(STICK_SOUND_URL),
+    sphereRadius = null,
     radius = 1,
     drumPadRadius = 0,
     // We get the current normalized position for the cos on a unit circle by taking 
@@ -201,17 +204,18 @@ function calculateLatency(collisionTime) {
     if (currentGameType === ON || currentGameType === CONTINUOUS) {
         // log(LOG_ARCHIVE, "IN ON || CONTINUOUS");
         currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * currentMSSpeed));
-        prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * currentMSSpeed));
-        finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
+        nextLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN + 1) * currentMSSpeed));
+        finalLatency = Math.min(currentLatency, nextLatency).toFixed(0);
         currentRoundLatency.push(+finalLatency);
     } else {
         // log(LOG_ARCHIVE, "IN OFF");
-        currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * (currentMSSpeed) + currentMSSpeed / 2));
-        prevLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * (currentMSSpeed) + currentMSSpeed / 2));
-        finalLatency = Math.min(currentLatency, prevLatency).toFixed(0);
+        // prevLatency = Math.abs(collisionTime - ( (currentBeat + COUNT_IN - 1) * currentMSSpeed + currentMSSpeed / 2) );
+        currentLatency = Math.abs(collisionTime - ( (currentBeat + COUNT_IN) * currentMSSpeed + currentMSSpeed / 2) );
+        nextLatency = Math.abs(collisionTime - ( (currentBeat + COUNT_IN + 1) * currentMSSpeed + currentMSSpeed / 2) );
+        finalLatency = Math.min(currentLatency, nextLatency).toFixed(0);
         currentRoundLatency.push(+finalLatency);
     }
-    var returnBeat = finalLatency === prevLatency.toFixed(0) ? currentBeat - 1 : currentBeat;
+    var returnBeat = finalLatency === currentLatency.toFixed(0) ? currentBeat : currentBeat + 1;
     // log(LOG_ARCHIVE, "collisionTime", collisionTime);
     // log(LOG_ARCHIVE, "(currentBeat + coutin)", currentBeat + COUNT_IN);
     // log(LOG_ARCHIVE, "(currentBeat * currentMSSpeed)", ((currentBeat + COUNT_IN) * currentMSSpeed));
@@ -478,7 +482,9 @@ function playVisual(boundary) {
 }
 
 function prepNextLevel() {
+    // console.log("in prep next");
     nextLevel = levelMap[nextLevel];
+    // console.log(JSON.stringify(nextLevel));
     // log(LOG_VALUE, "currentLevel: before", currentLevel);
     currentLevel = nextLevel.level;
     // log(LOG_VALUE, "currentLevel: after", currentLevel);
@@ -502,7 +508,7 @@ function prepNextLevel() {
 function reset() {
     isListenMode = true;
     totalDelta = 0;
-    currentBeat = 1 - COUNT_IN;
+    currentBeat = -COUNT_IN;
     currentLatency = 0;
     prevLatency = 0;
     continuousBeatCounter = 0;
@@ -530,8 +536,10 @@ function startGame() {
     self.createLevelMap();
 
     isGameRunning = true;
-
+    print('running levels shift')
+    console.log(JSON.stringify(levels));
     nextLevel = levels.shift();
+    console.log("next level", nextLevel);
     // nextLevel = testLevels.shift();
     self.prepNextLevel();
     self.reset();
@@ -869,6 +877,7 @@ function handleCollision(collisionObject, orbPosition) {
 }
 
 function incrementBeat() {
+    // console.log("currentBeat : " + JSON.stringify(currentBeat));
     // log(LOG_ENTER, "INCREMENT BEAT CALLED");
     // log(LOG_ARCHIVE, "CURRENT BEAT IN START OF INCREMENT", currentBeat);
     // this is called whenenver the orb collides with a wall 
@@ -882,6 +891,8 @@ function incrementBeat() {
             // updateDataText(JSON.stringify(status));
             updateLatencyText(finalLatency);
         } else {
+            log(LOG_ENTER, "in continuous mode check")
+            console.log("isListenMode : " + JSON.stringify(isListenMode));
             continuousBeatCounter++;
             if (isListenMode) {
                 // log(LOG_ARCHIVE, "isListen Mode before CurrentAv", currentAV);
@@ -916,9 +927,9 @@ function incrementBeat() {
         // This is handeling our Count Down Period
         sendMessage += GET_READY_MESSAGE + Math.abs(currentBeat);
         updateDataText(sendMessage);
-        // log(LOG_VALUE, "current Beat in Count down", currentBeat);
+        log(LOG_VALUE, "current Beat in Count down", currentBeat);
         if (currentBeat === 0) {
-            // log(LOG_ENTER, "CURRENT BEAT IS 0");
+            log(LOG_ENTER, "CURRENT BEAT IS 0");
             currentGameType = tempGameType;
             // log(LOG_ARCHIVE, "currentBeat === 0 before CurrentAv", currentAV);
             currentAV = tempAV;
@@ -955,7 +966,26 @@ function init() {
     currentLevel = 1;
     msInPI = PI / currentMSSpeed;
     this.createLevelMap();
+    nextLevel = levels.shift();
+    this.prepNextLevel();
     startUpdate();
+
+    var paramObject = {
+        userName: AccountServices.username,
+        displayName: MyAvatar.displayName,
+        name: "test1",
+        start: testGameData.start,
+        stop: testGameData.stop,
+        date: testGameData.date,
+        levels: JSON.stringify(testGameData.levels)
+    };
+
+    var gameDataMessage = JSON.stringify({
+        type: SAVE_JSON,
+        value: paramObject
+    });
+    console.log("### FINAL GAME DATA:\n", JSON.stringify(paramObject));
+    Messages.sendMessage(MESSAGE_CHANNEL, gameDataMessage, true);
     Overlays.mousePressOnOverlay.connect(onOverlayMousePress);
 }
 
@@ -1114,7 +1144,7 @@ function runHandCheck() {
             // log(LOG_ARCHIVE, "newCollision", newCollision);
             orbPosition = Overlays.getProperty(allOverlays[ORB], "position");
             self.handleCollision(newCollision, orbPosition);
-            playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, RIGHT_HAND);
+            playHaptic(HAPTIC_STRENGTH, HAPTIC_DURATION, LEFT_HAND);
             playSound(drumPadPointOnPlane, soundStick);
 
             canHitDrum = false;
@@ -1161,10 +1191,13 @@ function onUpdate(delta) {
     // These basically gives you the group number to multiply the bpm to get a position
     var ceilTotalDeltaByTotalms = Math.ceil(totalDelta / currentMSSpeed);
 
-    // log(LOG_ARCHIVE, "currentBeat", currentBeat);
-    // log(LOG_ARCHIVE, "'ceilTotalDeltaByTotalms", ceilTotalDeltaByTotalms);
-    // log(LOG_ARCHIVE, "ceilTotalDeltaByTotalms - COUNT_IN", ceilTotalDeltaByTotalms - COUNT_IN);
-    if (currentBeat !== (ceilTotalDeltaByTotalms - COUNT_IN + 1)) {
+    // log(LOG_VALUE, "currentBeat", currentBeat);
+    // log(LOG_VALUEv, "'ceilTotalDeltaByTotalms", ceilTotalDeltaByTotalms);
+    // log(LOG_VALUE, "ceilTotalDeltaByTotalms - COUNT_IN", ceilTotalDeltaByTotalms - COUNT_IN + 1);
+    if (currentBeat !== ceilTotalDeltaByTotalms - COUNT_IN) {
+        // console.log("currentBeat : " + JSON.stringify(currentBeat));
+        // console.log("ceilTotalDeltaByTotalms : " + JSON.stringify(ceilTotalDeltaByTotalms));
+        // console.log("ceilTotalDeltaByTotalms - COUNT_IN + 1 : " + JSON.stringify(ceilTotalDeltaByTotalms - COUNT_IN));
         currentBeat = ceilTotalDeltaByTotalms - COUNT_IN;
         // log(LOG_VALUE, "currentBeat", currentBeat);
         self.incrementBeat();

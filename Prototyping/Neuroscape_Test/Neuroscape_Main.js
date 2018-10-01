@@ -119,6 +119,7 @@
     }
 
     function saveJSON(gameData) {
+        console.log("running save json from main");
         settings.ui.gameEnding = true;
         tablet.emitScriptEvent(JSON.stringify({
             type: SAVE_JSON,
@@ -145,6 +146,7 @@
                 break;
             case SAVE_JSON:
                 var newMessage = data.value;
+                console.log("about to run save json from main");
                 saveJSON(newMessage);
                 doUIUpdate();
                 break;
@@ -169,14 +171,15 @@
         }
         tablet.gotoHomeScreen();
         tablet.screenChanged.connect(onTabletScreenChanged);
-
+        onTabletButtonClicked();
         Messages.subscribe(MESSAGE_CHANNEL);
         Messages.messageReceived.connect(onMessageReceived);
 
         allOverlays = Script.require("./Neuroscape_Spawner.js?" + Date.now());
         gameManager = Script.require("./Neuroscape_Manager.js?" + Date.now())(allOverlays);
-        gameManager.init();
+
         // gameManager.test();
+        
 
     }
 
@@ -269,7 +272,8 @@
 
     // Main
     setup();
-
+    gameManager.init();
+    
     // Cleanup
     function scriptEnding() {
         console.log("### in script ending");
