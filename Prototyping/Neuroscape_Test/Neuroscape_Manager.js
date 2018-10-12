@@ -121,6 +121,7 @@ var DEBUG = false,
     currentRoundLatency = [],
     finalLatency = 0,
     prevLatency = 0,
+    nextLatency = 0,
     nextLevel = null,
     tempAV = null,
     tempGameType = null,
@@ -203,8 +204,8 @@ function Level(level, speed, gameType, av) {
 function calculateLatency(collisionTime) {
     if (currentGameType === ON || currentGameType === CONTINUOUS) {
         // log(LOG_ARCHIVE, "IN ON || CONTINUOUS");
-        currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN) * currentMSSpeed));
-        nextLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN + 1) * currentMSSpeed));
+        currentLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN - 1) * currentMSSpeed));
+        nextLatency = Math.abs(collisionTime - ((currentBeat + COUNT_IN + 0) * currentMSSpeed));
         finalLatency = Math.min(currentLatency, nextLatency).toFixed(0);
         currentRoundLatency.push(+finalLatency);
     } else {
@@ -814,16 +815,16 @@ function updateStatus() {
 function createLevelMap() {
     var levelCounter = 1,
         BASENAME = "Level_",
-        gameTypes = [ON, OFF, CONTINUOUS],
+        // gameTypes = [ON, OFF, CONTINUOUS],
         // gameTypes = [ON, OFF],
-        // gameTypes = [ON],
+        gameTypes = [ON],
         // gameTypes = [OFF],
         // gameTypes = [CONTINUOUS],
 
         speeds = [SLOW, MEDIUM, FAST],
         // speeds = [SLOW],
-        avs = [AUDIOVISUAL, AUDIO, VISUAL];
-        // avs = [AUDIOVISUAL];
+        // avs = [AUDIOVISUAL, AUDIO, VISUAL];
+        avs = [AUDIOVISUAL];
         // avs = [VISUAL];
 
     speeds.forEach(function (speed) {
@@ -1195,7 +1196,7 @@ function onUpdate(delta) {
     // log(LOG_VALUEv, "'ceilTotalDeltaByTotalms", ceilTotalDeltaByTotalms);
     // log(LOG_VALUE, "ceilTotalDeltaByTotalms - COUNT_IN", ceilTotalDeltaByTotalms - COUNT_IN + 1);
     if (currentBeat !== ceilTotalDeltaByTotalms - COUNT_IN) {
-        // console.log("currentBeat : " + JSON.stringify(currentBeat));
+        console.log("currentBeat : " + JSON.stringify(currentBeat));
         // console.log("ceilTotalDeltaByTotalms : " + JSON.stringify(ceilTotalDeltaByTotalms));
         // console.log("ceilTotalDeltaByTotalms - COUNT_IN + 1 : " + JSON.stringify(ceilTotalDeltaByTotalms - COUNT_IN));
         currentBeat = ceilTotalDeltaByTotalms - COUNT_IN;
@@ -1258,7 +1259,7 @@ function onUpdate(delta) {
     // if the current distance away is smaller then the acceptable range, and if you can play it becaues you aren't debounced, go for it
     // Lean towards being before the beat.  Don't allow another play sound check until a decent margin that is 90% of the current 
     // miliseconds per beat is at
-    if (distanceAway < withInMargin) {
+    if (distanceAway < withInMargin || distanceAway === currentMSSpeed) {
         if (canPlayAV) {
             // log(LOG_ARCHIVE, "distanceAway: ", distanceAway);
             // log(LOG_ARCHIVE, "currentAv", currentAV);
