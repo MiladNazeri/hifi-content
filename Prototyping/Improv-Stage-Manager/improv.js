@@ -25,7 +25,9 @@
         var 
             AppUi = Script.require('appUi')
         ;
-    
+
+        Script.require(Script.resolvePath('./Polyfills.js'));
+
     // Consts
     // /////////////////////////////////////////////////////////////////////////
         var 
@@ -35,6 +37,11 @@
             EXAMPLE_MESSAGE = "EXAMPLE_MESSAGE",
             
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
+            UPDATE_CONFIG_NAME = "updateConfigName",
+            ADD_CAMERA_POSITION = "addCameraPosition",
+            REMOVE_CAMERA_POSITION = "removeCameraPosition",
+
+
             UPDATE_UI = BUTTON_NAME + "_update_ui",
 
             LIGHTS_ACCENT_SPOT_HOUSE_LEFT = "Lights_Accent_Spot_House_Left",
@@ -65,7 +72,10 @@
             DEFAULT_LIGHTS_STAGE_SPOT_COLOR = [255, 164, 125],
 
             DEFAULT_LIGHTS_ZONE_STAGE = 0.70,
-            DEFAULT_LIGHTS_KEY_COLOR = [255, 191, 89]
+            DEFAULT_LIGHTS_KEY_COLOR = [255, 191, 89],
+
+            SETTINGS_STRING = "io.improv.settings"
+
 
         ;
 
@@ -73,14 +83,29 @@
     // /////////////////////////////////////////////////////////////////////////
         var 
             ui,
-            dataStore = {
+            defaultDataStore = {
+                animations: new Animations(),
+                currentAnimation: "",
                 ui: {
                 }
-            }
+            },
+            oldSettings = Settings.getValue(SETTINGS_STRING),
+            dataStore = oldSettings === "" 
+                ? (Settings.setValue(SETTINGS_STRING, defaultDataStore), defaultDataStore)
+                : oldSettings
+            
         ;
+
     // Constructors
     // /////////////////////////////////////////////////////////////////////////
-        function LIGHT(lightArray, currentValue, minIntensityValue, maxIntensityValue, transitionIntensityDuration, fromIntensity, toIntensity, color, transitionColorDuration, fromColor, toColor){
+        function Light(
+            lightArray, 
+            currentValue, minIntensityValue, maxIntensityValue, 
+            transitionIntensityDuration, 
+            isZone, 
+            fromIntensity, toIntensity, 
+            color, transitionColorDuration, fromColor, toColor){
+
             this.lightArray = lightArray;
             this.currentIntensity = currentValue || 0;
             this.currentIntensityDirection = DIRECTION_INCREASE;
@@ -95,6 +120,7 @@
             this.intensityChangeSteps = Math.abs(maxIntensityValue - minIntensityValue) / transitionIntensityDuration;
             this.intensityDurationSteps = transitionIntensityDuration / this.intensityChangeSteps;
             this.intensityAnimationTimer = null;
+            this.isZone = isZone || false;
             this.editGroup = {};
 
             this.lightArray.forEach(function(light){
@@ -110,18 +136,26 @@
             // this.currentRotation = [0,0,0,0];
             // this.colorSteps = (maxIntensityValue - minIntensityValue) / transitionIntensityDuration;
         }
-        LIGHT.prototype.updateCurrentIntensity = function(newIntensity) {
+        Light.prototype.updateCurrentIntensity = function(newIntensity) {
             this.currentIntensity = newIntensity;
-            this.editGroup = {
-                intensity: this.currentIntensity
-            };
+            if (this.isZone) {
+                this.editGroup = {
+                    keyLight: {
+                        intensity: this.currentIntensity
+                    }
+                };
+            } else {
+                this.editGroup = {
+                    intensity: this.currentIntensity
+                };
+            }
+
             this.sendEdit();
         };
-        Entities.editEntity("", {})
-        LIGHT.prototype.updateIntensityDirection = function(newDirection) {
+        Light.prototype.updateIntensityDirection = function(newDirection) {
             this.currentIntensityDirection = newDirection;
         };
-        LIGHT.prototype.startAnimation = function(){
+        Light.prototype.startAnimation = function(){
             var _this = this;
             // console.log("toIntensity", _this.toIntensity)
 
@@ -138,12 +172,10 @@
             } else {
                 _this.currentIntensityDirection = DIRECTION_INCREASE;   
             }
-            console.log("_this.currentIntensity", _this.currentIntensity);
 
             this.intensityAnimationTimer = Script.setInterval(function(){
                 // console.log("new animation step")
                 var newIntensity = 0;
-                console.log("_this.currentIntensity", _this.currentIntensity);
                 if (_this.currentIntensityDirection === DIRECTION_INCREASE) {
                     newIntensity = _this.currentIntensity += _this.intensityChangeSteps;
                 } else {
@@ -158,36 +190,39 @@
                 }
             }, this.intensityDurationSteps);
         };
-        LIGHT.prototype.stopAnimation = function(){
+        Light.prototype.stopAnimation = function(){
             Script.clearInterval(this.intensityAnimationTimer);
             this.intensityAnimationTimer = null;
         };
-        LIGHT.prototype.updateMaxIntensity = function(newMaxIntensity) {
+        Light.prototype.updateMaxIntensity = function(newMaxIntensity) {
             this.maxIntensityValue = newMaxIntensity;
         };
-        LIGHT.prototype.updateMinIntensity = function(newMinIntensity) {
+        Light.prototype.updateMinIntensity = function(newMinIntensity) {
             this.minIntensityValue = newMinIntensity;
         };
-        LIGHT.prototype.updateFromIntensity = function(newFromIntensity) {
+        Light.prototype.updateFromIntensity = function(newFromIntensity) {
             this.fromIntensity = newFromIntensity;
         };
-        LIGHT.prototype.updateToIntensity = function(newToIntensity) {
+        Light.prototype.updateToIntensity = function(newToIntensity) {
             this.toIntensity = newToIntensity;
         };
-        LIGHT.prototype.updateTransitionIntensityDuration = function(newTransitionDuration){
+        Light.prototype.updateTransitionIntensityDuration = function(newTransitionDuration){
             this.transitionIntensityDuration = newTransitionDuration;
             this.updateIntensityChangeSteps();
         };
-        LIGHT.prototype.updateIntensityChangeSteps = function(){
+        Light.prototype.updateIntensityChangeSteps = function(){
             this.intensityChangeSteps = Math.abs(this.fromIntensity - this.toIntensity) / this.transitionIntensityDuration;
             this.intensityDurationSteps = this.ransitionIntensityDuration / this.intensityChangeSteps;
         };
-        LIGHT.prototype.sendEdit = function() {
+        Light.prototype.sendEdit = function() {
             this.lightArray.forEach(function(light){
                 // console.log("light:", light)
                 Entities.editEntity(light, this.editGroup);
             }, this);
             this.editGroup = {};
+        };
+        Light.prototype.resetToDefault = function() {
+            this.updateCurrentIntensity(this.DEFAULT_INTENSITY);
         };
         // LIGHT.prototype.updateCurrentColor = function(newColor) {
         //     this.currentColor = newColor;
@@ -203,11 +238,40 @@
         //     this.toItensity = newToColor;
         // };
 
+        function Animations(){
+            this.configs = {};
+        }
+
+        Animations.prototype.addAnimationConfig = function(animation) {
+            this.configs[animation.name] = animation;
+        };
+
+        Animations.prototype.removeAnimationConfig = function(animation) {
+            delete this.configs[animation.name];
+        };
+
+        Animations.prototype.startConfig = function(animation) {
+            this.configs[animation.name].forEach(function(light){
+                lights[light.type].updateFromIntensity(light.from);
+                lights[light.type].updateToIntensity(light.to);
+                lights[light.type].updateTransitionIntensityDuration(light.duration);
+                lights[light.type].startAnimation();
+            });
+        };
+
+        Animations.prototype.resetToDefault = function(animation){
+            this.configs[animation.name].forEach(function(light){
+                lights[light.type].resetToDefault();
+            });
+        }
+
+
     // Collections
     // /////////////////////////////////////////////////////////////////////////
         var 
             lights = {}
         ;
+
     // Helper Functions
     // /////////////////////////////////////////////////////////////////////////
     // Procedural Functions
@@ -225,19 +289,19 @@
             var lightKeys = Object.keys(lights);
             lightKeys.forEach(function(lightKey){
                 if (lightKey.indexOf("Lights_Accent_Spot_House") > -1) {
-                    lights[lightKey] = new LIGHT(lights[lightKey], DEFAULT_ACCENT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_ACCENT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
                 }
                 if (lightKey.indexOf(LIGHTS_ACCENT_SPOT_STAGE) > -1) {
-                    lights[lightKey] = new LIGHT(lights[lightKey], DEFAULT_SPOT_STAGE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_SPOT_STAGE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
                 } 
                 if (lightKey.indexOf(LIGHTS_HOUSE) > -1) {
-                    lights[lightKey] = new LIGHT(lights[lightKey], DEFAULT_LIGHTS_HOUSE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_HOUSE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
                 } 
                 if (lightKey.indexOf(LIGHTS_ZONE_STAGE) > -1) {
-                    lights[lightKey] = new LIGHT(lights[lightKey], DEFAULT_LIGHTS_ZONE_STAGE, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_ZONE_STAGE, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME, true);
                 } 
                 if (lightKey.indexOf("Lights_Stage_Spot_Main") > -1) {
-                    lights[lightKey] = new LIGHT(lights[lightKey], DEFAULT_LIGHTS_STAGE_SPOT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_STAGE_SPOT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
                 }
             })
         }
@@ -266,11 +330,15 @@
             });
 
             registerLights();
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
-            console.log("about to run start animation")
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
+            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
+            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
+            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
+            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
+
+            lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
+            lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
+            lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
+            lights[LIGHTS_ZONE_STAGE].startAnimation();
 
             Script.scriptEnding.connect(scriptEnding);
         }

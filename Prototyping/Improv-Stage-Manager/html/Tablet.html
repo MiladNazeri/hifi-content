@@ -11,6 +11,11 @@
 
     <body>
         <div class="container" id="app">
+            <config class="m-3" 
+                :configs="dataStore.configs"
+                :currentConfig="dataStore.currentConfig">
+            </config>
+
             <example v-for="example in dataStore.example" :example="example"></example>
         </div>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>

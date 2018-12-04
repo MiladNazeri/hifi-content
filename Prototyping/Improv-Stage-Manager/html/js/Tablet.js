@@ -7,7 +7,7 @@
         var 
             BUTTON_NAME = "BUTTON_NAME", // !important update in Example.js as well, MUST match Example.js
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
-            UPDATE_UI = BUTTON_NAME + "_update_ui"
+            UPDATE_UI = BUTTON_NAME + "_update_ui",
             
             EVENTBRIDGE_SETUP_DELAY = 200
         ;
@@ -15,25 +15,55 @@
     // Components
     // /////////////////////////////////////////////////////////////////////////
 
-        Vue.component('example', {
-            props: {
-                example: { type: Object}
-            },
-            methods: {
-                example() {
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: EXAMPLE_MESSAGE,
-                        value: this.example
-                    }));
+        Vue.component('config', {
+            props: ["current_animation", "animations"],
+            data: function(){
+                return {
+                    newName: "",
+                    editing: false,
+                    editingJSONURL: false,
+                    selectedAnimation: ""
                 }
             },
-            template:`
+            methods: {
+                editName(name){
+                    this.editing = true;
+                },
+                updateName(name){
+                    this.editing = false;
+                    EventBridge.emitWebEvent(JSON.stringify({
+                        type: UPDATE_ANIMATION_NAME,
+                        value: {
+                            newName: name,
+                            animation: this.current_animation
+                        }
+                    }));
+                    this.newName = "";
+                },
+                selectAnimation(animation){
+                    this.selectedAnimation = animation;
+                }
+            },
+            template: /*html*/`
                 <div class="card">
                     <div class="card-header">
-                        {{ example.name }}
+                    <strong>Animation Name: {{current_animation}}</strong> 
+                    <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Edit Name</button> 
+                        <div v-if="editing">
+                            <input id="new-name" type="text" class="form-control" v-model="newName">
+                            <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="updateName(newName)">Update Name</button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="example()">Example</button>
+                        <div class="dropdown">
+                            <ul class="dropdown-type">
+                                <div id="typeDropdown" class="dropdown-items" :class="{ show: showDevices }">
+                                    <li v-for="animation in animations" v-on:click="selectAnimation(animation)">{{ animation }}</li>
+                                </div>
+                            </ul>
+                        </div>
+                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Load Animations</button> 
+
                     </div>
                 </div>
             `
