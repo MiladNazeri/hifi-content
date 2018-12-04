@@ -7,6 +7,8 @@
         var 
             BUTTON_NAME = "BUTTON_NAME", // !important update in Example.js as well, MUST match Example.js
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
+            LOAD_ANIMATION = "load_animation",
+
             UPDATE_UI = BUTTON_NAME + "_update_ui",
             
             EVENTBRIDGE_SETUP_DELAY = 200
@@ -22,10 +24,14 @@
                     newName: "",
                     editing: false,
                     editingJSONURL: false,
-                    selectedAnimation: ""
+                    selectedAnimation: "",
+                    showAnimations: false
                 }
             },
             methods: {
+                toggleAnimations(){
+                    this.showAnimations = !this.showAnimations;
+                },
                 editName(name){
                     this.editing = true;
                 },
@@ -42,6 +48,12 @@
                 },
                 selectAnimation(animation){
                     this.selectedAnimation = animation;
+                },
+                loadAnimation(){
+                    EventBridge.emitWebEvent(JSON.stringify({
+                        type: LOAD_ANIMATION,
+                        value: this.selectAnimation
+                    }));
                 }
             },
             template: /*html*/`
@@ -57,12 +69,14 @@
                     <div class="card-body">
                         <div class="dropdown">
                             <ul class="dropdown-type">
-                                <div id="typeDropdown" class="dropdown-items" v-on:click="toggleDevices()" :class="{ show: showAnimations }">
+                                <div id="typeDropdown" class="dropdown-items" v-on:click="toggleAnimations()" :class="{ show: showAnimations }">
+                                    <li>test1</li>
+                                    <li>test2</li>
                                     <li v-for="animation in animations" v-on:click="selectAnimation(animation)">{{ animation }}</li>
                                 </div>
                             </ul>
                         </div>
-                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Load Animations</button> 
+                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="loadAnimation()">Load Animations</button> 
 
                     </div>
                 </div>

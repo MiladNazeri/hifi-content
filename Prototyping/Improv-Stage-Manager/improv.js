@@ -37,6 +37,7 @@
             EXAMPLE_MESSAGE = "EXAMPLE_MESSAGE",
             
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
+            LOAD_ANIMATION = "load_animation",
             UPDATE_CONFIG_NAME = "updateConfigName",
             ADD_CAMERA_POSITION = "addCameraPosition",
             REMOVE_CAMERA_POSITION = "removeCameraPosition",
@@ -84,7 +85,11 @@
         var 
             ui,
             defaultDataStore = {
-                animations: new Animations(),
+                // animations: new Animations(),
+                animations: {
+                    "test1": [],
+                    "test2": []
+                },
                 currentAnimation: "",
                 ui: {
                 }
@@ -239,19 +244,19 @@
         // };
 
         function Animations(){
-            this.configs = {};
+            this.animations = {};
         }
 
         Animations.prototype.addAnimationConfig = function(animation) {
-            this.configs[animation.name] = animation;
+            this.animations[animation.name] = animation;
         };
 
         Animations.prototype.removeAnimationConfig = function(animation) {
-            delete this.configs[animation.name];
+            delete this.animations[animation.name];
         };
 
         Animations.prototype.startConfig = function(animation) {
-            this.configs[animation.name].forEach(function(light){
+            this.animations[animation.name].forEach(function(light){
                 lights[light.type].updateFromIntensity(light.from);
                 lights[light.type].updateToIntensity(light.to);
                 lights[light.type].updateTransitionIntensityDuration(light.duration);
@@ -260,7 +265,7 @@
         };
 
         Animations.prototype.resetToDefault = function(animation){
-            this.configs[animation.name].forEach(function(light){
+            this.animations[animation.name].forEach(function(light){
                 lights[light.type].resetToDefault();
             });
         }
@@ -307,6 +312,10 @@
         }
 
         function exampleFunctionToRun(){
+
+        }
+
+        function loadAnimation(animation){
 
         }
 
@@ -359,6 +368,9 @@
                     break;
                 case EXAMPLE_MESSAGE:
                     exampleFunctionToRun();
+                    break;
+                case LOAD_ANIMATION:
+                    loadAnimation();
                     break;
                 default: 
             }
