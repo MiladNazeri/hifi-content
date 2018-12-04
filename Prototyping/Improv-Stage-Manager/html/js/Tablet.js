@@ -57,7 +57,7 @@
                     <div class="card-body">
                         <div class="dropdown">
                             <ul class="dropdown-type">
-                                <div id="typeDropdown" class="dropdown-items" :class="{ show: showDevices }">
+                                <div id="typeDropdown" class="dropdown-items" v-on:click="toggleDevices()" :class="{ show: showAnimations }">
                                     <li v-for="animation in animations" v-on:click="selectAnimation(animation)">{{ animation }}</li>
                                 </div>
                             </ul>
