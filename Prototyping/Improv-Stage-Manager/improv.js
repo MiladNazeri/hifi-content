@@ -38,10 +38,14 @@
             
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
             LOAD_ANIMATION = "load_animation",
+            START_ANIMATION = "start_animation",
+            ADD_LIGHT = "add_light",
+            NEW_ANIMATION = "new_animation",
+            UPDATE_ANIMATION_NAME = "update_animation_name",
             UPDATE_CONFIG_NAME = "updateConfigName",
             ADD_CAMERA_POSITION = "addCameraPosition",
             REMOVE_CAMERA_POSITION = "removeCameraPosition",
-
+            CREATE_LIGHT_ANIMATION = "create_light_animation",
 
             UPDATE_UI = BUTTON_NAME + "_update_ui",
 
@@ -85,27 +89,43 @@
         var 
             ui,
             defaultDataStore = {
-                // animations: new Animations(),
-                animations: {
-                    "test1": [
-                        {
-                            name: "Lights_House",
-                            from: 0,
-                            to: 100,
-                            duration: 5000
-                        }
-                    ],
-                    "test2": [
-                        {
-                            name: "Lights_House_2",
-                            from: 0,
-                            to: 100,
-                            duration: 5000
-                        }
-                    ]
-                },
-                currentAnimation: "test1",
+                animations: new Animations(),
+                // animations: {
+                //     "test1": [
+                //         {
+                //             name: "Lights_House",
+                //             from: 24,
+                //             to: 100,
+                //             duration: 5000
+                //         },
+                //         {
+                //             name: "Lights_Zone_Stage",
+                //             from: 24,
+                //             to: 100,
+                //             duration: 5000
+                //         }
+                //     ],
+                //     "test2": [
+                //         {
+                //             name: "Lights_House",
+                //             from: 0,
+                //             to: 100,
+                //             duration: 15000
+                //         }
+                //     ]
+                // },
+                choices: [
+                    LIGHTS_ACCENT_SPOT_HOUSE_LEFT, 
+                    LIGHTS_ACCENT_SPOT_HOUSE_RIGHT,
+                    LIGHTS_ACCENT_SPOT_STAGE,
+                    LIGHTS_HOUSE,
+                    LIGHTS_ZONE_STAGE,
+                    LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT,
+                    LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT
+                ],
+                currentAnimation: "",
                 ui: {
+                    showLightAdd: false
                 }
             },
             // oldSettings = Settings.getValue(SETTINGS_STRING),
@@ -141,7 +161,10 @@
             this.intensityAnimationTimer = null;
             this.isZone = isZone || false;
             this.editGroup = {};
-
+            
+            if (isZone){
+                Entities.editEntity(lightArray[0], {keyLight: { intensity: currentValue } });
+            }
             this.lightArray.forEach(function(light){
                 // console.log("currentValue", currentValue);
                 Entities.editEntity(light, {intensity: currentValue});
@@ -258,19 +281,40 @@
         // };
 
         function Animations(){
-            this.animations = {};
+            this.animationGroup = {};
         }
 
         Animations.prototype.addAnimationConfig = function(animation) {
-            this.animations[animation.name] = animation;
+            this.animationGroup[animation.name] = animation;
+        };
+
+        Animations.prototype.addNewAnimation = function(name) {
+            this.animationGroup[name] = [];
+            dataStore.currentAnimation = name;
+        }
+
+        Animations.prototype.addLightToAnimation = function(animation, light){
+            console.log("IN ADD LIGHT TO ANIMATION");
+            this.animationGroup[animation].push(light);
+            console.log("animationGroup: ", JSON.stringify(this.animationGroup));
         };
 
         Animations.prototype.removeAnimationConfig = function(animation) {
-            delete this.animations[animation.name];
+            delete this.animationGroup[animation.name];
         };
 
-        Animations.prototype.startConfig = function(animation) {
-            this.animations[animation.name].forEach(function(light){
+        Animations.prototype.updateAnimationName = function(newName, oldName){
+            console.log("newName", newName)
+            console.log("oldName", oldName)
+
+            console.log(JSON.stringify(this.animationGroup));
+            this.animationGroup[newName] = this.animationGroup[oldName];
+            dataStore.currentAnimation = newName;
+            delete this.animationGroup[oldName];
+        }
+
+        Animations.prototype.startAnimation = function(animation) {
+            this.animationGroup[animation.name].forEach(function(light){
                 lights[light.type].updateFromIntensity(light.from);
                 lights[light.type].updateToIntensity(light.to);
                 lights[light.type].updateTransitionIntensityDuration(light.duration);
@@ -279,7 +323,7 @@
         };
 
         Animations.prototype.resetToDefault = function(animation){
-            this.animations[animation.name].forEach(function(light){
+            this.animationGroup[animation.name].forEach(function(light){
                 lights[light.type].resetToDefault();
             });
         }
@@ -329,8 +373,38 @@
 
         }
 
-        function loadAnimation(animation){
+        function createLightAnimation(){
 
+        }
+
+        function loadAnimation(animation){
+            dataStore.currentAnimation = animation;
+            ui.updateUI(dataStore);
+        }
+
+        function addLight(light){
+            console.log("IN ADD LIGHT TO ANIMATION HANDLER");
+            console.log(JSON.stringify(light));
+            dataStore.animations.addLightToAnimation(dataStore.currentAnimation, light);
+            ui.updateUI(dataStore);
+
+        }
+
+        function newAnimation(){
+            console.log("in new animation")
+            dataStore.animations.addNewAnimation("New");
+            ui.updateUI(dataStore);
+        }
+
+        function updateAnimationName(nameInfo){
+            console.log("in update animation name");
+
+            dataStore.animations.updateAnimationName(nameInfo.newName, nameInfo.oldName);
+            ui.updateUI(dataStore);
+        }
+
+        function startAnimation(){
+            dataStore.animations[dataStore.currentAnimation].startAnimation();
         }
 
         function scriptEnding(){
@@ -345,7 +419,7 @@
     // Tablet
     // /////////////////////////////////////////////////////////////////////////
         function startup() {
-            console.log("startUP")
+            console.log("startUP");
             ui = new AppUi({
                 buttonName: BUTTON_NAME,
                 home: URL,
@@ -359,10 +433,10 @@
             // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
             // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
 
-            lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
-            lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
-            lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
-            lights[LIGHTS_ZONE_STAGE].startAnimation();
+            // lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
+            // lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
+            // lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
+            // lights[LIGHTS_ZONE_STAGE].startAnimation();
 
             Script.scriptEnding.connect(scriptEnding);
         }
@@ -388,7 +462,22 @@
                     exampleFunctionToRun();
                     break;
                 case LOAD_ANIMATION:
-                    loadAnimation();
+                    loadAnimation(data.value);
+                    break;
+                case NEW_ANIMATION:
+                    newAnimation();
+                    break;
+                case UPDATE_ANIMATION_NAME:
+                    updateAnimationName(data.value);
+                    break;
+                case ADD_LIGHT:
+                    addLight(data.value);
+                    break;
+                case CREATE_LIGHT_ANIMATION:
+                    createLightAnimation();
+                    break;
+                case START_ANIMATION:
+                    startAnimation();
                     break;
                 default: 
             }

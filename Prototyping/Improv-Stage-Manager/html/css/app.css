@@ -10,6 +10,10 @@
     padding: 0;
   }
 
+  .main-font-size: {
+    font-size: 2rem;
+  }
+
   .dropdown {
     font-family: 'Raleway', sans-serif;
     font-weight: bold;
@@ -30,7 +34,7 @@
   .dropdown li {
     list-style-type: none;
     padding: 3px 0 1px 12px;
-    width: 120px;
+    width: 300px;
     height: auto;
     font-size: 15px;
     color: #404040;
@@ -52,7 +56,7 @@
     display: none;
     position: absolute;
     background-color: #dddcdc;
-    min-width: 125px;
+    min-width: 300;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
   }
