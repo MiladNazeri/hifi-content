@@ -54,9 +54,20 @@
             LIGHTS_ACCENT_SPOT_HOUSE_RIGHT = "Lights_Accent_Spot_House_Right",
             LIGHTS_ACCENT_SPOT_STAGE = "Lights_Accent_Spot_Stage",
             LIGHTS_HOUSE = "Lights_House",
-            LIGHTS_ZONE_STAGE = "Lights_Zone_Stage",
+            LIGHTS_MC_CENTER_SPOT = "Lights_MC-Center-Spot",
+            LIGHTS_STAGE_ACCENT = "Lights_Stage-Accent",
             LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT = "Lights_Stage_Spot_Main_Stage_Right",
             LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT = "Lights_Stage_Spot_Main_Stage_Left",
+            LIGHTS_UPSTAGE_FILL_LEFT = "Lights_Update-Fill-Left",
+            LIGHTS_UPSTAGE_FILL_RIGHT = "Lights_Update-Fill-Right",
+            LIGHTS_ZONE_STAGE = "Lights_Zone_Stage",
+
+            INTENSITY = "intensity",
+            FALLOFF_RADIUS = "falloffRadius",
+            VISIBLE = "visible",
+            KEYLIGHT = "keyLight",
+            AMBIENT_LIGHT = "ambientLight",
+            AMBIENT_INTENSITY = "ambientIntensity",
 
             DIRECTION_INCREASE = "direction_increase",
             DIRECTION_DECREASE = "direction_decrease",
@@ -90,7 +101,7 @@
         var 
             ui,
             defaultDataStore = {
-                animations: new Animations(),
+                animations: new Snapshots(),
                 // animations: {
                 //     "test1": [
                 //         {
@@ -122,7 +133,18 @@
                     LIGHTS_HOUSE,
                     LIGHTS_ZONE_STAGE,
                     LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT,
-                    LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT
+                    LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT,
+                    LIGHTS_MC_CENTER_SPOT,
+                    LIGHTS_STAGE_ACCENT,
+                    LIGHTS_UPSTAGE_FILL_LEFT,
+                    LIGHTS_UPSTAGE_FILL_RIGHT
+                ],
+                SnapshotProperties: [
+                    INTENSITY,
+                    FALLOFF_RADIUS,
+                    VISIBLE,
+                    [KEYLIGHT, INTENSITY],
+                    [AMBIENT_LIGHT, AMBIENT_INTENSITY]
                 ],
                 currentAnimation: "",
                 ui: {
@@ -286,57 +308,53 @@
         //     this.toItensity = newToColor;
         // };
 
-        function Animations(){
-            this.animationGroup = {};
+        function Snapshots(){
+            this.snapshotStore = {};
         }
 
-        Animations.prototype.addAnimationConfig = function(animation) {
-            this.animationGroup[animation.name] = animation;
+        Snapshots.prototype.addSnapshot = function(snapshot) {
+            this.snapshotStore[snapshot.name] = snapshot;
         };
 
-        Animations.prototype.addNewAnimation = function(name) {
-            this.animationGroup[name] = [];
-            dataStore.currentAnimation = name;
+        Snapshots.prototype.addNewSnapshot = function(name) {
+            this.snapshotStore[name] = [];
+            // ## Not sure if I need this
+            // dataStore.currentAnimation = name;  
         }
 
-        Animations.prototype.addLightToAnimation = function(animation, light){
-            console.log("IN ADD LIGHT TO ANIMATION");
-            this.animationGroup[animation].push(light);
-            console.log("animationGroup: ", JSON.stringify(this.animationGroup));
+        // Snapshots.prototype.addLightToAnimation = function(animation, light){
+        //     console.log("IN ADD LIGHT TO ANIMATION");
+        //     this.snapshotStore[animation].push(light);
+        //     console.log("snapshotStore: ", JSON.stringify(this.snapshotStore));
+        // };
+
+        Snapshots.prototype.removeSnapshot = function(snapshot) {
+            delete this.snapshotStore[snapshot.name];
         };
 
-        Animations.prototype.removeAnimationConfig = function(animation) {
-            delete this.animationGroup[animation.name];
+        Snapshots.prototype.updateSnapshotName = function(newName, oldName){
+            console.log(JSON.stringify(this.snapshotStore));
+            this.snapshotStore[newName] = this.snapshotStore[oldName];
+            // dataStore.currentAnimation = newName;
+            delete this.snapshotStore[oldName];
         };
 
-        Animations.prototype.updateAnimationName = function(newName, oldName){
-            console.log(JSON.stringify(this.animationGroup));
-            this.animationGroup[newName] = this.animationGroup[oldName];
-            dataStore.currentAnimation = newName;
-            delete this.animationGroup[oldName];
+        // Snapshots.prototype.removeLight = function(animation, light){
+        //     var index = findObjectIndexByKey(this.snapshotStore[animation], "name", light);
+        //     this.snapshotStore[animation].splice(index, 1);
+        // };
+
+        Snapshots.prototype.startTransition = function(from, to, duration) {
+            // this.snapshotStore[animation].forEach(function(light){
+            //     lights[light.name].updateFromIntensity(light.from);
+            //     lights[light.name].updateToIntensity(light.to);
+            //     lights[light.name].updateTransitionIntensityDuration(light.duration);
+            //     lights[light.name].startAnimation();
+            // });
         };
 
-        Animations.prototype.removeLight = function(animation, light){
-            var index = findObjectIndexByKey(this.animationGroup[animation], "name", light);
-            this.animationGroup[animation].splice(index, 1);
-        };
-
-        Animations.prototype.startAnimation = function(animation) {
-            console.log("in Animations startAnimation");
-            console.log("animation:", animation);
-            console.log("lights:", JSON.stringify(lights)); 
-            console.log("this.animationGroup[animation]", JSON.stringify(this.animationGroup[animation]));
-            this.animationGroup[animation].forEach(function(light){
-                console.log("lights:", JSON.stringify(light));
-                lights[light.name].updateFromIntensity(light.from);
-                lights[light.name].updateToIntensity(light.to);
-                lights[light.name].updateTransitionIntensityDuration(light.duration);
-                lights[light.name].startAnimation();
-            });
-        };
-
-        Animations.prototype.resetToDefault = function(animation){
-            this.animationGroup[animation.name].forEach(function(light){
+        Snapshots.prototype.resetToDefault = function(animation){
+            this.snapshotStore[animation.name].forEach(function(light){
                 lights[light.name].resetToDefault();
             });
         };
@@ -420,12 +438,12 @@
         function updateAnimationName(nameInfo){
             console.log("in update animation name");
 
-            dataStore.animations.updateAnimationName(nameInfo.newName, nameInfo.oldName);
+            dataStore.animations.updateSnapshotName(nameInfo.newName, nameInfo.oldName);
             ui.updateUI(dataStore);
         }
 
         function startAnimation(){
-            dataStore.animations.startAnimation(dataStore.currentAnimation);
+            dataStore.animations.startTransition(dataStore.currentAnimation);
         }
 
         function removeLight(light){
