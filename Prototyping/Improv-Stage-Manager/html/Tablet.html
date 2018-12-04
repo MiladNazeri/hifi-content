@@ -28,13 +28,13 @@
 
             <light-add class="m-3"
                 v-if="showLightAdd"
-                :animations="dataStore.animations"
+                :animations="dataStore.animations.animationGroup"
                 :current_animation="dataStore.currentAnimation"
                 :choices="dataStore.choices"
             >
             </light-add>
         
-            <button id="new-light" v-on:click="toggleShowLightAdd" type="button" class="btn-sm btn-primary m-3">New light</button>
+            <button id="new-light" v-if="!showLightAdd" v-on:click="toggleShowLightAdd" type="button" class="btn-sm btn-primary m-3">New light</button>
             <button id="animate" v-on:click="animate" type="button" class="btn-sm btn-primary m-3">Animate</button>
 
         </div>

@@ -46,6 +46,7 @@
             ADD_CAMERA_POSITION = "addCameraPosition",
             REMOVE_CAMERA_POSITION = "removeCameraPosition",
             CREATE_LIGHT_ANIMATION = "create_light_animation",
+            REMOVE_LIGHT = "remove_light",
 
             UPDATE_UI = BUTTON_NAME + "_update_ui",
 
@@ -129,7 +130,7 @@
                 }
             },
             // oldSettings = Settings.getValue(SETTINGS_STRING),
-            // dataStore = oldSettings === "" 
+            // dataStore = oldSettings === ""
             //     ? (Settings.setValue(SETTINGS_STRING, defaultDataStore), defaultDataStore)
             //     : oldSettings
             dataStore = defaultDataStore
@@ -199,12 +200,11 @@
         };
         Light.prototype.startAnimation = function(){
             var _this = this;
-            // console.log("toIntensity", _this.toIntensity)
+            console.log("toIntensity", _this.toIntensity)
 
 
             // var newIntensity = Math.min(_this.toIntensity, _this.currentIntensity += _this.intensityChangeSteps);
             
-            // console.log("newIntensity", newIntensity);
             if (_this.fromIntensity === _this.toIntensity) {
                 return;
             }
@@ -215,8 +215,14 @@
                 _this.currentIntensityDirection = DIRECTION_INCREASE;   
             }
 
+            console.log("_this.intensityChangeSteps", _this.intensityChangeSteps);
+            console.log("_this.intensityDurationSteps", _this.intensityDurationSteps);
+            console.log("_this.fromIntensity", _this.fromIntensity);
+            console.log("_this.toIntensity", _this.toIntensity);
+            console.log("_this.toIntensity", _this.currentIntensity);
+
+
             this.intensityAnimationTimer = Script.setInterval(function(){
-                // console.log("new animation step")
                 var newIntensity = 0;
                 if (_this.currentIntensityDirection === DIRECTION_INCREASE) {
                     newIntensity = _this.currentIntensity += _this.intensityChangeSteps;
@@ -253,8 +259,8 @@
             this.updateIntensityChangeSteps();
         };
         Light.prototype.updateIntensityChangeSteps = function(){
-            this.intensityChangeSteps = Math.abs(this.fromIntensity - this.toIntensity) / this.transitionIntensityDuration;
-            this.intensityDurationSteps = this.ransitionIntensityDuration / this.intensityChangeSteps;
+            this.intensityChangeSteps =  Math.abs(this.fromIntensity - this.toIntensity) * 0.01;
+            this.intensityDurationSteps = this.transitionIntensityDuration * 0.01;
         };
         Light.prototype.sendEdit = function() {
             this.lightArray.forEach(function(light){
@@ -304,29 +310,36 @@
         };
 
         Animations.prototype.updateAnimationName = function(newName, oldName){
-            console.log("newName", newName)
-            console.log("oldName", oldName)
-
             console.log(JSON.stringify(this.animationGroup));
             this.animationGroup[newName] = this.animationGroup[oldName];
             dataStore.currentAnimation = newName;
             delete this.animationGroup[oldName];
-        }
+        };
+
+        Animations.prototype.removeLight = function(animation, light){
+            var index = findObjectIndexByKey(this.animationGroup[animation], "name", light);
+            this.animationGroup[animation].splice(index, 1);
+        };
 
         Animations.prototype.startAnimation = function(animation) {
-            this.animationGroup[animation.name].forEach(function(light){
-                lights[light.type].updateFromIntensity(light.from);
-                lights[light.type].updateToIntensity(light.to);
-                lights[light.type].updateTransitionIntensityDuration(light.duration);
-                lights[light.type].startAnimation();
+            console.log("in Animations startAnimation");
+            console.log("animation:", animation);
+            console.log("lights:", JSON.stringify(lights)); 
+            console.log("this.animationGroup[animation]", JSON.stringify(this.animationGroup[animation]));
+            this.animationGroup[animation].forEach(function(light){
+                console.log("lights:", JSON.stringify(light));
+                lights[light.name].updateFromIntensity(light.from);
+                lights[light.name].updateToIntensity(light.to);
+                lights[light.name].updateTransitionIntensityDuration(light.duration);
+                lights[light.name].startAnimation();
             });
         };
 
         Animations.prototype.resetToDefault = function(animation){
             this.animationGroup[animation.name].forEach(function(light){
-                lights[light.type].resetToDefault();
+                lights[light.name].resetToDefault();
             });
-        }
+        };
 
 
     // Collections
@@ -337,6 +350,14 @@
 
     // Helper Functions
     // /////////////////////////////////////////////////////////////////////////
+        function findObjectIndexByKey(array, key, value) {
+            for (var i = 0; i < array.length; i++) {
+                if (array[i][key] === value) {
+                    return i;
+                }
+            }
+            return null;
+        }
     // Procedural Functions
     // /////////////////////////////////////////////////////////////////////////
         
@@ -404,7 +425,12 @@
         }
 
         function startAnimation(){
-            dataStore.animations[dataStore.currentAnimation].startAnimation();
+            dataStore.animations.startAnimation(dataStore.currentAnimation);
+        }
+
+        function removeLight(light){
+            dataStore.animations.removeLight(dataStore.currentAnimation, light);
+            ui.updateUI(dataStore);
         }
 
         function scriptEnding(){
@@ -466,15 +492,23 @@
                     break;
                 case NEW_ANIMATION:
                     newAnimation();
+                    Settings.setValue(SETTINGS_STRING, dataStore);
                     break;
                 case UPDATE_ANIMATION_NAME:
                     updateAnimationName(data.value);
+                    Settings.setValue(SETTINGS_STRING, dataStore);
                     break;
                 case ADD_LIGHT:
                     addLight(data.value);
+                    Settings.setValue(SETTINGS_STRING, dataStore);
+                    break;
+                case REMOVE_LIGHT:
+                    removeLight(data.value);
+                    Settings.setValue(SETTINGS_STRING, dataStore);
                     break;
                 case CREATE_LIGHT_ANIMATION:
                     createLightAnimation();
+                    Settings.setValue(SETTINGS_STRING, dataStore);
                     break;
                 case START_ANIMATION:
                     startAnimation();

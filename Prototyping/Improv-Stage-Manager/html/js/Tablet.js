@@ -9,6 +9,7 @@
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
             LOAD_ANIMATION = "load_animation",
             CREATE_LIGHT_ANIMATION = "create_light_animation",
+            REMOVE_LIGHT = "remove_light",
             START_ANIMATION = "start_animation",
             NEW_ANIMATION = "new_animation",
             UPDATE_ANIMATION_NAME = "update_animation_name",
@@ -101,7 +102,10 @@
             props: ["name", "to", "from", "duration"],
             methods: {
                 removeLight(){
-                    
+                    EventBridge.emitWebEvent(JSON.stringify({
+                        type: REMOVE_LIGHT,
+                        value: "name"
+                    }));
                 }   
             },
             template: /*html*/`
@@ -113,21 +117,22 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <span>to:</span> {{to}}
-                        </div>
-                        <div class="col">
                             <span>from:</span> {{from}}
                         </div>
+                        <div class="col">
+                            <span>to:</span> {{to}}
+                        </div>
+
                         <div class="col">
                             <span>duration:</span> {{duration}}
                         </div>
                         <div class="col">
                             <span class="delete" v-on:click="removeLight">
-                            <i class="float-right mr-2 fas fa-times"></i>
+                                <i class="float-right mr-2 fas fa-times"></i>
+                            </span>
                         </div>
-                    </span>
                     </div>
-
+                </div>
             `
         })
 
@@ -145,16 +150,21 @@
             computed: {
                 lightsLeft: function(){
                     var current;
+                    console.log("this.animations:" + JSON.stringify(this.animations));
+                    console.log("this.current_animation:" + JSON.stringify(this.current_animation));
+
                     if (!this.animations[this.current_animation]) {
                         current = [];
                     } else {
                         current = this.animations[this.current_animation].map(function(light){ return light.name });
                     }
+                    console.log("this.choices:" + JSON.stringify(this.choices))
+                    console.log("current:" + JSON.stringify(current))
+
                     var keys = this.choices
                         .filter(function(key){
-                            // console.log("key:" + JSON.stringify(key))
-                            // console.log("this.choices:" + JSON.stringify(this.choices))
-                            // console.log("index:" + this.current.indexOf(key) === -1);
+                            console.log("key:" + JSON.stringify(key))
+                            console.log("index:" + current.indexOf(key) === -1);
                             return current.indexOf(key) === -1;
                         }, this)
                     return keys;
@@ -182,7 +192,9 @@
                     this.from = 0;
                     this.to = 0;
                     this.duration = 3000;
-                    this.showNames = false
+                    this.showNames = false;
+                    this.$parent.showLightAdd = false;
+
                 },
                 removeDance(){
                     EventBridge.emitWebEvent(JSON.stringify({
@@ -234,17 +246,17 @@
                             <div class="col">
                                 <div class="input-group mb-1">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text font-weight-bold">To</span>
+                                        <span class="input-group-text main-font-size font-weight-bold">From</span>
                                     </div>
-                                    <input type="text" v-model="to" class="form-control main-font-size" placeholder="0">
+                                    <input type="text" v-model="from" class="form-control main-font-size" placeholder="0">
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="input-group mb-1">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text main-font-size font-weight-bold">From</span>
+                                        <span class="input-group-text font-weight-bold">To</span>
                                     </div>
-                                    <input type="text" v-model="from" class="form-control main-font-size" placeholder="0">
+                                    <input type="text" v-model="to" class="form-control main-font-size" placeholder="0">
                                 </div>
                             </div>
                         </div>
