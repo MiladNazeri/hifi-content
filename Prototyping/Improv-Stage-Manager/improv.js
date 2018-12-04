@@ -36,7 +36,7 @@
 
             EXAMPLE_MESSAGE = "EXAMPLE_MESSAGE",
             
-            EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
+            EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
             LOAD_ANIMATION = "load_animation",
             UPDATE_CONFIG_NAME = "updateConfigName",
             ADD_CAMERA_POSITION = "addCameraPosition",
@@ -87,18 +87,32 @@
             defaultDataStore = {
                 // animations: new Animations(),
                 animations: {
-                    "test1": [],
-                    "test2": []
+                    "test1": [
+                        {
+                            name: "Lights_House",
+                            from: 0,
+                            to: 100,
+                            duration: 5000
+                        }
+                    ],
+                    "test2": [
+                        {
+                            name: "Lights_House_2",
+                            from: 0,
+                            to: 100,
+                            duration: 5000
+                        }
+                    ]
                 },
-                currentAnimation: "",
+                currentAnimation: "test1",
                 ui: {
                 }
             },
-            oldSettings = Settings.getValue(SETTINGS_STRING),
-            dataStore = oldSettings === "" 
-                ? (Settings.setValue(SETTINGS_STRING, defaultDataStore), defaultDataStore)
-                : oldSettings
-            
+            // oldSettings = Settings.getValue(SETTINGS_STRING),
+            // dataStore = oldSettings === "" 
+            //     ? (Settings.setValue(SETTINGS_STRING, defaultDataStore), defaultDataStore)
+            //     : oldSettings
+            dataStore = defaultDataStore
         ;
 
     // Constructors
@@ -331,6 +345,7 @@
     // Tablet
     // /////////////////////////////////////////////////////////////////////////
         function startup() {
+            console.log("startUP")
             ui = new AppUi({
                 buttonName: BUTTON_NAME,
                 home: URL,
@@ -353,10 +368,12 @@
         }
 
         function updateUI(dataStore) {
+            console.log("UPDATE UI");
             var messageObject = {
                 type: UPDATE_UI,
                 value: dataStore  
             };
+            console.log("dataStore: ", JSON.stringify(dataStore));
             ui.sendToHtml(messageObject);
         }
 
@@ -364,6 +381,7 @@
             // EventBridge message from HTML script.
             switch (data.type) {
                 case EVENT_BRIDGE_OPEN_MESSAGE:
+                    console.log("EVENT BRIDGE");
                     ui.updateUI(dataStore);
                     break;
                 case EXAMPLE_MESSAGE:

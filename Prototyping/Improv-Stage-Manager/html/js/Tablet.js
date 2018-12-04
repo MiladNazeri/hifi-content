@@ -5,13 +5,13 @@
     // Consts
     // /////////////////////////////////////////////////////////////////////////
         var 
-            BUTTON_NAME = "BUTTON_NAME", // !important update in Example.js as well, MUST match Example.js
-            EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "eventBridgeOpen",
+            BUTTON_NAME = "IMPROV", // !important update in Example.js as well, MUST match Example.js
+            EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
             LOAD_ANIMATION = "load_animation",
 
             UPDATE_UI = BUTTON_NAME + "_update_ui",
             
-            EVENTBRIDGE_SETUP_DELAY = 200
+            EVENTBRIDGE_SETUP_DELAY = 1000
         ;
 
     // Components
@@ -28,6 +28,7 @@
                     showAnimations: false
                 }
             },
+
             methods: {
                 toggleAnimations(){
                     this.showAnimations = !this.showAnimations;
@@ -48,19 +49,21 @@
                 },
                 selectAnimation(animation){
                     this.selectedAnimation = animation;
-                },
-                loadAnimation(){
+                    this.toggleAnimations();
                     EventBridge.emitWebEvent(JSON.stringify({
                         type: LOAD_ANIMATION,
                         value: this.selectAnimation
                     }));
+                },
+                loadAnimation(){
+                    
                 }
             },
             template: /*html*/`
                 <div class="card">
                     <div class="card-header">
-                    <strong>Animation Name: {{current_animation}}</strong> 
-                    <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Edit Name</button> 
+                        <strong>Current Animation Name: {{current_animation}}</strong> 
+                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Edit Name</button> 
                         <div v-if="editing">
                             <input id="new-name" type="text" class="form-control" v-model="newName">
                             <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="updateName(newName)">Update Name</button>
@@ -69,18 +72,21 @@
                     <div class="card-body">
                         <div class="dropdown">
                             <ul class="dropdown-type">
-                                <div id="typeDropdown" class="dropdown-items" v-on:click="toggleAnimations()" :class="{ show: showAnimations }">
-                                    <li>test1</li>
-                                    <li>test2</li>
-                                    <li v-for="animation in animations" v-on:click="selectAnimation(animation)">{{ animation }}</li>
+                                <button class="btn-sm btn-primary mt-1 mr-1 float-left" id="selectedType" v-on:click="toggleAnimations()">
+                                    Animations
+                                </button>
+                                <div id="typeDropdown" class="dropdown-items" :class="{ show: showAnimations }">
+                                    <li v-for="(animation, key) in animations" v-on:click="selectAnimation(animation)">{{ key }}</li>
                                 </div>
                             </ul>
                         </div>
-                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="loadAnimation()">Load Animations</button> 
-
                     </div>
                 </div>
             `
+        })
+
+        Vue.component('light', {
+            
         })
 
     // App
@@ -135,5 +141,4 @@
     // Main
     // /////////////////////////////////////////////////////////////////////////    
         onLoad();
-
 }());
