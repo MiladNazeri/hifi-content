@@ -33,19 +33,14 @@
         var 
             URL = Script.resolvePath("./html/Tablet.html"),
             BUTTON_NAME = "IMPROV", // !important update in Tablet.js as well, MUST match Example.js
-
-            EXAMPLE_MESSAGE = "EXAMPLE_MESSAGE",
             
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
-            LOAD_ANIMATION = "load_animation",
-            START_ANIMATION = "start_animation",
-            ADD_LIGHT = "add_light",
-            NEW_ANIMATION = "new_animation",
-            UPDATE_ANIMATION_NAME = "update_animation_name",
-            UPDATE_CONFIG_NAME = "updateConfigName",
-            ADD_CAMERA_POSITION = "addCameraPosition",
-            REMOVE_CAMERA_POSITION = "removeCameraPosition",
-            CREATE_LIGHT_ANIMATION = "create_light_animation",
+            LOAD_SNAPSHOT = "load_snapshot",
+            START_SNAPSHOT = "start_snapshot",
+            // ADD_LIGHT = "add_light",
+            NEW_SNAPSHOT = "new_snapshot",
+            UPDATE_SNAPSHOT_NAME = "update_snapshot_name",
+            CREATE_LIGHT_SNAPSHOT = "create_light_snapshot",
             REMOVE_LIGHT = "remove_light",
 
             UPDATE_UI = BUTTON_NAME + "_update_ui",
@@ -58,9 +53,13 @@
             LIGHTS_STAGE_ACCENT = "Lights_Stage-Accent",
             LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT = "Lights_Stage_Spot_Main_Stage_Right",
             LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT = "Lights_Stage_Spot_Main_Stage_Left",
-            LIGHTS_UPSTAGE_FILL_LEFT = "Lights_Update-Fill-Left",
-            LIGHTS_UPSTAGE_FILL_RIGHT = "Lights_Update-Fill-Right",
+            LIGHTS_UPSTAGE_FILL_LEFT = "Lights_Upstage-Fill-Left",
+            LIGHTS_UPSTAGE_FILL_RIGHT = "Lights_Upstage-Fill-Right",
             LIGHTS_ZONE_STAGE = "Lights_Zone_Stage",
+
+            LIGHTS_ACCENT_SPOT_HOUSE = "Lights_Accent_Spot_House",
+            LIGHTS_STAGE_SPOT_MAIN = "Lights_Stage_Spot_Main",
+            LIGHTS_UPSTAGE_FILL = "Lights_Upstage-Fill",
 
             INTENSITY = "intensity",
             FALLOFF_RADIUS = "falloffRadius",
@@ -69,31 +68,14 @@
             AMBIENT_LIGHT = "ambientLight",
             AMBIENT_INTENSITY = "ambientIntensity",
 
+            KEYLIGHT_INTENSITY = "keyLight.intensity",
+            AMBIENT_LIGHT_INTENSITY = "ambientLight.ambientIntensity",
+
             DIRECTION_INCREASE = "direction_increase",
             DIRECTION_DECREASE = "direction_decrease",
 
-            DEFAULT_MAX_INTENSITY_VALUE = 100,
-            DEFAULT_MIN_INTENSITY_VALUE = -1,
-            DEFAULT_TRANSITION_TIME = 2000
-
-            DEFAULT_ACCENT_INTENSITY = 4.0,
-            DEFAULT_ACCENT_COLOR = [203, 61, 255],
-
-            DEFAULT_SPOT_STAGE_INTENSITY = 3.0,
-            DEFAULT_SPOT_STAGE_COLOR = [203, 61, 255],
-
-            DEFAULT_LIGHTS_HOUSE_INTENSITY = 4.0,
-            DEFAULT_LIGHTS_HOUSE_COLOR = [105, 6, 32],
-
-            DEFAULT_LIGHTS_STAGE_SPOT_INTENSITY = 5.0,
-            DEFAULT_LIGHTS_STAGE_SPOT_COLOR = [255, 164, 125],
-
-            DEFAULT_LIGHTS_ZONE_STAGE = 0.70,
-            DEFAULT_LIGHTS_KEY_COLOR = [255, 191, 89],
-
+            DEFAULT_TRANSITION_TIME = 2000,
             SETTINGS_STRING = "io.improv.settings"
-
-
         ;
 
     // Init
@@ -101,43 +83,17 @@
         var 
             ui,
             defaultDataStore = {
-                animations: new Snapshots(),
-                // animations: {
-                //     "test1": [
-                //         {
-                //             name: "Lights_House",
-                //             from: 24,
-                //             to: 100,
-                //             duration: 5000
-                //         },
-                //         {
-                //             name: "Lights_Zone_Stage",
-                //             from: 24,
-                //             to: 100,
-                //             duration: 5000
-                //         }
-                //     ],
-                //     "test2": [
-                //         {
-                //             name: "Lights_House",
-                //             from: 0,
-                //             to: 100,
-                //             duration: 15000
-                //         }
-                //     ]
-                // },
+                snapshots: new Snapshots(),
                 choices: [
-                    LIGHTS_ACCENT_SPOT_HOUSE_LEFT, 
-                    LIGHTS_ACCENT_SPOT_HOUSE_RIGHT,
+                    LIGHTS_ACCENT_SPOT_HOUSE,
+                    LIGHTS_STAGE_SPOT_MAIN,
+                    LIGHTS_UPSTAGE_FILL,
+
                     LIGHTS_ACCENT_SPOT_STAGE,
                     LIGHTS_HOUSE,
                     LIGHTS_ZONE_STAGE,
-                    LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT,
-                    LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT,
                     LIGHTS_MC_CENTER_SPOT,
-                    LIGHTS_STAGE_ACCENT,
-                    LIGHTS_UPSTAGE_FILL_LEFT,
-                    LIGHTS_UPSTAGE_FILL_RIGHT
+                    LIGHTS_STAGE_ACCENT
                 ],
                 SnapshotProperties: [
                     INTENSITY,
@@ -147,10 +103,12 @@
                     [AMBIENT_LIGHT, AMBIENT_INTENSITY]
                 ],
                 currentAnimation: "",
+                inTransition: false,
                 ui: {
                     showLightAdd: false
                 }
             },
+
             // oldSettings = Settings.getValue(SETTINGS_STRING),
             // dataStore = oldSettings === ""
             //     ? (Settings.setValue(SETTINGS_STRING, defaultDataStore), defaultDataStore)
@@ -160,204 +118,230 @@
 
     // Constructors
     // /////////////////////////////////////////////////////////////////////////
-        function Light(
-            lightArray, 
-            currentValue, minIntensityValue, maxIntensityValue, 
-            transitionIntensityDuration, 
-            isZone, 
-            fromIntensity, toIntensity, 
-            color, transitionColorDuration, fromColor, toColor){
-
-            this.lightArray = lightArray;
-            this.currentIntensity = currentValue || 0;
-            this.currentIntensityDirection = DIRECTION_INCREASE;
-            this.maxIntensityValue = maxIntensityValue;
-            this.minIntensityValue = minIntensityValue;
-            this.DEFAULT_INTENSITY = currentValue;
-            this.DEFAULT_MAX_INTENSITY_VALUE = maxIntensityValue;
-            this.DEFAULT_MIN_INTENSITY_VALUE = minIntensityValue;
-            this.fromIntensity = fromIntensity || minIntensityValue;
-            this.toIntensity = toIntensity || maxIntensityValue;
-            this.transitionIntensityDuration = transitionIntensityDuration;
-            this.intensityChangeSteps = Math.abs(maxIntensityValue - minIntensityValue) / transitionIntensityDuration;
-            this.intensityDurationSteps = transitionIntensityDuration / this.intensityChangeSteps;
-            this.intensityAnimationTimer = null;
-            this.isZone = isZone || false;
-            this.editGroup = {};
             
-            if (isZone){
-                Entities.editEntity(lightArray[0], {keyLight: { intensity: currentValue } });
-            }
-            this.lightArray.forEach(function(light){
-                // console.log("currentValue", currentValue);
-                Entities.editEntity(light, {intensity: currentValue});
-            });
-            this.editGroup = {};
-            // this.transitionColorDuration = transitionColorDuration;
-            // this.fromColor = fromColor;
-            // this.toColor = toColor;
-            // this.currentColor = color || [255,255,255];
-            // this.currentPosition = [0,0,0];
-            // this.currentRotation = [0,0,0,0];
-            // this.colorSteps = (maxIntensityValue - minIntensityValue) / transitionIntensityDuration;
-        }
-        Light.prototype.updateCurrentIntensity = function(newIntensity) {
-            this.currentIntensity = newIntensity;
-            if (this.isZone) {
-                this.editGroup = {
-                    keyLight: {
-                        intensity: this.currentIntensity
-                    }
-                };
-            } else {
-                this.editGroup = {
-                    intensity: this.currentIntensity
-                };
-            }
+        // Light
+        // /////////////////////////////////////////////////////////////////////////
+            function Light(lightArray,isZone, propsToWatch){
+                this.lightArray = lightArray;
+                
+                this.from = {};
+                this.to = {};
+                this.current = {};
+                
+                propsToWatch.forEach(function(property){
+                    if (Array.isArray(property) && property.length === 2){
+                        this.from[property[0]] = {};
+                        this.from[property[0]][property[1]] = {
+                            value: null
+                        };
+                        this.to[property[0]] = {};
+                        this.to[property[0]][property[1]] = {
+                            value: null
+                        };
+                        this.current[property[0]] = {};
+                        this.current[property[0]][property[1]] = {
+                            value: null,
+                            changeStep: null
+                        };
+                    } else {
+                        this.from[property] = {
+                            value: null
+                        };
+                        this.to[property] = {
+                            value: null
+                        };
+                        this.current[property] = {
+                            value: null,
+                            changeStep: null
+                        };
+                    }   
+                }, this);
+                
+                this.transitionDuration = 0;
+                this.transitionDurationStep = 0;
 
-            this.sendEdit();
-        };
-        Light.prototype.updateIntensityDirection = function(newDirection) {
-            this.currentIntensityDirection = newDirection;
-        };
-        Light.prototype.startAnimation = function(){
-            var _this = this;
-            console.log("toIntensity", _this.toIntensity)
-
-
-            // var newIntensity = Math.min(_this.toIntensity, _this.currentIntensity += _this.intensityChangeSteps);
-            
-            if (_this.fromIntensity === _this.toIntensity) {
-                return;
-            }
-            _this.updateCurrentIntensity(_this.fromIntensity);
-            if (_this.fromIntensity > _this.toIntensity){
-                _this.currentIntensityDirection = DIRECTION_DECREASE;   
-            } else {
-                _this.currentIntensityDirection = DIRECTION_INCREASE;   
+                this.animationTimer = null;
+                this.isZone = isZone || false;
+                this.editGroup = {};
             }
 
-            console.log("_this.intensityChangeSteps", _this.intensityChangeSteps);
-            console.log("_this.intensityDurationSteps", _this.intensityDurationSteps);
-            console.log("_this.fromIntensity", _this.fromIntensity);
-            console.log("_this.toIntensity", _this.toIntensity);
-            console.log("_this.toIntensity", _this.currentIntensity);
+            Light.prototype.startAnimation = function(){
+                var _this = this;
 
-
-            this.intensityAnimationTimer = Script.setInterval(function(){
-                var newIntensity = 0;
-                if (_this.currentIntensityDirection === DIRECTION_INCREASE) {
-                    newIntensity = _this.currentIntensity += _this.intensityChangeSteps;
+                if (_this.fromIntensity === _this.toIntensity) {
+                    return;
+                }
+                _this.updateCurrentIntensity(_this.fromIntensity);
+                if (_this.fromIntensity > _this.toIntensity){
+                    _this.currentIntensityDirection = DIRECTION_DECREASE;   
                 } else {
-                    newIntensity = _this.currentIntensity -= _this.intensityChangeSteps;
+                    _this.currentIntensityDirection = DIRECTION_INCREASE;   
                 }
-                _this.updateCurrentIntensity(newIntensity);
-                if (_this.currentIntensityDirection === DIRECTION_INCREASE && _this.currentIntensity >= _this.toIntensity) {
-                    _this.stopAnimation();
+
+                this.intensityAnimationTimer = Script.setInterval(function(){
+                    var newIntensity = 0;
+                    if (_this.currentIntensityDirection === DIRECTION_INCREASE) {
+                        newIntensity = _this.currentIntensity += _this.intensityChangeSteps;
+                    } else {
+                        newIntensity = _this.currentIntensity -= _this.intensityChangeSteps;
+                    }
+                    _this.updateCurrentIntensity(newIntensity);
+                    if (_this.currentIntensityDirection === DIRECTION_INCREASE && _this.currentIntensity >= _this.toIntensity) {
+                        _this.stopAnimation();
+                    }
+                    if (_this.currentIntensityDirection === DIRECTION_DECREASE && _this.currentIntensity <= _this.toIntensity) {
+                        _this.stopAnimation();
+                    }
+                }, this.intensityDurationSteps);
+            };
+
+            Light.prototype.stopAnimation = function(){
+                Script.clearInterval(this.intensityAnimationTimer);
+                this.intensityAnimationTimer = null;
+            };
+
+            Light.prototype.updateFromProperty = function(property, value) {
+                if (Array.isArray(property) && property.length === 2){
+                    this.from[property[0]][property[1]] = value;
+                } else {
+                    this.from[property] = value;
                 }
-                if (_this.currentIntensityDirection === DIRECTION_DECREASE && _this.currentIntensity <= _this.toIntensity) {
-                    _this.stopAnimation();
+            };
+
+            Light.prototype.updateToProperty = function(property, value) {
+                if (Array.isArray(property) && property.length === 2){
+                    this.to[property[0]][property[1]] = value;
+                } else {
+                    this.to[property] = value;
                 }
-            }, this.intensityDurationSteps);
-        };
-        Light.prototype.stopAnimation = function(){
-            Script.clearInterval(this.intensityAnimationTimer);
-            this.intensityAnimationTimer = null;
-        };
-        Light.prototype.updateMaxIntensity = function(newMaxIntensity) {
-            this.maxIntensityValue = newMaxIntensity;
-        };
-        Light.prototype.updateMinIntensity = function(newMinIntensity) {
-            this.minIntensityValue = newMinIntensity;
-        };
-        Light.prototype.updateFromIntensity = function(newFromIntensity) {
-            this.fromIntensity = newFromIntensity;
-        };
-        Light.prototype.updateToIntensity = function(newToIntensity) {
-            this.toIntensity = newToIntensity;
-        };
-        Light.prototype.updateTransitionIntensityDuration = function(newTransitionDuration){
-            this.transitionIntensityDuration = newTransitionDuration;
-            this.updateIntensityChangeSteps();
-        };
-        Light.prototype.updateIntensityChangeSteps = function(){
-            this.intensityChangeSteps =  Math.abs(this.fromIntensity - this.toIntensity) * 0.01;
-            this.intensityDurationSteps = this.transitionIntensityDuration * 0.01;
-        };
-        Light.prototype.sendEdit = function() {
-            this.lightArray.forEach(function(light){
-                // console.log("light:", light)
-                Entities.editEntity(light, this.editGroup);
-            }, this);
-            this.editGroup = {};
-        };
-        Light.prototype.resetToDefault = function() {
-            this.updateCurrentIntensity(this.DEFAULT_INTENSITY);
-        };
-        // LIGHT.prototype.updateCurrentColor = function(newColor) {
-        //     this.currentColor = newColor;
-        //     this.editGroup = {
-        //         color: this.currentColor
-        //     };
-        //     this.sendEdit();
-        // };
-        // LIGHT.prototype.updateFromColor = function(newFromColor) {
-        //     this.fromColor = newFromColor;
-        // };
-        // LIGHT.prototype.updateToColor = function(newToColor) {
-        //     this.toItensity = newToColor;
-        // };
+            };
 
-        function Snapshots(){
-            this.snapshotStore = {};
-        }
+            Light.prototype.updateCurrentProperty = function(property, value) {
+                if (Array.isArray(property) && property.length === 2){
+                    this.current[property[0]][property[1]] = value;
+                } else {
+                    this.current[property] = value;
+                }
+            };
 
-        Snapshots.prototype.addSnapshot = function(snapshot) {
-            this.snapshotStore[snapshot.name] = snapshot;
-        };
+            Light.prototype.transitionDuration = function(newTransitionDuration){
+                this.transitionDuration = newTransitionDuration;
+                this.updateChange();
+            };
 
-        Snapshots.prototype.addNewSnapshot = function(name) {
-            this.snapshotStore[name] = [];
-            // ## Not sure if I need this
-            // dataStore.currentAnimation = name;  
-        }
+            Light.prototype.updateChange = function(){
+                var keys = Object.keys(this.current).forEach(function(key){
+                    if ('value' in this.current[key]) {
+                        this.current[key].changeStep = Math.abs(this.from[key].value - this.to[key].value) * 0.01;
+                    } else {
+                        var innerKey = Object.keys(this.current[key]);
+                        this.current[key][innerKey].changeStep = Math.abs(this.from[key].value - this.to[key].value) * 0.01;
+                    }
+                }, this);
+                this.transitionDurationStep = this.transitionDuration * 0.01;
+            };
 
-        // Snapshots.prototype.addLightToAnimation = function(animation, light){
-        //     console.log("IN ADD LIGHT TO ANIMATION");
-        //     this.snapshotStore[animation].push(light);
-        //     console.log("snapshotStore: ", JSON.stringify(this.snapshotStore));
-        // };
+            Light.prototype.sendEdit = function() {
+                this.lightArray.forEach(function(light){
+                    Entities.editEntity(light, this.editGroup);
+                }, this);
+                this.editGroup = {};
+            };
 
-        Snapshots.prototype.removeSnapshot = function(snapshot) {
-            delete this.snapshotStore[snapshot.name];
-        };
+        
+        // Snapshots
+        // /////////////////////////////////////////////////////////////////////////
+            function Snapshots(){
+                this.snapshotStore = {};
+                this.transitionStore = {};
+                this.tempSnapshot = {};
+            }
 
-        Snapshots.prototype.updateSnapshotName = function(newName, oldName){
-            console.log(JSON.stringify(this.snapshotStore));
-            this.snapshotStore[newName] = this.snapshotStore[oldName];
-            // dataStore.currentAnimation = newName;
-            delete this.snapshotStore[oldName];
-        };
+            Snapshots.prototype.addSnapshot = function(snapshot) {
+                this.snapshotStore[snapshot.name] = snapshot;
+            };
 
-        // Snapshots.prototype.removeLight = function(animation, light){
-        //     var index = findObjectIndexByKey(this.snapshotStore[animation], "name", light);
-        //     this.snapshotStore[animation].splice(index, 1);
-        // };
+            Snapshots.prototype.addNewSnapshot = function(name) {
+                this.snapshotStore[name] = [];
+                // ## Not sure if I need this
+                // dataStore.currentAnimation = name;  
+            };
 
-        Snapshots.prototype.startTransition = function(from, to, duration) {
-            // this.snapshotStore[animation].forEach(function(light){
-            //     lights[light.name].updateFromIntensity(light.from);
-            //     lights[light.name].updateToIntensity(light.to);
-            //     lights[light.name].updateTransitionIntensityDuration(light.duration);
-            //     lights[light.name].startAnimation();
-            // });
-        };
+            Snapshots.prototype.removeSnapshot = function(snapshot) {
+                delete this.snapshotStore[snapshot.name];
+            };
 
-        Snapshots.prototype.resetToDefault = function(animation){
-            this.snapshotStore[animation.name].forEach(function(light){
-                lights[light.name].resetToDefault();
-            });
-        };
+            Snapshots.prototype.updateSnapshotName = function(newName, oldName){
+                console.log(JSON.stringify(this.snapshotStore));
+                this.snapshotStore[newName] = this.snapshotStore[oldName];
+                // dataStore.currentAnimation = newName;
+                delete this.snapshotStore[oldName];
+            };
+
+            Snapshots.prototype.startTransition = function(from, to, duration) {
+                // this.snapshotStore[animation].forEach(function(light){
+                //     lights[light.name].updateFromIntensity(light.from);
+                //     lights[light.name].updateToIntensity(light.to);
+                //     lights[light.name].updateTransitionIntensityDuration(light.duration);
+                //     lights[light.name].startAnimation();
+            };
+
+            Snapshots.prototype.assignToKey = function(snapshot, key) {
+                // ## TODO
+            };
+            
+            Snapshots.prototype.addTransition = function(name, from, to, duration, key) {
+                this.transitionStore[name] = {
+                    name: name,
+                    from: from,
+                    to: to,
+                    duration: duration,
+                    key: key
+                };
+            };
+
+            Snapshots.prototype.removeTransition = function(name){
+                delete this.transitionStore[name];
+            }
+
+            Snapshots.prototype.updateTransitionName = function(newName, oldName){
+                this.transitionStore[newName] = this.transitionStore[oldName];
+                delete this.transitionStore[oldName];
+            } 
+
+            Snapshots.prototype.takeSnapshot = function(){
+                
+                dataStore.choices.forEach(function(light){
+                    console.log("light", light);
+                    console.log(JSON.stringify(lights));
+                    var properties = Entities.getEntityProperties(lights[light].lightArray[0]);
+                    this.tempSnapshot[light] = {};
+                    console.log("### properties", JSON.stringify(properties));
+                    dataStore.SnapshotProperties.forEach(function(propertyToCopy){
+                        if (Array.isArray(propertyToCopy) && propertyToCopy.length === 2){
+                            if (properties.type !== "Zone") { 
+                                    return; 
+                            }
+                            this.tempSnapshot[light][propertyToCopy[0]] = {};
+                            console.log("### propertyToCopy", JSON.stringify(propertyToCopy));
+                            console.log("propertyToCopy", JSON.stringify(propertyToCopy));
+                            console.log("### properties[propertyToCopy[0]]", JSON.stringify(properties[propertyToCopy[0]]));
+                            this.tempSnapshot[light][propertyToCopy[0]][propertyToCopy[1]] = properties[propertyToCopy[0]][propertyToCopy[1]];
+                        } else {
+                            this.tempSnapshot[light][propertyToCopy] = properties[propertyToCopy];
+                        }
+                    }, this);
+                }, this);
+
+                console.log("tempSnapshot: ", JSON.stringify( this.tempSnapshot));
+            }; 
+            
+            // ## Don't think I need this since snapshots are a default
+            // Snapshots.prototype.resetToDefault = function(snapshot){
+            //     this.snapshotStore[animation.name].forEach(function(light){
+            //         lights[light.name].resetToDefault();
+            //     });
+            // };
 
 
     // Collections
@@ -380,36 +364,55 @@
     // /////////////////////////////////////////////////////////////////////////
         
         function registerLights(){
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_LEFT, MyAvatar.position, 25);
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_RIGHT, MyAvatar.position, 25);
+            lights[LIGHTS_MC_CENTER_SPOT] = Entities.findEntitiesByName(LIGHTS_MC_CENTER_SPOT, MyAvatar.position, 25);
+            lights[LIGHTS_STAGE_ACCENT] = Entities.findEntitiesByName(LIGHTS_STAGE_ACCENT, MyAvatar.position, 25);
             lights[LIGHTS_ACCENT_SPOT_STAGE] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_STAGE, MyAvatar.position, 25);
             lights[LIGHTS_HOUSE] = Entities.findEntitiesByName(LIGHTS_HOUSE, MyAvatar.position, 25);
+            lights[LIGHTS_ZONE_STAGE] = Entities.findEntitiesByName(LIGHTS_ZONE_STAGE, MyAvatar.position, 25);
+
+            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_LEFT, MyAvatar.position, 25);
+            lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_RIGHT, MyAvatar.position, 25);
+            lights[LIGHTS_ACCENT_SPOT_HOUSE] = lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].concat(lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT]);
+
             lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT] = Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT, MyAvatar.position, 25);
             lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT] = Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT, MyAvatar.position, 25);
-            lights[LIGHTS_ZONE_STAGE] = Entities.findEntitiesByName(LIGHTS_ZONE_STAGE, MyAvatar.position, 25);
+            lights[LIGHTS_STAGE_SPOT_MAIN] = lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT].concat(lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT]);
+
+            lights[LIGHTS_UPSTAGE_FILL_LEFT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_LEFT, MyAvatar.position, 25);
+            lights[LIGHTS_UPSTAGE_FILL_RIGHT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_RIGHT, MyAvatar.position, 25);
+            lights[LIGHTS_UPSTAGE_FILL] = lights[LIGHTS_UPSTAGE_FILL_LEFT].concat(lights[LIGHTS_UPSTAGE_FILL_RIGHT]);
+
+
+
+
 
             var lightKeys = Object.keys(lights);
             lightKeys.forEach(function(lightKey){
-                if (lightKey.indexOf("Lights_Accent_Spot_House") > -1) {
-                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_ACCENT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                if (lightKey.indexOf(LIGHTS_ACCENT_SPOT_HOUSE) > -1) {
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
                 }
                 if (lightKey.indexOf(LIGHTS_ACCENT_SPOT_STAGE) > -1) {
-                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_SPOT_STAGE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
                 } 
                 if (lightKey.indexOf(LIGHTS_HOUSE) > -1) {
-                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_HOUSE_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
                 } 
                 if (lightKey.indexOf(LIGHTS_ZONE_STAGE) > -1) {
-                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_ZONE_STAGE, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME, true);
+                    lights[lightKey] = new Light(lights[lightKey], true, dataStore.SnapshotProperties);
                 } 
-                if (lightKey.indexOf("Lights_Stage_Spot_Main") > -1) {
-                    lights[lightKey] = new Light(lights[lightKey], DEFAULT_LIGHTS_STAGE_SPOT_INTENSITY, DEFAULT_MIN_INTENSITY_VALUE, DEFAULT_MAX_INTENSITY_VALUE, DEFAULT_TRANSITION_TIME);
+                if (lightKey.indexOf(LIGHTS_STAGE_SPOT_MAIN) > -1) {
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
                 }
-            })
-        }
-
-        function exampleFunctionToRun(){
-
+                if (lightKey.indexOf(LIGHTS_MC_CENTER_SPOT) > -1) {
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
+                }
+                if (lightKey.indexOf(LIGHTS_STAGE_ACCENT) > -1) {
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
+                }
+                if (lightKey.indexOf(LIGHTS_UPSTAGE_FILL) > -1) {
+                    lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
+                }
+            }, this);
         }
 
         function createLightAnimation(){
@@ -454,7 +457,7 @@
         function scriptEnding(){
             var lightKeys = Object.keys(lights);
             lightKeys.forEach(function(lightKey){
-                if (lightKeys[lightKey].intensityAnimationTimer) {
+                if (lightKeys[lightKey].intensityAnimationTimer !== null) {
                     Script.clearTimeout(lightKeys[lightKey].intensityAnimationTime);
                 }
             })
@@ -472,6 +475,7 @@
             });
 
             registerLights();
+            dataStore.snapshots.takeSnapshot();
             // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
             // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
             // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
