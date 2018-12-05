@@ -168,9 +168,9 @@
             Light.prototype.startAnimation = function(){
                 var _this = this;
 
-                if (_this.fromIntensity === _this.toIntensity) {
-                    return;
-                }
+                // if (_this.fromIntensity === _this.toIntensity) {
+                //     return;
+                // }
                 _this.updateCurrentIntensity(_this.fromIntensity);
                 if (_this.fromIntensity > _this.toIntensity){
                     _this.currentIntensityDirection = DIRECTION_DECREASE;   
@@ -222,6 +222,8 @@
                 } else {
                     this.current[property] = value;
                 }
+                this.editGroup = this.current;
+                this.sendEdit();
             };
 
             Light.prototype.transitionDuration = function(newTransitionDuration){
@@ -252,44 +254,76 @@
         // Snapshots
         // /////////////////////////////////////////////////////////////////////////
             function Snapshots(){
+                this.currentSnap = null;
                 this.snapshotStore = {};
                 this.transitionStore = {};
                 this.tempSnapshot = {};
             }
 
-            Snapshots.prototype.addSnapshot = function(snapshot) {
-                this.snapshotStore[snapshot.name] = snapshot;
+            Snapshots.prototype.addSnapshot = function(name) {
+                this.tempSnapshot.name = name;
+                this.snapshotStore[name] = this.tempSnapshot;
+                this.tempSnapshot = {};
             };
 
-            Snapshots.prototype.addNewSnapshot = function(name) {
-                this.snapshotStore[name] = [];
-                // ## Not sure if I need this
-                // dataStore.currentAnimation = name;  
-            };
-
-            Snapshots.prototype.removeSnapshot = function(snapshot) {
-                delete this.snapshotStore[snapshot.name];
-            };
-
-            Snapshots.prototype.updateSnapshotName = function(newName, oldName){
-                console.log(JSON.stringify(this.snapshotStore));
+            Snapshots.prototype.renameSnapshot = function(oldName, newName){
                 this.snapshotStore[newName] = this.snapshotStore[oldName];
-                // dataStore.currentAnimation = newName;
                 delete this.snapshotStore[oldName];
             };
 
-            Snapshots.prototype.startTransition = function(from, to, duration) {
-                // this.snapshotStore[animation].forEach(function(light){
-                //     lights[light.name].updateFromIntensity(light.from);
-                //     lights[light.name].updateToIntensity(light.to);
-                //     lights[light.name].updateTransitionIntensityDuration(light.duration);
-                //     lights[light.name].startAnimation();
+            Snapshots.prototype.removeSnapshot = function(name) {
+                delete this.snapshotStore[name];
             };
 
-            Snapshots.prototype.assignToKey = function(snapshot, key) {
-                // ## TODO
+            Snapshots.prototype.assignSnapshotToKey = function(name, key) {
+                this.snapshotStore[name].key = key;
             };
+
+            Snapshots.prototype.takeSnapshot = function(){
+                
+                dataStore.choices.forEach(function(light){
+                    // console.log("light", light);
+                    // console.log(JSON.stringify(lights));
+                    var properties = Entities.getEntityProperties(lights[light].lightArray[0]);
+                    this.tempSnapshot[light] = {};
+                    // console.log("### properties", JSON.stringify(properties));
+                    dataStore.SnapshotProperties.forEach(function(propertyToCopy){
+                        if (Array.isArray(propertyToCopy) && propertyToCopy.length === 2){
+                            if (properties.type !== "Zone") { 
+                                    return; 
+                            }
+                            this.tempSnapshot[light][propertyToCopy[0]] = {};
+                            // console.log("### propertyToCopy", JSON.stringify(propertyToCopy));
+                            // console.log("propertyToCopy", JSON.stringify(propertyToCopy));
+                            // console.log("### properties[propertyToCopy[0]]", JSON.stringify(properties[propertyToCopy[0]]));
+                            this.tempSnapshot[light][propertyToCopy[0]][propertyToCopy[1]] = properties[propertyToCopy[0]][propertyToCopy[1]];
+                        } else {
+                            this.tempSnapshot[light][propertyToCopy] = properties[propertyToCopy];
+                        }
+                    }, this);
+                }, this);
+
+                // console.log("tempSnapshot: ", JSON.stringify( this.tempSnapshot));
+            }; 
             
+            Snapshots.prototype.loadSnapshot = function(snapshot){
+                this.getSnapshotLightkeys().forEach(function(light){
+                    this.getSnapshotPropertyKeys().forEach(function(property){
+                        lights[light].updateCurrentProperty(
+                            property, this.snapshotStore[snapshot][light][property]
+                        );
+                    });
+                }, this);
+            };
+
+            Snapshots.prototype.getSnapshotLightkeys = function(snapshot){
+                return Object.key(this.snapshotStore[snapshot]);
+            };
+
+            Snapshots.prototype.getSnapshotPropertyKeys = function(snapshot, light){
+                return Object.key(this.snapshotStore[snapshot][light]);
+            };
+
             Snapshots.prototype.addTransition = function(name, from, to, duration, key) {
                 this.transitionStore[name] = {
                     name: name,
@@ -302,39 +336,30 @@
 
             Snapshots.prototype.removeTransition = function(name){
                 delete this.transitionStore[name];
-            }
+            };
 
-            Snapshots.prototype.updateTransitionName = function(newName, oldName){
+            Snapshots.prototype.renameTransition = function(oldName, newName){
                 this.transitionStore[newName] = this.transitionStore[oldName];
                 delete this.transitionStore[oldName];
-            } 
+            };
 
-            Snapshots.prototype.takeSnapshot = function(){
-                
-                dataStore.choices.forEach(function(light){
-                    console.log("light", light);
-                    console.log(JSON.stringify(lights));
-                    var properties = Entities.getEntityProperties(lights[light].lightArray[0]);
-                    this.tempSnapshot[light] = {};
-                    console.log("### properties", JSON.stringify(properties));
-                    dataStore.SnapshotProperties.forEach(function(propertyToCopy){
-                        if (Array.isArray(propertyToCopy) && propertyToCopy.length === 2){
-                            if (properties.type !== "Zone") { 
-                                    return; 
-                            }
-                            this.tempSnapshot[light][propertyToCopy[0]] = {};
-                            console.log("### propertyToCopy", JSON.stringify(propertyToCopy));
-                            console.log("propertyToCopy", JSON.stringify(propertyToCopy));
-                            console.log("### properties[propertyToCopy[0]]", JSON.stringify(properties[propertyToCopy[0]]));
-                            this.tempSnapshot[light][propertyToCopy[0]][propertyToCopy[1]] = properties[propertyToCopy[0]][propertyToCopy[1]];
-                        } else {
-                            this.tempSnapshot[light][propertyToCopy] = properties[propertyToCopy];
-                        }
-                    }, this);
-                }, this);
+            Snapshots.prototype.assignTransitionToKey = function(name, key) {
+                this.transitionStore[name].key = key;
+            };
 
-                console.log("tempSnapshot: ", JSON.stringify( this.tempSnapshot));
-            }; 
+            Snapshots.prototype.startTransition = function(from, to, duration) {
+                // this.snapshotStore[animation].forEach(function(light){
+                //     lights[light.name].updateFromIntensity(light.from);
+                //     lights[light.name].updateToIntensity(light.to);
+                //     lights[light.name].updateTransitionIntensityDuration(light.duration);
+                //     lights[light.name].startAnimation();
+            };
+
+            Snapshots.prototype.removeTransition = function(name){
+                delete this.transitionStore[name];
+            }
+
+
             
             // ## Don't think I need this since snapshots are a default
             // Snapshots.prototype.resetToDefault = function(snapshot){
@@ -426,7 +451,7 @@
 
         function addLight(light){
             console.log("IN ADD LIGHT TO ANIMATION HANDLER");
-            console.log(JSON.stringify(light));
+            // console.log(JSON.stringify(light));
             dataStore.animations.addLightToAnimation(dataStore.currentAnimation, light);
             ui.updateUI(dataStore);
 
@@ -473,18 +498,100 @@
                 onMessage: onMessage,
                 updateUI: updateUI
             });
-
             registerLights();
-            dataStore.snapshots.takeSnapshot();
-            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
-            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
-            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
-            // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
+            
+            // Tests
+            // /////////////////////////////////////////////////////////////////////////// Tests
+                var testSnapshotName ="SNAPTEST";
+                var updatedSnapshotname = "UPDATED_SNAPTEST";
+                var snapKey = "X";
+                var transitionKey = "C";
+                var newTransitionKey = "D";
+                var snapTestTwo = "SnapTestTwo";
+                var transitionName = "oneToTwo";
+                var updatedTransitionName = "UPDATED_TRANSITION";
+                var duration = 2000;
+                console.log("\n\n\nSTARTING TESTS\n\n\n");
+                
+                console.log("\n\nTesting take snapshot\n");
+                
+                dataStore.snapshots.takeSnapshot();
+                console.log("Tempsnapshot Object.keys > 0 : ", Object.keys(dataStore.snapshots.tempSnapshot).length > 0);
+                console.log("snap shot has every light in choices: ", Object.keys(dataStore.snapshots.tempSnapshot).length === dataStore.choices.length);
+                
+                console.log("\n\nTesting add snapshot\n");
+                
+                // console.log(JSON.stringify(dataStore.snapshots.tempSnapshot));
+                dataStore.snapshots.addSnapshot(testSnapshotName);
+                console.log("Snapshot exists in snapshot store : ", dataStore.snapshots.snapshotStore[testSnapshotName].name === testSnapshotName);
+                console.log("temp snapshot is empty : ", Object.keys(dataStore.snapshots.tempSnapshot).length === 0);
+                
+                console.log("\n\nTesting rename snapshot\n");         
+                
+                dataStore.snapshots.renameSnapshot(testSnapshotName, updatedSnapshotname);
+                console.log("Snapshot name updated and exists: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(updatedSnapshotname) > -1);
+                console.log("old Snapshot name doesnt exist: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(testSnapshotName) === -1);
+                
+                console.log("\n\nTesting Assign snapshot to key\n"); 
 
-            // lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
-            // lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
-            // lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
-            // lights[LIGHTS_ZONE_STAGE].startAnimation();
+                dataStore.snapshots.assignSnapshotToKey(updatedSnapshotname, snapKey);
+                console.log("X assigned to snapshot: ", dataStore.snapshots.snapshotStore[updatedSnapshotname].key === snapKey);
+                // console.log(JSON.stringify(dataStore.snapshots.snapshotStore));            
+                
+                console.log("\n\nTesting Adding transition\n");
+
+                dataStore.snapshots.takeSnapshot();
+                dataStore.snapshots.addSnapshot(snapTestTwo);
+                dataStore.snapshots.addTransition(transitionName, updatedSnapshotname, snapTestTwo, duration, transitionKey);
+                console.log("Transition exits: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) > -1);
+                console.log("Transition correct name : ", dataStore.snapshots.transitionStore[transitionName].name === transitionName);
+                console.log("Transition correct from : ", dataStore.snapshots.transitionStore[transitionName].from === updatedSnapshotname);               
+                console.log("Transition correct to : ", dataStore.snapshots.transitionStore[transitionName].to === snapTestTwo);                              
+                console.log("Transition correct duration : ", dataStore.snapshots.transitionStore[transitionName].duration === duration);              
+                console.log("Transition correct key : ", dataStore.snapshots.transitionStore[transitionName].key === transitionKey);               
+                
+                console.log("\n\nTesting updateTransitionName \n");         
+                
+                dataStore.snapshots.renameTransition(transitionName, updatedTransitionName);
+                console.log("TRANSITION name updated and exists: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(updatedTransitionName) > -1);
+                console.log("old transition name doesnt exist: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
+                
+                console.log("\n\nTesting Assign snapshot to key\n"); 
+
+                dataStore.snapshots.assignTransitionToKey(updatedTransitionName, newTransitionKey);
+                console.log("D assigned to snapshot: ", dataStore.snapshots.transitionStore[updatedTransitionName].key === newTransitionKey);
+                // console.log(JSON.stringify(dataStore.snapshots.snapshotStore));            
+                
+                // NOT COVERED
+                /*
+                    dataStore.snapshots.loadSnapshot
+                    dataStore.snapshots.getSnapshotLightkeys
+                    dataStore.snapshots.getSnapshotPropertyKeys
+                    dataStore.snapshots.startTransition
+
+                */
+                // CLEAN UP
+                console.log("\n\nTesting remove transition\n");         
+
+                dataStore.snapshots.removeTransition(updatedTransitionName);
+                console.log("Transition no longer exists: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
+
+                console.log("\n\nTesting remove snapshot\n");         
+
+                dataStore.snapshots.removeSnapshot(updatedSnapshotname);
+                console.log("Snapshot no longer exists: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(updatedSnapshotname) === -1);
+                
+                console.log("\n\n\nENDING TESTS TESTS\n\n\n");
+
+                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
+                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
+                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
+                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
+
+                // lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
+                // lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
+                // lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
+                // lights[LIGHTS_ZONE_STAGE].startAnimation();
 
             Script.scriptEnding.connect(scriptEnding);
         }
@@ -495,7 +602,7 @@
                 type: UPDATE_UI,
                 value: dataStore  
             };
-            console.log("dataStore: ", JSON.stringify(dataStore));
+            // console.log("dataStore: ", JSON.stringify(dataStore));
             ui.sendToHtml(messageObject);
         }
 
