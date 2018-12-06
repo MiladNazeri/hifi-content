@@ -141,7 +141,9 @@
                         this.current[property[0]] = {};
                         this.current[property[0]][property[1]] = {
                             value: null,
-                            changeStep: null
+                            changeStep: null,
+                            direction: null,
+                            timer: null
                         };
                     } else {
                         this.from[property] = {
@@ -152,7 +154,8 @@
                         };
                         this.current[property] = {
                             value: null,
-                            changeStep: null
+                            changeStep: null,
+                            direction: null
                         };
                     }   
                 }, this);
@@ -172,27 +175,53 @@
                 //     return;
                 // }
                 _this.updateCurrentIntensity(_this.fromIntensity);
-                if (_this.fromIntensity > _this.toIntensity){
-                    _this.currentIntensityDirection = DIRECTION_DECREASE;   
-                } else {
-                    _this.currentIntensityDirection = DIRECTION_INCREASE;   
-                }
 
-                this.intensityAnimationTimer = Script.setInterval(function(){
-                    var newIntensity = 0;
-                    if (_this.currentIntensityDirection === DIRECTION_INCREASE) {
-                        newIntensity = _this.currentIntensity += _this.intensityChangeSteps;
+                Object.keys(this.from).forEach(function(property){
+                    var fromValue = 0;
+                    var toValue = 0;
+                    if (Array.isArray(property) && property.length === 2){
+                        fromValue = this.from[property[0]][property[1]].value;
+                        toValue = this.to[property[0]][property[1]].value;
                     } else {
-                        newIntensity = _this.currentIntensity -= _this.intensityChangeSteps;
+                        fromValue = this.from[property].value;
+                        toValue = this.to[property].value;
                     }
-                    _this.updateCurrentIntensity(newIntensity);
-                    if (_this.currentIntensityDirection === DIRECTION_INCREASE && _this.currentIntensity >= _this.toIntensity) {
-                        _this.stopAnimation();
+                    if (fromValue > toValue){
+                        _this.current[property]["direction"] = DIRECTION_DECREASE; 
+                    } else {
+                        _this.current[property]["direction"] = DIRECTION_INCREASE;
                     }
-                    if (_this.currentIntensityDirection === DIRECTION_DECREASE && _this.currentIntensity <= _this.toIntensity) {
-                        _this.stopAnimation();
-                    }
-                }, this.intensityDurationSteps);
+                    this.intensityAnimationTimer = Script.setInterval(function(){
+                        var newValue = 0;
+                        if (_this.current[property]["direction"] === DIRECTION_INCREASE) {
+                            if (Array.isArray(property) && property.length === 2){
+                                newValue = _this.current[property[0]][property[1]].value += _this.current[property[0]][property[1]].changeSteps;
+                            } else {
+                                newValue = _this.current[property].value += _this.current[property].changeSteps;
+                            }
+                        } else {
+                            if (Array.isArray(property) && property.length === 2){
+                                newValue = _this.current[property[0]][property[1]].value -= _this.current[property[0]][property[1]].changeSteps;
+                            } else {
+                                newValue = _this.current[property].value -= _this.current[property].changeSteps;
+                            }
+                        }
+                        _this.updateCurrentProperty(property, newValue);
+
+                        if (Array.isArray(property) && property.length === 2){
+                            if (_this.current[property]["direction"] === DIRECTION_INCREASE && _this.currentIntensity >= _this.toIntensity) {
+                                _this.stopAnimation();
+                            }
+                            newValue = _this.current[property[0]][property[1]] += _this.current[property[0]][property[1]].changeSteps;
+                        } else {
+                            newValue = _this.current[property] += _this.current[property].changeSteps;
+                        }
+
+                        if (_this.current[property]["direction"] === DIRECTION_DECREASE && _this.currentIntensity <= _this.toIntensity) {
+                            _this.stopAnimation();
+                        }
+                    }, this.intensityDurationSteps);
+                }, this)
             };
 
             Light.prototype.stopAnimation = function(){
@@ -226,8 +255,16 @@
                 this.sendEdit();
             };
 
-            Light.prototype.transitionDuration = function(newTransitionDuration){
+            Light.prototype.updateCurrentProperties = function(group) {
+                var keysProperties = Object.keys(this[group]);
+                keysProperties.forEach(function(property){
+                    Light.prototype.updateCurrentProperty(property, group[property]);      
+                });
+            };
+
+            Light.prototype.updateTransitionDuration = function(newTransitionDuration){
                 this.transitionDuration = newTransitionDuration;
+                this.transitionDurationStep = this.transitionDuration * 0.01;
                 this.updateChange();
             };
 
@@ -240,7 +277,6 @@
                         this.current[key][innerKey].changeStep = Math.abs(this.from[key].value - this.to[key].value) * 0.01;
                     }
                 }, this);
-                this.transitionDurationStep = this.transitionDuration * 0.01;
             };
 
             Light.prototype.sendEdit = function() {
@@ -307,8 +343,8 @@
             }; 
             
             Snapshots.prototype.loadSnapshot = function(snapshot){
-                this.getSnapshotLightkeys().forEach(function(light){
-                    this.getSnapshotPropertyKeys().forEach(function(property){
+                this.getSnapshotLightkeys(snapshot).forEach(function(light){
+                    this.getSnapshotPropertyKeys(snapshot, light).forEach(function(property){
                         lights[light].updateCurrentProperty(
                             property, this.snapshotStore[snapshot][light][property]
                         );
@@ -317,11 +353,13 @@
             };
 
             Snapshots.prototype.getSnapshotLightkeys = function(snapshot){
-                return Object.key(this.snapshotStore[snapshot]);
+                return Object.keys(this.snapshotStore[snapshot]);
             };
 
             Snapshots.prototype.getSnapshotPropertyKeys = function(snapshot, light){
-                return Object.key(this.snapshotStore[snapshot][light]);
+            // console.log("### snapshot", JSON.stringify(this.snapshotStore[snapshot]));                
+            // console.log("### light", light);
+                return Object.keys(this.snapshotStore[snapshot][light]);
             };
 
             Snapshots.prototype.addTransition = function(name, from, to, duration, key) {
@@ -348,18 +386,33 @@
             };
 
             Snapshots.prototype.startTransition = function(from, to, duration) {
-                // this.snapshotStore[animation].forEach(function(light){
-                //     lights[light.name].updateFromIntensity(light.from);
-                //     lights[light.name].updateToIntensity(light.to);
-                //     lights[light.name].updateTransitionIntensityDuration(light.duration);
-                //     lights[light.name].startAnimation();
+                this.getSnapshotLightkeys(from).forEach(function(light){
+                    this.getSnapshotPropertyKeys(from, light).forEach(function(property){
+                        lights[light].updatefromProperty(
+                            property, this.snapshotStore[from][light][property]
+                        );
+                    });
+                }, this);
+                this.getSnapshotLightkeys(to).forEach(function(light){
+                    this.getSnapshotPropertyKeys(to, light).forEach(function(property){
+                        lights[light].updateToProperty(
+                            property, this.snapshotStore[to][light][property]
+                        );
+                    });
+                }, this);
+                
+                this.getSnapshotLightkeys(from).forEach(function(light){
+                    lights[light].updateTransitionDuration(duration);
+                });
+
+                this.getSnapshotLightkeys(from).forEach(function(light){
+                    lights[light].startAnimation();
+                });
             };
 
             Snapshots.prototype.removeTransition = function(name){
                 delete this.transitionStore[name];
-            }
-
-
+            };
             
             // ## Don't think I need this since snapshots are a default
             // Snapshots.prototype.resetToDefault = function(snapshot){
@@ -406,10 +459,6 @@
             lights[LIGHTS_UPSTAGE_FILL_LEFT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_LEFT, MyAvatar.position, 25);
             lights[LIGHTS_UPSTAGE_FILL_RIGHT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_RIGHT, MyAvatar.position, 25);
             lights[LIGHTS_UPSTAGE_FILL] = lights[LIGHTS_UPSTAGE_FILL_LEFT].concat(lights[LIGHTS_UPSTAGE_FILL_RIGHT]);
-
-
-
-
 
             var lightKeys = Object.keys(lights);
             lightKeys.forEach(function(lightKey){
@@ -562,6 +611,15 @@
                 console.log("D assigned to snapshot: ", dataStore.snapshots.transitionStore[updatedTransitionName].key === newTransitionKey);
                 // console.log(JSON.stringify(dataStore.snapshots.snapshotStore));            
                 
+                console.log("\n\nTesting getSnapshotLightkeys \n");         
+                console.log("dataStore.snapshots.getSnapshotLightkeys(updatedSnapshotname); ", dataStore.snapshots.getSnapshotLightkeys(updatedSnapshotname));                
+                
+                console.log("\n\nTesting getSnapshotPropertyKeys \n");         
+                console.log("dataStore.snapshots.getSnapshotPropertyKeys(updatedSnapshotname); ", dataStore.snapshots.getSnapshotPropertyKeys(updatedSnapshotname, LIGHTS_ACCENT_SPOT_HOUSE));                
+                
+                console.log("old transition name doesnt exist: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
+                
+            
                 // NOT COVERED
                 /*
                     dataStore.snapshots.loadSnapshot
