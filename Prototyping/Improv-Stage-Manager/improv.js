@@ -23,7 +23,8 @@
     // Dependencies
     // /////////////////////////////////////////////////////////////////////////
         var 
-            AppUi = Script.require('appUi')
+            AppUi = Script.require('appUi'),
+            defaults = Script.require('./defaults.js')
         ;
 
         Script.require(Script.resolvePath('./Polyfills.js'));
@@ -75,7 +76,11 @@
             DIRECTION_DECREASE = "direction_decrease",
 
             DEFAULT_TRANSITION_TIME = 2000,
-            SETTINGS_STRING = "io.improv.settings"
+            SETTINGS_STRING = "io.improv.settings",
+
+            SNAPSHOT = "snapshot",
+            TRANSITION = "transition",
+            AUDIO = "audio"
         ;
 
     // Init
@@ -84,6 +89,31 @@
             ui,
             defaultDataStore = {
                 snapshots: new Snapshots(),
+                defaultSnapshots: {
+                    blackout: defaults.blackout,
+                    improv_troop_full_wash: defaults.improv_troop_full_wash,
+                    mc_wash: defaults.mc_wash,
+                    mc_center: defaults.mc_center,
+                    pre_post_show: defaults.pre_post_show,
+                    workshop_wash: defaults.workshop_wash
+                },
+                defaultTransitions: {
+                    blackout_to_mc_wash: {
+                        name: "blackout_to_mc_wash",
+                        from: "blackout",
+                        to: "mc_wash",
+                        duration: 3000,
+                        key: "t"
+                    },
+                    mc_wash_to_blackout_: {
+                        name: "mc_wash_to_blackout_",
+                        from: "mc_wash",
+                        to: "blackout",
+                        duration: 3000,
+                        key: "y"
+                    }
+                    
+                },
                 choices: [
                     LIGHTS_ACCENT_SPOT_HOUSE,
                     LIGHTS_STAGE_SPOT_MAIN,
@@ -102,6 +132,7 @@
                     [KEYLIGHT, INTENSITY],
                     [AMBIENT_LIGHT, AMBIENT_INTENSITY]
                 ],
+                mapping: {},
                 currentAnimation: "",
                 inTransition: false,
                 ui: {
@@ -118,9 +149,10 @@
 
     // Constructors
     // /////////////////////////////////////////////////////////////////////////
-        function Mapping(name, key) {
+        function Mapping(name, key, type) {
             this.name = name;
             this.key = key;
+            this.type = type;
         }   
 
         // Light
@@ -131,8 +163,9 @@
                 this.from = {};
                 this.to = {};
                 this.current = {};
+                this.running = {};
+                this.isRunning = false;
                 
-                this.zoneExcludes = ["intensity", "falloffRadius"]
                 this.zoneExcludes = ["intensity", "falloffRadius"]
                 propsToWatch.forEach(function(property){
                     if (isZone) {
@@ -185,37 +218,50 @@
                 this.editGroup = {};
             }
 
+            Light.prototype.runningCheck = function(){
+                var runningKeys = Object.keys(this.running).length;
+                if (runningKeys > 0) {
+                    this.isRunning = true;
+                    return true;
+                } else {
+                    this.isRunning = false;
+                    return false;
+                }
+            };
+
             Light.prototype.startAnimation = function(){
                 console.log("STARTING LIGHT ANIMATION")
                 var _this = this;
                 // _this.updateCurrentIntensity(_this.fromIntensity);
                 // console.log("\n\n ALL OF THIS.FROM \n\n" ,JSON.stringify(this.from));
                 Object.keys(this.from).forEach(function(property){
-                    console.log(property);
-                    console.log("this.from[property])", JSON.stringify(this.from[property]));
-                    console.log("typeof this.from[property].value !== 'undefined'", typeof this.from[property].value !== 'undefined'); 
+                    // console.log(property);
+                    // console.log("this.from[property])", JSON.stringify(this.from[property]));
+                    // console.log("typeof this.from[property].value !== 'undefined'", typeof this.from[property].value !== 'undefined'); 
                     var fromValue = 0;
                     var toValue = 0;
                     var innerKey;
                     if (typeof this.from[property].value === 'undefined'){
-                        console.log("nested property 5");
+                        // console.log("nested property 5", property);
                         innerKey = Object.keys(this.from[property])[0];
-                        console.log("innerKey", innerKey);
+                        // console.log("innerKey", innerKey);
                         fromValue = this.from[property][innerKey].value;
-                        console.log("nested fromValue", fromValue);
+                        // console.log("nested fromValue", fromValue);
                         toValue = this.to[property][innerKey].value;
-                        console.log("nested toValue", toValue);
-                        console.log("ABOUT TO UPDATE TO FROM VALUES");
-                        _this.updateCurrentProperty(property, this.from[property][innerKey].value, true);
+                        // console.log("nested toValue", toValue);
+                        // console.log("ABOUT TO UPDATE TO FROM VALUES");
+                        // console.log("SENDING THIS TO UPDATE: ", JSON.stringify(this.from[property]));
+                        _this.updateCurrentProperty(property, this.from[property], true);
 
                     } else {
-                        console.log("single property")
+                        // console.log("single property")
                         fromValue = this.from[property].value;
-                        console.log("single fromValue", fromValue)
+                        // console.log("single fromValue", fromValue)
 
                         toValue = this.to[property].value;
-                        console.log("single toValue", toValue);
-                        console.log("ABOUT TO UPDATE TO FROM VALUES");
+                        // console.log("single toValue", toValue);
+                        // console.log("ABOUT TO UPDATE TO FROM VALUES");
+                        // console.log("SENDING THIS TO UPDATE: ", JSON.stringify(this.from[property].value));
                         _this.updateCurrentProperty(property, this.from[property].value, true);
 
                     }
@@ -243,47 +289,56 @@
                         return;
                     }
                     
+                    // console.log("^^^ property", property)
+                    // console.log("^^^ this.from",  JSON.stringify(this.from));
+                    // console.log("^^^ this.to",  JSON.stringify(this.to));
+                    // console.log("^^^ this.current",  JSON.stringify(this.current));
+                    innerKey = Object.keys(this.from[property])[0];
+
                     if (typeof this.from[property].value === 'undefined') {
-                        innerKey = Object.keys(this.from[property])[0];
+
                         _this.current[property][innerKey].timer = Script.setInterval(animationUpdate, this.transitionDurationStep);
                     } else {
-                        _this.current[property][innerKey].timer = Script.setInterval(animationUpdate, this.transitionDurationStep);
+                        _this.current[property].timer = Script.setInterval(animationUpdate, this.transitionDurationStep);
                     }
-
                     console.log("STARTING ANIMATION");
+                    this.running[property] = true;
                     function animationUpdate(){
                         var newValue = 0;
                         var oldValue = 0;
                         var changeStep = 0;
 
                         if (typeof _this.from[property].value === 'undefined'){ 
-                            console.log("nested property check again");
+                            // console.log("nested property check again");
                             innerKey = Object.keys(_this.from[property])[0];
                             console.log("@@ innerkey", innerKey);
                             console.log("@@ property", property);
+                            console.log("JSON.stringify(_this.current[property]", JSON.stringify(_this.current[property]));
+                            console.log("_this.current[property][innerKey]", JSON.stringify(_this.current[property][innerKey]));
                             if (_this.current[property][innerKey].direction === DIRECTION_INCREASE){
-                                console.log("JSON.stringify(_this.current[property]", JSON.stringify(_this.current[property]));
-                                console.log("_this.current[property][innerKey]", JSON.stringify(_this.current[property][innerKey]));
-                                oldValue = _this.current[property][innerKey].value[innerKey];
+                                // oldValue = _this.current[property][innerKey].value[innerKey];
+                                oldValue = _this.current[property][innerKey].value;
                                 changeStep = _this.current[property][innerKey].changeStep;
-                                console.log("1 oldValue", oldValue);
-                                console.log("1 changeStep", changeStep);
+                                // console.log("1 oldValue", oldValue);
+                                // console.log("1 changeStep", changeStep);
 
                                 newValue = oldValue + changeStep;
-                                console.log("1 newValue", newValue);
+                                // console.log("1 newValue", newValue);
                             } else {
-                                oldValue = _this.current[property][innerKey].value[innerKey];
+                                oldValue = _this.current[property][innerKey].value;
                                 changeStep = _this.current[property][innerKey].changeStep;
 
                                 newValue = oldValue - changeStep;
-                                console.log("2 newValue", newValue);
+                                // console.log("2 newValue", newValue);
                             }
                             var transformedValue = {};
-                            transformedValue[innerKey] = newValue;
-                            console.log("ABOUT TO UPDATE!!! NESTED")
+                            transformedValue[innerKey] = {};
+                            transformedValue[innerKey].value = newValue;
+                            // console.log("FINAL TRANSFORMED VALUE", JSON.stringify(transformedValue));
+                            // console.log("ABOUT TO UPDATE!!! NESTED")
                             _this.updateCurrentProperty(property, transformedValue, true);
                         } else {
-                            console.log("single property")
+                            // console.log("single property")
                             if (_this.current[property].direction === DIRECTION_INCREASE) {
                                 oldValue = _this.current[property].value;
                                 changeStep = _this.current[property].changeStep;
@@ -296,45 +351,46 @@
                                 changeStep = _this.current[property].changeStep;
 
                                 newValue = oldValue - changeStep;
-                                console.log("4 newValue", newValue);
+                                // console.log("4 newValue", newValue);
                             }
                             _this.updateCurrentProperty(property, newValue, true);
                         }
 
                         if (typeof _this.from[property].value === 'undefined'){ 
-                            console.log("nested property 4");
+                            // console.log("nested property 4");
                             innerKey = Object.keys(_this.from[property])[0];
-                            console.log("4 inner key", JSON.stringify(innerKey));
-                            var current = _this.current[property][innerKey].value[innerKey];
+                            // console.log("4 inner key", JSON.stringify(innerKey));
+                            var current = _this.current[property][innerKey].value;
                             var to = _this.to[property][innerKey].value;
-                            console.log("$$$ current value: ", JSON.stringify(current));
-                            console.log("$$$", JSON.stringify(to));
-                            console.log("current >= to", current >= to);
+                            // console.log("$$$ current value: ", JSON.stringify(current));
+                            // console.log("$$$", JSON.stringify(to));
+                            // console.log("current >= to", current >= to);
                             if (_this.current[property][innerKey].direction === DIRECTION_INCREASE &&
                                 current >= to){
                                 console.log("A STOPPING ANIMATION");
                                 _this.stopAnimation(property, innerKey);
+                                delete _this.running[property];
                             }
                             if (_this.current[property][innerKey].direction === DIRECTION_DECREASE &&
                                 current <= to){
                                 console.log("B STOPPING ANIMATION");
-
+                                delete _this.running[property];
                                 _this.stopAnimation(property, innerKey);
                             } 
                         } else {
-                            console.log("single property")
+                            // console.log("single property")
                             var current = _this.current[property].value;
                             var to = _this.to[property].value;
                             if (_this.current[property].direction === DIRECTION_INCREASE &&
                                 current >= to){
-                                console.log("STOPPING ANIMATION")
-
+                                console.log("STOPPING ANIMATION");
+                                delete _this.running[property];
                                 _this.stopAnimation(property);
                             }
                             if (_this.current[property].direction === DIRECTION_DECREASE &&
                                current <= to){
-                                console.log("STOPPING ANIMATION")
-
+                                console.log("STOPPING ANIMATION");
+                                delete _this.running[property];
                                 _this.stopAnimation(property);
                             } 
                         }
@@ -345,7 +401,7 @@
 
             Light.prototype.stopAnimation = function(key, innerKey){
                 if (typeof innerKey === "undefined"){
-                    console.log("inner key undefined");
+                    // console.log("inner key undefined");
                     console.log(JSON.stringify(this.current[key]));
                     if (this.current[key].timer !== null) {
                         console.log("single timer is there going null");
@@ -365,9 +421,9 @@
             };
 
             Light.prototype.updateFromProperty = function(property, value) {
-                // console.log("\n\n** UPDATE FROM PROPERTY** \n\n");
-                // console.log("updateFromProperty: ", JSON.stringify(property));
-                // console.log("updateFromValue: ",JSON.stringify(value));
+                console.log("\n\n** UPDATE FROM PROPERTY** \n\n");
+                console.log("updateFromProperty: ", JSON.stringify(property));
+                console.log("updateFromValue: ",JSON.stringify(value));
 
                 if (typeof value !== "number"){
                     console.log("this is not a number")
@@ -376,8 +432,8 @@
                     this.from[property][innerKey].value = value[innerKey];
                     // this.from[property][innerKey].value = value;
 
-                    // console.log("\n final from value E \n", JSON.stringify(this.from[property][innerKey]));
-                    // console.log("\n final from with value \n", JSON.stringify(this.from[property][innerKey].value));
+                    console.log("\n final from value E \n", JSON.stringify(this.from[property][innerKey]));
+                    console.log("\n final from with value \n", JSON.stringify(this.from[property][innerKey].value));
 
                 } else {
                     this.from[property].value = value;
@@ -392,7 +448,7 @@
                     console.log("this is not a number")
                     var innerKey = Object.keys(value)[0];
                     console.log("\n TO \n VALUE AT INNER KEY\n", JSON.stringify(value[innerKey]));
-                    this.to[property][innerKey].value = value[innerKey]
+                    this.to[property][innerKey].value = value[innerKey];
                     // this.to[property][innerKey].value = value;
 
                 } else {
@@ -401,25 +457,43 @@
             };
 
             Light.prototype.updateCurrentProperty = function(property, value, sendEdit) {
-                // console.log("\n\n** UPDATE CURRENT PROPERTY** \n\n");
-                // console.log("updateCurrentProperty: ", JSON.stringify(property));
-                // console.log("updateCurrentValue: ",JSON.stringify(value));
+
 
                 if (typeof value !== "number"){
+                    console.log("\n\n** UPDATE CURRENT PROPERTY** \n\n");
+                    console.log("updateCurrentProperty: ", JSON.stringify(property));
+                    console.log("updateCurrentValue: ",JSON.stringify(value));
                     var innerKey = Object.keys(value)[0];
                     // console.log("INNER KEY FOR CURRENT:", innerKey);
                     // console.log("\n cURRENT \n VALUE AT INNER KEY\n", JSON.stringify(value[innerKey]));
+                    // console.log("\n cURRENT \n VALUE value[innerKey].value\n", JSON.stringify(value[innerKey].value));
+
                     // this.current[property][innerKey].value = value[innerKey];
-                    this.current[property][innerKey].value = value[innerKey];
+                    // console.log("\n BEFORE final from value E \n", JSON.stringify(this.current[property][innerKey]));
+                    // console.log("\n BEFORE final from with value \n", JSON.stringify(this.current[property][innerKey].value));
+                    var newValue;
+                    
+                    if (typeof value[innerKey].value === 'undefined')  {
+                        newValue = value[innerKey];
+                    } else {
+                        newValue = value[innerKey].value;
+                    }
+
+                    this.current[property][innerKey].value = newValue;
+                    console.log("\n newValue \n", JSON.stringify(newValue));
+                    console.log("\n this.current[property]", JSON.stringify(this.current[property]));
                     this.editGroup[property] = {};
-                    this.editGroup[property] = this.current[property][innerKey].value = value;
+                    this.editGroup[property][innerKey] = newValue;
 
                 } else {
+                    // console.log("!!!! THIS IS HAPPENING")
+                    
                     this.current[property].value = value;
+                    // console.log(JSON.stringify(this.current[property]));
 
                     this.editGroup[property] = value;
                 }
-                console.log(JSON.stringify(this.editGroup));
+                // console.log(JSON.stringify(this.editGroup));
                 if (sendEdit) {
                     this.sendEdit();
                 }
@@ -456,7 +530,12 @@
             };
 
             Light.prototype.sendEdit = function() {
-                // console.log("sending over: ", JSON.stringify(this.editGroup))
+                if (this.isZone){
+                    console.log("sending over: ", JSON.stringify(this.editGroup))
+                    console.log("sending over: ", JSON.stringify(this.lightArray))
+
+
+                }
                 this.lightArray.forEach(function(light){
                     Entities.editEntity(light, this.editGroup);
                 }, this);
@@ -471,6 +550,19 @@
                 this.snapshotStore = {};
                 this.transitionStore = {};
                 this.tempSnapshot = {};
+                this.currentSnap = {};
+                this.alwaysTransition = true;
+                this.defaultTransitionTime = 10000;
+                this.previousTransition = null;
+                this.nextTransition = null;
+            }
+
+            Snapshots.prototype.changeDefaultTransitionTime = function(newTransitionTime) {
+                this.defaultTransitionTime = newTransitionTime;
+            }
+
+            Snapshots.prototype.changeAlwaysTransition = function(shouldAlwaysTransition) {
+                this.alwaysTransition = shouldAlwaysTransition;
             }
 
             Snapshots.prototype.addSnapshot = function(name) {
@@ -478,6 +570,10 @@
                 this.tempSnapshot.name = name;
                 this.snapshotStore[name] = this.tempSnapshot;
                 this.tempSnapshot = {};
+            };
+
+            Snapshots.prototype.forceAddSnapshot = function(name, snapshot){
+                this.snapshotStore[name] = snapshot;
             };
 
             Snapshots.prototype.renameSnapshot = function(oldName, newName){
@@ -491,6 +587,7 @@
 
             Snapshots.prototype.assignSnapshotToKey = function(name, key) {
                 this.snapshotStore[name].key = key;
+                dataStore.mapping[key] = new Mapping(name, key, SNAPSHOT);
             };
 
             Snapshots.prototype.takeSnapshot = function(){
@@ -525,37 +622,47 @@
                     }, this);
                 }, this);
 
-                // console.log("tempSnapshot: ", JSON.stringify( this.tempSnapshot));
+                console.log("tempSnapshot: ", JSON.stringify( this.tempSnapshot));
             }; 
             
             Snapshots.prototype.loadSnapshot = function(snapshot){
-                console.log("Loading snapshot: ", snapshot);
-                this.getSnapshotLightkeys(snapshot).forEach(function(light){
-                    // console.log("light", light)
-                    this.getSnapshotPropertyKeys(snapshot, light).forEach(function(property){
-                        if (light === LIGHTS_ZONE_STAGE){
-                            // console.log("property", property)
-                            // console.log("this.snapshotStore[snapshot][light][property]", JSON.stringify(this.snapshotStore[snapshot][light][property]));
-                        }
-                        
-                        lights[light].updateCurrentProperty(
-                            property, this.snapshotStore[snapshot][light][property], false
-                        );
+                if (this.alwaysTransition) {
+                    this.takeSnapshot(); 
+                    this.addSnapshot("alwaysTransition");
+                    this.startTransition("alwaysTransition", snapshot, this.defaultTransitionTime);
+                } else {
+                    this.getSnapshotLightkeys(snapshot).forEach(function(light){
+                        // console.log("light", light)
+                        if (light === "key") return;
+    
+                        this.getSnapshotPropertyKeys(snapshot, light).forEach(function(property){
+    
+                            if (light === LIGHTS_ZONE_STAGE){
+                                // console.log("property", property)
+                                // console.log("this.snapshotStore[snapshot][light][property]", JSON.stringify(this.snapshotStore[snapshot][light][property]));
+                            }
+                            
+                            lights[light].updateCurrentProperty(
+                                property, this.snapshotStore[snapshot][light][property], false
+                            );
+                        }, this);
+                        lights[light].sendEdit();
                     }, this);
-                    lights[light].sendEdit();
-                }, this);
+                }
+
             };
 
             Snapshots.prototype.getSnapshotLightkeys = function(snapshot){
-                console.log("### snapshot", snapshot);     
-                console.log("SNAPSHOT");
-                console.log(JSON.stringify(this.snapshotStore));
+                // console.log("### snapshot", snapshot);     
+                // console.log("SNAPSHOT");
+                // console.log(JSON.stringify(this.snapshotStore));
                 return Object.keys(this.snapshotStore[snapshot]).filter(function(key){
                     return key !== "name";
                 });
             };
 
             Snapshots.prototype.getSnapshotPropertyKeys = function(snapshot, light){
+                if (light === "key") return;
                 // console.log("### snapshot", snapshot);                
                 // console.log("### light", light);
                 // console.log("Object.keys(this.snapshotStore[snapshot][light]:", Object.keys(this.snapshotStore[snapshot][light]))
@@ -570,6 +677,7 @@
                     duration: duration,
                     key: key
                 };
+                dataStore.mapping[key] = new Mapping(name, key, TRANSITION);
             };
 
             Snapshots.prototype.removeTransition = function(name){
@@ -586,20 +694,21 @@
             };
 
             Snapshots.prototype.startTransition = function(from, to, duration) {
+                console.log("starting transition")
                 this.getSnapshotLightkeys(from).forEach(function(light){
+                    if (light === "key") return;
                     this.getSnapshotPropertyKeys(from, light).forEach(function(property){
-                        console.log("\n\n\n *** CHECKING UPDATE FROM PROPERTY *** \n\n\n");
-                        console.log("PROPERTY GOING INTO FROM PROPERTY", JSON.stringify(property));
-                        console.log(" this.snapshotStore[from][light][property]", JSON.stringify(this.snapshotStore[from][light][property]));
+                        // console.log("\n\n\n *** CHECKING UPDATE FROM PROPERTY *** \n\n\n");
+                        // console.log("PROPERTY GOING INTO FROM PROPERTY", JSON.stringify(property));
+                        // console.log(" this.snapshotStore[from][light][property]", JSON.stringify(this.snapshotStore[from][light][property]));
                         
-                        console.log("light and property: ", light," : " , property);
+                        // console.log("light and property: ", light," : " , property);
                         
                         var zoneExcludes = ["intensity", "falloffRadius"];
                         if (light.toLowerCase().indexOf("zone") > -1 && zoneExcludes.indexOf(property) > -1){
-                            console.log("\n\n\n *** RETURNING FROM UPDATE FROM PROPERTY *** \n\n\n");
-                            console.log("FOUND ZONE", light);
-                            console.log("FOUND bad property", property);
-
+                            // console.log("\n\n\n *** RETURNING FROM UPDATE FROM PROPERTY *** \n\n\n");
+                            // console.log("FOUND ZONE", light);
+                            // console.log("FOUND bad property", property);
                             return;
                         }
                         lights[light].updateFromProperty(
@@ -609,6 +718,7 @@
                 }, this);
 
                 this.getSnapshotLightkeys(to).forEach(function(light){
+                    if (light === "key") return;
                     this.getSnapshotPropertyKeys(to, light).forEach(function(property){
                         lights[light].updateToProperty(
                             property, this.snapshotStore[to][light][property]
@@ -617,21 +727,27 @@
                 }, this);
                 
                 this.getSnapshotLightkeys(from).forEach(function(light){
+                    if (light === "key") return;
                     lights[light].updateTransitionDuration(duration);
                 });
 
                 this.getSnapshotLightkeys(from).forEach(function(light){
+                    if (light === "key") return;
                     lights[light].startAnimation();
                 });
 
             };
 
             Snapshots.prototype.executeTransitionByName = function(name){
+                console.log("execute transition")
+
                 var from = this.transitionStore[name].from;
                 var to = this.transitionStore[name].to;
                 var duration = this.transitionStore[name].duration;
-
-                this.startTransition(from, to, duration);
+                if (!runningCheck()) {
+                    this.startTransition(from, to, duration);
+                }
+                console.log("CURRENTY RUNNING");
             };
 
             Snapshots.prototype.removeTransition = function(name){
@@ -668,6 +784,17 @@
 
         function loadSettings(){
             dataStore = Settings.getValue(SETTINGS_STRING);
+        }
+
+        function runningCheck(){
+            var keys = Object.keys(lights);
+            for (var i = 0; i < keys.length; i++) {
+                var runningCheck = lights[keys[i]].runningCheck();
+                if (runningCheck === true) {
+                    return true;
+                }
+            }
+            return false;
         }
     // Procedural Functions
     // /////////////////////////////////////////////////////////////////////////
@@ -718,6 +845,30 @@
                     lights[lightKey] = new Light(lights[lightKey], false, dataStore.SnapshotProperties);
                 }
             }, this);
+        }
+
+        function registerDefaults(){
+            var defaultSnapshotKeys = Object.keys(dataStore.defaultSnapshots);
+
+            defaultSnapshotKeys.forEach(function(key, index){
+                var offset = 4;
+                dataStore.snapshots.forceAddSnapshot(key, dataStore.defaultSnapshots[key]);
+                dataStore.snapshots.assignSnapshotToKey(key, index + offset);
+            });
+
+            var defaultTransitionKeys = Object.keys(dataStore.defaultTransitions);
+
+            defaultTransitionKeys.forEach(function(key){
+                var transitionObject = dataStore.defaultTransitions[key];
+                dataStore.snapshots.addTransition(
+                    transitionObject.name,
+                    transitionObject.from,
+                    transitionObject.to,
+                    transitionObject.duration,
+                    transitionObject.key
+                );
+            });
+
         }
 
         function createLightAnimation(){
@@ -771,9 +922,18 @@
         }
 
     function keyPressHandler(event) {
-        // if (dataStore.mapping[event.text]) {
-          
-        // }
+        if (dataStore.mapping[event.text]) {
+            switch (dataStore.mapping[event.text].type){
+                case SNAPSHOT:
+                    dataStore.snapshots.loadSnapshot(dataStore.mapping[event.text].name);
+                    break;
+                case TRANSITION:
+                    dataStore.snapshots.executeTransitionByName(dataStore.mapping[event.text].name);
+                    break;
+                case AUDIO:
+                    break;
+            }
+        }
     }
     
     var messageChannel = "improv";
@@ -830,110 +990,7 @@
             Controller.keyPressEvent.connect(keyPressHandler);
 
             registerLights();
-            
-            // Tests
-            // /////////////////////////////////////////////////////////////////////////// 
-            /*
-                var testSnapshotName ="SNAPTEST";
-                var updatedSnapshotname = "UPDATED_SNAPTEST";
-                var snapKey = "X";
-                var transitionKey = "C";
-                var newTransitionKey = "D";
-                var snapTestTwo = "SnapTestTwo";
-                var transitionName = "oneToTwo";
-                var updatedTransitionName = "UPDATED_TRANSITION";
-                var duration = 2000;
-                console.log("\n\n\nSTARTING TESTS\n\n\n");
-                
-                console.log("\n\nTesting take snapshot\n");
-                
-                dataStore.snapshots.takeSnapshot();
-                console.log("Tempsnapshot Object.keys > 0 : ", Object.keys(dataStore.snapshots.tempSnapshot).length > 0);
-                console.log("snap shot has every light in choices: ", Object.keys(dataStore.snapshots.tempSnapshot).length === dataStore.choices.length);
-                
-                console.log("\n\nTesting add snapshot\n");
-                
-                // console.log(JSON.stringify(dataStore.snapshots.tempSnapshot));
-                dataStore.snapshots.addSnapshot(testSnapshotName);
-                console.log("Snapshot exists in snapshot store : ", dataStore.snapshots.snapshotStore[testSnapshotName].name === testSnapshotName);
-                console.log("temp snapshot is empty : ", Object.keys(dataStore.snapshots.tempSnapshot).length === 0);
-                
-                console.log("\n\nTesting rename snapshot\n");         
-                
-                dataStore.snapshots.renameSnapshot(testSnapshotName, updatedSnapshotname);
-                console.log("Snapshot name updated and exists: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(updatedSnapshotname) > -1);
-                console.log("old Snapshot name doesnt exist: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(testSnapshotName) === -1);
-                
-                console.log("\n\nTesting Assign snapshot to key\n"); 
-
-                dataStore.snapshots.assignSnapshotToKey(updatedSnapshotname, snapKey);
-                console.log("X assigned to snapshot: ", dataStore.snapshots.snapshotStore[updatedSnapshotname].key === snapKey);
-                // console.log(JSON.stringify(dataStore.snapshots.snapshotStore));            
-                
-                console.log("\n\nTesting Adding transition\n");
-
-                dataStore.snapshots.takeSnapshot();
-                dataStore.snapshots.addSnapshot(snapTestTwo);
-                dataStore.snapshots.addTransition(transitionName, updatedSnapshotname, snapTestTwo, duration, transitionKey);
-                console.log("Transition exits: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) > -1);
-                console.log("Transition correct name : ", dataStore.snapshots.transitionStore[transitionName].name === transitionName);
-                console.log("Transition correct from : ", dataStore.snapshots.transitionStore[transitionName].from === updatedSnapshotname);               
-                console.log("Transition correct to : ", dataStore.snapshots.transitionStore[transitionName].to === snapTestTwo);                              
-                console.log("Transition correct duration : ", dataStore.snapshots.transitionStore[transitionName].duration === duration);              
-                console.log("Transition correct key : ", dataStore.snapshots.transitionStore[transitionName].key === transitionKey);               
-                
-                console.log("\n\nTesting updateTransitionName \n");         
-                
-                dataStore.snapshots.renameTransition(transitionName, updatedTransitionName);
-                console.log("TRANSITION name updated and exists: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(updatedTransitionName) > -1);
-                console.log("old transition name doesnt exist: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
-                
-                console.log("\n\nTesting Assign snapshot to key\n"); 
-
-                dataStore.snapshots.assignTransitionToKey(updatedTransitionName, newTransitionKey);
-                console.log("D assigned to snapshot: ", dataStore.snapshots.transitionStore[updatedTransitionName].key === newTransitionKey);
-                // console.log(JSON.stringify(dataStore.snapshots.snapshotStore));            
-                
-                console.log("\n\nTesting getSnapshotLightkeys \n");         
-                console.log("dataStore.snapshots.getSnapshotLightkeys(updatedSnapshotname); ", dataStore.snapshots.getSnapshotLightkeys(updatedSnapshotname));                
-                
-                console.log("\n\nTesting getSnapshotPropertyKeys \n");         
-                console.log("dataStore.snapshots.getSnapshotPropertyKeys(updatedSnapshotname); ", dataStore.snapshots.getSnapshotPropertyKeys(updatedSnapshotname, LIGHTS_ACCENT_SPOT_HOUSE));                
-                
-                console.log("old transition name doesnt exist: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
-                
-                */
-            
-                // NOT COVERED
-                /*
-                    dataStore.snapshots.loadSnapshot
-                    dataStore.snapshots.getSnapshotLightkeys
-                    dataStore.snapshots.getSnapshotPropertyKeys
-                    dataStore.snapshots.startTransition
-
-                // CLEAN UP
-                console.log("\n\nTesting remove transition\n");         
-
-                dataStore.snapshots.removeTransition(updatedTransitionName);
-                console.log("Transition no longer exists: ", Object.keys(dataStore.snapshots.transitionStore).indexOf(transitionName) === -1);
-
-                console.log("\n\nTesting remove snapshot\n");         
-
-                dataStore.snapshots.removeSnapshot(updatedSnapshotname);
-                console.log("Snapshot no longer exists: ", Object.keys(dataStore.snapshots.snapshotStore).indexOf(updatedSnapshotname) === -1);
-                
-                console.log("\n\n\nENDING TESTS TESTS\n\n\n");
-                */
-
-                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateFromIntensity(1000);
-                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateToIntensity(-1000);
-                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].updateTransitionIntensityDuration(1000);
-                // lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].startAnimation();
-
-                // lights[LIGHTS_ZONE_STAGE].updateFromIntensity(10);
-                // lights[LIGHTS_ZONE_STAGE].updateToIntensity(-1);
-                // lights[LIGHTS_ZONE_STAGE].updateTransitionIntensityDuration(20000);
-                // lights[LIGHTS_ZONE_STAGE].startAnimation();
+            registerDefaults();
 
             Script.scriptEnding.connect(scriptEnding);
         }
