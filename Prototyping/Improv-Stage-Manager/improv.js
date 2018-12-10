@@ -43,17 +43,20 @@
             REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
             SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
             SAVE_NEW_SNAPSHOT = "SAVE_NEW_SNAPSHOT",
-
             
             ADD_TRANSITION = "addTransition",
             EXECUTE_TRANSITION_BY_NAME = "executeTransitionByName",
             ASSIGN_TRANSITION_TO_KEY = "assignTransitionToKey",
-            RENAME_TRANSITION = "renameTransition",
-            REMOVE_TRANSITION = "removeTransition",
+            RENAME_TRANSITION = "RENAME_TRANSITION",
+            REMOVE_TRANSITION = "REMOVE_TRANSITION",
+            SAVE_NEW_TRANSITION = "SAVE_NEW_TRANSITION",
+            SAVE_TRANSITION_EDIT = "SAVE_TRANSITION_EDIT",
 
             SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
             ADD_SOUND = "ADD_SOUND",
             REMOVE_SOUND = "REMOVE_SOUND",
+            UPDATE_POSITION = "UPDATE_POSITION",
+            UPDATE_ORIENTATION = "UPDATE_ORIENTATION",
 
             CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
             CHANGE_ALWAYS_TRANSITION_SNAPS = "changeAlwaysTransitionSnaps",
@@ -129,8 +132,8 @@
                         key: "y"
                     }
                 },
-                currentPosition: [0,0,0],
-                currentOrientation: [0,0,0,0],
+                currentPosition: [+MyAvatar.position.x.toFixed(3),+MyAvatar.position.y.toFixed(3),+MyAvatar.position.z.toFixed(3)],
+                currentOrientation: [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)],
                 choices: [
                     LIGHTS_ACCENT_SPOT_HOUSE,
                     LIGHTS_STAGE_SPOT_MAIN,
@@ -905,6 +908,7 @@
             };
 
             Snapshots.prototype.addTransition = function(name, from, to, duration, key) {
+                console.log("Adding Transition");
                 this.transitionStore[name] = {
                     name: name,
                     from: from,
@@ -916,20 +920,27 @@
             };
 
             Snapshots.prototype.removeTransition = function(name){
+                console.log("Removing Transition");
                 delete this.transitionStore[name];
             };
 
             Snapshots.prototype.renameTransition = function(oldName, newName){
+                console.log("renaming Transition");
+
                 this.transitionStore[newName] = this.transitionStore[oldName];
                 delete this.transitionStore[oldName];
             };
 
             Snapshots.prototype.assignTransitionToKey = function(name, key) {
+                console.log("assigngg Transition to key")
+
                 this.transitionStore[name].key = key;
                 dataStore.mapping[key] = new Mapping(name, key, TRANSITION);
             };
 
             Snapshots.prototype.startTransition = function(from, to, duration) {
+                console.log("Starting transition")
+
                 console.log("starting transition");
                 this.getSnapshotLightkeys(from).forEach(function(light){
                     if (light === "key") {
@@ -1159,8 +1170,10 @@
             //
         }
 
-        function removeTransition(){
-            //
+        function removeTransition(name){
+            console.log("in removing transition");
+            dataStore.snapshots.removeTransition(name);
+            ui.updateUI(dataStore);
         }
 
         function changeDefaultTransitionTime(newTime){
@@ -1193,7 +1206,7 @@
 
         function saveSnapshotEdit(oldSnapshot, newSnapshot){
             if (oldSnapshot.key !== newSnapshot.key) {
-                dataStore.audio.removeAudio(oldSnapshot.name)
+                dataStore.snapshot.removeSnapshot(oldSnapshot.name);
             }
             dataStore.snapshot.forceAddSnapshot(newSnapshot.name, newSnapshot);
             ui.updateUI(dataStore);
@@ -1206,8 +1219,41 @@
             ui.updateUI(dataStore);
         }
 
+        function saveNewTransition(newTransition){
+            dataStore.snapshots.addTransition(
+                newTransition.name,
+                newTransition.from,
+                newTransition.to,
+                newTransition.duration,
+                newTransition.key);
+            ui.updateUI(dataStore);
+        }
+
+        function saveTransitionEdit(oldTransition, newTransition){
+            if (oldTransition.key !== newTransition.key) {
+                dataStore.snapshots.removeTransition(oldTransition.name);
+            }
+            dataStore.snapshots.addTransition(
+                newTransition.name,
+                newTransition.from,
+                newTransition.to,
+                newTransition.duration,
+                newTransition.key);
+            ui.updateUI(dataStore);
+        }
+
+        function updatePosition(){
+            dataStore.currentPosition = [+MyAvatar.position.x.toFixed(3),+MyAvatar.position.y.toFixed(3),+MyAvatar.position.z.toFixed(3)];
+            ui.updateUI(dataStore);
+        }
+
+        function updateOrientation(){
+            dataStore.currentOrientation = [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)];
+            ui.updateUI(dataStore);
+        }
+
         function scriptEnding(){
-            Controller.keyPressEvent.connect(keyPressHandler);
+            Controller.keyPressEvent.disconnect(keyPressHandler);
 
             var lightKeys = Object.keys(lights);
             // ##TODO FIX THIS 
@@ -1263,8 +1309,8 @@
                 fadeInTime: 3000,
                 fadeOutTime: 3000,
                 maxVolume: 1.0,
-                position: MyAvatar.position,
-                orientation: MyAvatar.orientation,
+                position: [+MyAvatar.position.x.toFixed(3),+MyAvatar.position.y.toFixed(3),+MyAvatar.position.z.toFixed(3)],
+                orientation: [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)],
                 loop: false,
                 pitch: 2
             }
@@ -1275,8 +1321,6 @@
 
         function updateUI(dataStore) {
             console.log("UPDATE UI");
-            dataStore.currentPosition = MyAvatar.position;
-            dataStore.currentOrientation = MyAvatar.orientation;
             var messageObject = {
                 type: UPDATE_UI,
                 value: dataStore  
@@ -1285,6 +1329,7 @@
         }
 
         function onMessage(data) {
+            console.log(JSON.stringify(data));
             // EventBridge message from HTML script.
             switch (data.type) {
                 case EVENT_BRIDGE_OPEN_MESSAGE:
@@ -1322,7 +1367,8 @@
                     renameTransition();
                     break;
                 case REMOVE_TRANSITION:
-                    removeTransition();
+                    console.log("removing transition received");
+                    removeTransition(data.value);
                     break;
                 case CHANGE_DEFAULT_TRANSITION_TIME:
                     changeDefaultTransitionTime(data.value);
@@ -1345,7 +1391,18 @@
                 case SAVE_NEW_SNAPSHOT:
                     saveNewSnapshot(data.value);
                     break;
-                default: 
+                case SAVE_NEW_TRANSITION:
+                    saveNewTransition(data.value);
+                    break;
+                case SAVE_TRANSITION_EDIT:
+                    saveTransitionEdit(data.value.oldTransition, data.value.newTransition);
+                    break;
+                case UPDATE_POSITION:
+                    updatePosition();
+                    break;
+                case UPDATE_ORIENTATION:
+                    updateOrientation();
+
             }
         }
 

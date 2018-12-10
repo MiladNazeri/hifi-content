@@ -21,8 +21,10 @@
                 :always_transition_snaps="dataStore.snapshots.alwaysTransitionSnaps" 
                 :default_transition_time="dataStore.snapshots.defaultTransitionTime">
             </snapshots>
-            <transitions v-if="dataStore.snapshots.transitionStore" v-bind:transitions="dataStore.snapshots.transitionStore">
-
+            <transitions
+                v-if="dataStore.snapshots.transitionStore" 
+                :snapshots="dataStore.snapshots.snapshotStore" 
+                :transitions="dataStore.snapshots.transitionStore">
             </transitions>
             <audio_library 
                 v-if="dataStore.audio.audioStore" 

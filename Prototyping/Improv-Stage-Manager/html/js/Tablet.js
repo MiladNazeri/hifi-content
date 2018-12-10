@@ -8,22 +8,23 @@
         var 
             BUTTON_NAME = "IMPROV", // !important update in Example.js as well, MUST match Example.js
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
-            LOAD_ANIMATION = "load_animation",
+
             CREATE_LIGHT_ANIMATION = "create_light_animation",
-            REMOVE_LIGHT = "remove_light",
             START_ANIMATION = "start_animation",
-            NEW_ANIMATION = "new_animation",
-            UPDATE_ANIMATION_NAME = "update_animation_name",
-            ADD_LIGHT = "add_light",
 
             REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
             SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
             SAVE_NEW_SNAPSHOT = "SAVE_NEW_SNAPSHOT",
 
+            SAVE_NEW_TRANSITION = "SAVE_NEW_TRANSITION",
+            SAVE_TRANSITION_EDIT = "SAVE_TRANSITION_EDIT",
+            REMOVE_TRANSITION = "REMOVE_TRANSITION",
 
             SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
             ADD_SOUND = "ADD_SOUND",
             REMOVE_SOUND = "REMOVE_SOUND",
+            UPDATE_POSITION = "UPDATE_POSITION",
+            UPDATE_ORIENTATION = "UPDATE_ORIENTATION",
 
             CHANGE_ALWAYS_TRANSITION_SNAPS = "changeAlwaysTransitionSnaps",
             CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
@@ -115,7 +116,6 @@
                 props: ['snapshot'],
                 methods: {
                     removeSnapshot: function () {
-                        console.log(JSON.stringify(this.snapshot));
                         EventBridge.emitWebEvent(JSON.stringify({
                             type: REMOVE_SNAPSHOT,
                             value: this.snapshot.name
@@ -246,19 +246,18 @@
                 `
             })
         
-         // Transitions
+        // Transitions
         // ////////////////////////////////////////////////////////////////////
             Vue.component('transitions', {
-                props: ['transitions'],
+                props: ['snapshots', 'transitions'],
                 methods: {
-                    toggleShowNewTransition: function () {
+                    toggleShowNewTransition: function(){
                         this.showNewTransition = !this.showNewTransition;
                     }
                 },
-                data: function () {
+                data: function(){
                     return {
                         showNewTransition: false
-
                     }
                 },
                 template: /*html*/`
@@ -266,9 +265,9 @@
                         <div class="card-header" data-toggle="collapse" data-target="#transitions-body">
                             <h5>Transitions</h5>
                         </div>
-                        <div class="card-body collapse" id="transitions-body">
-                            <transition v-for="transition in transitions" :transition="transition"></transition>
-                            <new_transition v-if="showNewTransition"></new_transition>
+                        <div class="collapse card-body" id="transitions-body">
+                            <transition v-for="transition in transitions" :transition="transition" :snapshots="snapshots"></transition>
+                            <new_transition v-if="showNewTransition" :snapshots="snapshots"></new_transition>
                             <button v-if="!showNewTransition" class="btn btn-primary" v-on:click="toggleShowNewTransition">Add new transition</button>
                         </div>
                     </div>
@@ -276,78 +275,202 @@
             });
 
             Vue.component('transition', {
-                props: ['transition'],
+                props: ['transition','snapshots'],
                 methods: {
-
+                    removeTransition: function () {
+                        EventBridge.emitWebEvent(JSON.stringify({
+                            type: REMOVE_TRANSITION,
+                            value: this.transition.name
+                        }));
+                    }
                 },
                 data: function () {
                     return {
-
+                        editMode: false
                     }
                 },
                 template: /*html*/`
                     <div class="card">
                         <div class="card-header" data-toggle="collapse" :data-target="'#' + transition.name">
                             <h5>{{transition.name}}</h5>
-                            <span>Key: {{transition.key}}</span>
+                            <span>Key: {{transition.key}}</span> <span class="icon icon-close float-right" @click="removeTransition"></span>
                         </div>
                         <div class="card-body collapse" :id="transition.name">
-                            test
+                            <display_transition v-if="!editMode" :transition="transition"></display_transition>
+                            <edit_transition v-if="editMode" :transition="transition" :snapshots="snapshots"></edit_transition>
                         </div>
                     </div>
                 `
             })
 
-            Vue.component('edit_transition', {
-                
-            })
-
-            Vue.component('new_transition', {
-                props: [],
+            Vue.component('display_transition', {
+                props: ['transition'],
                 methods: {
-                    saveSnapShot: function () {
-                        this.$parent.showNewSnapshot = false;
+                    edit: function () {
+                        this.$parent.editMode = true;
                     }
                 },
                 data: function () {
                     return {
-
+                        editMode: false
                     }
                 },
                 template: /*html*/`
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>New Snapshot</h5>
-                                </div>
-                                <div class="card-body">
-                                    test
-                                    <button class="btn btn-primary" v-on:click="saveSnapShot">Save Snapshot</button>
-                                </div>
+                    <div>
+                        <div class="icon icon-edit-pencil" v-on:click="edit">
+                        </div>
+                        <div>
+                            <h5>name: </h5>
+                            <p>{{transition.name}}</p>
+                        </div>
+                        <div>
+                            <h5>key: </h5>
+                            <p>{{transition.key}}</p>
+                        </div>
+                        <div>
+                            <h5>from: </h5>
+                            <p>{{transition.from}}</p>
+                        </div>
+                        <div>
+                            <h5>to: </h5>
+                            <p>{{transition.to}}</p>
+                        </div>
+                        <div>
+                            <h5>duration: </h5>
+                            <p>{{transition.duration}}</p>
+                        </div>
+                        
+                    </div>
+                `
+            })
+
+            Vue.component('edit_transition', {
+                props: ['snapshots', "new", 'transition'],
+                methods: {
+                    saveEdit: function () {
+                        this.$parent.editMode = false;
+                        if (this.new){
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_NEW_TRANSITION,
+                                value: this.newTransition
+                            }));
+                        } else {
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_TRANSITION_EDIT,
+                                value: {
+                                    oldTransition: this.transition,
+                                    newTransition: this.newTransition
+                                }
+                            }));
+                        }
+                    },
+                    cancelEdit: function () {
+                        this.newTransition = Object.assign({}, this.transition);
+                        this.$parent.editMode = false;
+                    },
+                    selectFrom: function (name) {
+                        this.newTransition.from = name;
+                        this.toggleFrom();
+                    },
+                    selectTo: function (name) {
+                        this.newTransition.to = name;
+                        this.toggleTo();
+                    },
+                    toggleFrom: function(){
+                        this.toggle_from = !this.toggle_from;
+                    },
+                    toggleTo: function(){
+                        this.toggle_to = !this.toggle_to;
+                    },
+                },
+                data: function () {
+                    return {
+                        newTransition: Object.assign({}, this.transition),
+                        toggle_from: false,
+                        toggle_to: false
+                    }
+                },
+                template: /*html*/`
+                    <div>
+                        <div>
+                            <h5>name: </h5>
+                            <input type="text" class="form-control" v-model="newTransition.name">
+                        </div>
+                        <div>
+                            <h5>key: </h5>
+                            <input type="text" class="form-control" v-model="newTransition.key">
+                        </div>
+                        <div>
+                            <div class="dropdown">
+                                <ul class="dropdown-type">
+                                    <button class="btn-sm btn-primary mt-1 mr-1" id="toggle_from" v-on:click="toggleFrom()">
+                                        From
+                                    </button>
+                                    <div id="fromDropdown" class="dropdown-items" :class="{ show: toggle_from }">
+                                        <li v-for="snapshot in snapshots" v-on:click="selectFrom(snapshot.name)">{{ snapshot.name }}</li>
+                                    </div>
+                                </ul>
                             </div>
-                        `
+                        </div>
+                        <div>
+                            <p>Selected From: {{newTransition.from}}</p>                    
+                        </div>
+                        <div>
+                            <div class="dropdown">
+                                <ul class="dropdown-type">
+                                    <button class="btn-sm btn-primary mt-1 mr-1" id="toggle_to" v-on:click="toggleTo()">
+                                        To
+                                    </button>
+                                    <div id="toDropdown" class="dropdown-items" :class="{ show: toggle_to }">
+                                        <li v-for="snapshot in snapshots" v-on:click="selectTo(snapshot.name)">{{ snapshot.name }}</li>
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Selected To: {{newTransition.to}}</p>                     
+                        </div>
+                        <div>
+                            <h5>duration: </h5>
+                            <input type="number" class="form-control" min="0"v-model="newTransition.duration">
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" v-on:click="saveEdit">Save Edit</button>
+                            <button class="btn btn-warning" v-on:click="cancelEdit">Cancel Edit</button>
+                        </div>
+                    </div>
+                `
             })
 
             Vue.component('new_transition', {
-                props: [],
+                props: ['snapshots'],
                 methods: {
                     saveTransition: function () {
                         this.$parent.showNewTransition = false;
                     }
                 },
+                watch: {
+                    editMode: function (oldProp, newProp) {
+                        if (oldProp !== newProp) {
+                            this.$parent.showNewTransition = false;
+                        }
+                    }
+                },
                 data: function () {
                     return {
-
+                        editMode: true,
+                        newTransition: {
+                            name: "",
+                            key: "",
+                            from: "",
+                            to: "",
+                            duration: 0
+                        }
                     }
                 },
                 template: /*html*/`
                     <div class="card">
-                        <div class="card-header">
-                            <h5>this is a new transition</h5>
-                        </div>
-                        <div class="card-body">
-                            test
-                            <button class="btn btn-primary" v-on:click="saveTransition">Save Transition</button>
-                        </div>
+                        <edit_transition v-if="editMode" :new="true" :transition="newTransition" :snapshots="snapshots"></edit_transition>
                     </div>
                 `
             })
@@ -372,7 +495,7 @@
                             <h5>Audio</h5>
                         </div>
                         <div class="card-body collapse" id="audio_library-body">
-                            <sound v-for="sound in audio" :sound="sound"></sound>
+                            <sound v-for="sound in audio" :sound="sound" :current_position="current_position" :current_orientation="current_orientation"></sound>
                             <new_sound v-if="showNewSound" :current_position="current_position" :current_orientation="current_orientation"></new_sound>
                             <button v-if="!showNewSound" class="btn btn-primary" v-on:click="toggleShowNewSound">Add new Sound</button>
                         </div>
@@ -380,7 +503,6 @@
                 `
             });
 
-            
             Vue.component('sound', {
                 props: ['sound', 'current_position', 'current_orientation'],
                 methods: {
@@ -456,11 +578,11 @@
                         </div>
                         <div>
                             <h5>Position </h5>
-                            <p>{{sound.position}}</p>
+                            <p>{{sound.position[0] + ', ' + sound.position[1] + ', ' + sound.position[2]}}</p>
                         </div>
                         <div>
                             <h5>Orientation </h5>
-                            <p>{{sound.orientation}}</p>
+                            <p>{{+sound.orientation[0] + ', ' + +sound.orientation[1] + ', ' + +sound.orientation[2] + +sound.orientation[3]}}</p>
                         </div>
                     </div>
                 `
@@ -482,11 +604,49 @@
                     cancelEdit: function(){
                         this.newSound = Object.assign({}, this.sound);
                         this.$parent.editMode = false;
+                    },
+                    updatePosition: function(){
+                        EventBridge.emitWebEvent(JSON.stringify({
+                            type: UPDATE_POSITION
+                        }));
+                        // this.newSound.position = [+this.current_position.x.toFixed(3), +this.current_position.y.toFixed(3), +this.current_position.z.toFixed(3)];
+                    },
+                    updateOrientation: function(){
+                        EventBridge.emitWebEvent(JSON.stringify({
+                            type: UPDATE_ORIENTATION
+                        }));
+                        // this.newSound.orientation = [+this.current_orientation.x.toFixed(3), +this.current_orientation.y.toFixed(3), +this.current_orientation.z.toFixed(3), +this.current_orientation.w.toFixed(3)];
                     }
                 },
                 data: function () {
                     return {
-                        newSound: Object.assign({}, this.sound)
+                        newSound: Object.assign(
+                            {}, 
+                            this.sound, 
+                            {
+                                position: [this.sound.position[0], this.sound.position[1], this.sound.position[2]], 
+                                orientation: [this.sound.orientation[0], this.sound.orientation[1], this.sound.orientation[2], this.sound.orientation[3]]
+                            })
+                    }
+                },
+                watch: {
+                    current_position: function (oldProp, newProp){
+                        console.log("current position changed")
+                        console.log(JSON.stringify(oldProp));
+                        console.log(JSON.stringify(newProp));
+                        if (oldProp !== newProp){
+                            this.newSound.position = [newProp[0], newProp[1], newProp[2]];
+                            this.$forceUpdate();
+                        }
+                    },
+                    current_orientation: function (oldProp, newProp){
+                        console.log("current current_orientation changed")
+                        console.log(JSON.stringify(oldProp));
+                        console.log(JSON.stringify(newProp));
+                        if (oldProp !== newProp){
+                            this.newSound.orientation = [newProp[0], newProp[1], newProp[2], newProp[3]];
+                            this.$forceUpdate();
+                        }
                     }
                 },
                 template: /*html*/`
@@ -520,11 +680,13 @@
                             <input type="checkbox" :checked="newSound.loop">
                         </div>
                         <div>
-                            <h5>Position ([0,0,0])</h5>
+                            <h5>Position (0,0,0)</h5>
+                            <button class="btn btn-primary" @click="updatePosition">Update with Current Position</button>
                             <input type="text" class="form-control" v-model="newSound.position">
                         </div>
                         <div>
-                            <h5>Orientation ([0,0,0,0])</h5>
+                            <h5>Orientation (0,0,0,0)</h5>
+                            <button class="btn btn-primary" @click="updateOrientation">Update with Current Orientation</button>
                             <input type="text" class="form-control" v-model="newSound.orientation">
                         </div>
                         <div class="mt-2">
