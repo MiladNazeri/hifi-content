@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 "use strict";
 /* eslint-disable indent */
 
@@ -47,8 +48,8 @@
             RENAME_TRANSITION = "renameTransition",
             REMOVE_TRANSITION = "removeTransition",
 
-            CHANGE_DEFAULT_TRANSITION_TIME = "changeDefaultTransitionTime",
-            CHANGE_ALWAYS_TRANSITION = "changeAlwaysTransition",
+            CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
+            CHANGE_ALWAYS_TRANSITION_SNAPS = "changeAlwaysTransitionSnaps",
             
 
             UPDATE_UI = BUTTON_NAME + "_update_ui",
@@ -96,6 +97,7 @@
             ui,
             defaultDataStore = {
                 snapshots: new Snapshots(),
+                audio: new AudioLibrary(),
                 defaultSnapshots: {
                     blackout: defaults.blackout,
                     improv_troop_full_wash: defaults.improv_troop_full_wash,
@@ -161,127 +163,354 @@
         }   
 
         // Audio
-        // /////////////////////////////////////////////////////////////////////////
-            // function Sound(url) {
-            //     this.url = url;
-            //     this.sound = SoundCache.getSound(url);
-            //     this.injector;
-            //     this.SECS_TO_MS = 1000;
-            //     this.fadeInTime = 2000;
-            //     this.fadeOutTime = 2000;
-            //     this.maxVolume = 1.0;
-            //     this.minVolume = 0.0;
-                                
-            // }
+        // ///////////////////////////////////////////////////////////////////////
+            function Sound(url, name) {
+                this.url = url;
+                this.name = name;
+                this.sound = SoundCache.getSound(url);
+                console.log(this.sound);
+                this.injector;
+                this.SECS_TO_MS = 1000;
+                this.fadeInTimer = null;
+                this.fadeOutTimer = null;
+                this.fadeInTime = 2000;
+                this.fadeOutTime = 2000;
+                this.percentChange = 0.01;
+                this.fadeInDurationTimeStep = this.fadeInTime * this.percentChange;
+                this.fadeOutDurationTimeStep = this.fadeOutTime * this.percentChange;
+                this.fadeLevelStep = this.maxVolume * this.percentChange;
+                this.fadeOutStarted = false;
+                this.fadeOutStopped = false;
+                this.fadeInStopped = false;
+                this.fadeOutStopped = false;
+                this.shouldFadeIn = true;
+                this.shouldFadeOut = true;
+                this.maxVolume = 1.0;
+                this.minVolume = 0.0;
+                this.currentVolume = 1.0;
+                this.position = null;
+                this.orientation = null;
+                this.pitch = null;
+                this.loop = false;
+                this.secondOffset = null;
+                this.localOnly = false;          
+            }
 
-            // Sound.prototype = {
+            Sound.prototype = {
+                changePosition: function(position) {
+                    console.log("changing Position")
+                    this.position = position;
+                    if (this.injector) {
+                        this.injector.setOptions({ position: this.position});
+                    }
+                },
+                changeOrientation: function(orientation) {
+                    console.log("changing Orientation")
+                    this.changeOrientation = orientation;
+                    if (this.injector) {
+                        this.injector.setOptions({ orientation: this.orientation });
+                    }
+                },
+                changeSecondOffset: function(secondOffset) {
+                    console.log("changing offset")
 
-            //     changeFadeInTime: function(time) {
-            //         this.fadeInTime = time;
-            //     },
-            //     changeFadeOutTime: function(time){
-            //         this.fadeOutTime = time;
-            //     },
-            //     fadeIn: function () {
+                    this.secondOffset = secondOffset;
+                    if (this.injector) {
+                        this.injector.setOptions({ secondOffset: this.secondOffset });
+                    }
+                },
+                changeLoop: function(shouldLoop) {
+                    console.log("changing loop")
 
-            //     },
-            //     fadeOut: function () {
+                    this.loop = shouldLoop;
+                    if (this.injector) {
+                        this.injector.setOptions({ loop: this.loop });
+                    }
+                },
+                changePitch: function(pitch) {
+                    console.log("changing pitch")
 
-            //     },
-            //     getURL: function () {
-            //         return this.url;
-            //     },
-            //     isLoaded: function () {
-            //         return this.sound.downloaded;
-            //     },
-            //     getDurationSeconds: function () {
-            //         if (this.sound.downloaded) {
-            //             return this.sound.duration;
-            //         }
-            //     },
-            //     getDurationMS: function () {
-            //         if (this.sound.downloaded) {
-            //             return this.sound.duration * this.SECS_TO_MS;
-            //         }
-            //     },
-            //     playSoundStaticPosition: function (injectorOptions, bufferTime, onCompleteCallback, args) {
+                    this.pitch = pitch;
+                    if (this.injector) {
+                        this.injector.setOptions({ pitch: this.pitch });
+                    }
+                },
+                changeFadeInTime: function(time) {
+                    console.log("changing fadeintime")
 
-            //         if (this.sound.downloaded) {
+                    this.fadeInTime = time;
+                    this.fadeInTime * this.percentChange;
+                },
+                changeFadeOutTime: function(time){
+                    console.log("changing fadeouttime")
 
-            //             this.injector = Audio.playSound(this.sound, injectorOptions);
+                    this.fadeOutTime = time;
+                    this.fadeOutTime * this.percentChange;
+                },
+                changeMaxVolume: function (volume) {
+                    console.log("changing maxvolume")
 
-            //             var soundLength = this.getDurationMS();
+                    this.maxVolume = Math.max(volume, 1.0);
+                    this.fadeLevelStep = this.maxVolume * this.percentChange;
+                },
+                changeCurrentVolume: function (volume) {
+                    console.log("changing currentvolume")
+                    console.log("volume:", volume);
+                    this.currentVolume = volume;
+                    if (this.injector) {
+                        console.log("setting options")
+                        console.log("this.currentVolume", this.currentVolume);
+                        this.injector.setOptions({ volume: this.currentVolume });
+                    }
+                },
+                changeShouldFadeIn: function (shouldFadeIn) {
+                    console.log("changeShouldFadeIn")
 
-            //             if (bufferTime && typeof bufferTime === "number") {
-            //                 soundLength = soundLength + bufferTime;
-            //             }
-            //             var injector = this.injector;
+                    this.shouldFadeIn = shouldFadeIn;
+                },
+                changeShouldFadeOut: function (shouldFadeOut) {
+                    console.log("changeShouldFadeOut")
 
-            //             Script.setTimeout(function () {
+                    this.shouldFadeOut = shouldFadeOut;
+                },
+                fadeIn: function () {
+                    console.log("fadeIn")
 
-            //                 if (injector) {
-            //                     injector.stop();
-            //                     injector = null;
-            //                 }
+                    var _this = this;
+                    this.fadeInStarted = true;
+                    if (this.injector && this.injector.isPlaying()){
+                        this.fadeInTimer = Script.setInterval(function(){
+                            console.log("Starting fade in")
+                            console.log("_this.currentVolume", _this.currentVolume)
 
-            //                 if (onCompleteCallback) {
-            //                     onCompleteCallback(args);
-            //                 }
+                            _this.currentVolume += _this.fadeLevelStep;
+                            _this.currentVolume = Math.min(_this.maxVolume, _this.currentVolume);
+                            _this.injector.setOptions({ volume: _this.currentVolume });
+                            if (_this.currentVolume >= _this.maxVolume) {
+                                _this.fadeInStarted = false;
+                                Script.clearInterval(_this.fadeInTimer);
+                            }
+                        }, this.fadeInDurationTimeStep);
+                    }
+                },
+                fadeOut: function () {
+                    console.log("fadeOut")
 
-            //             }, soundLength);
-            //         }
-            //     },
-            //     updateOptions: function(options){
-            //         var finalObject = {};
-            //         Object.keys(options).forEach(function(arg){
-            //             if(typeof options[arg] !== "undefined") {
-            //                 finalObject[arg] = options[arg];
-            //             }
-            //         })
-            //         this.injector.setOptions(finalObject);
-            //     },
-            //     unload: function () {
-            //         if (this.injector) {
-            //             this.injector.stop();
-            //             this.injector = null;
-            //         }
-            //     },
-            // };
+                    var _this = this;
+                    this.fadeOutStarted = true;
+                    if (this.injector && this.injector.isPlaying()) {
+                        console.log("_this.currentVolume", _this.currentVolume)
+                        console.log("_this.minVolume", _this.minVolume);
+                        console.log("_this.fadeLevelStep", _this.fadeLevelStep);
+                        this.fadeOutTimer = Script.setInterval(function () {
+                            console.log("stopping fade out");
+                            _this.currentVolume -= _this.fadeLevelStep;
+                            console.log(" _this.currentVolume After", _this.currentVolume)
+                            _this.currentVolume = Math.max(_this.minVolume, _this.currentVolume);
+                            _this.injector.setOptions({ volume: _this.currentVolume });
+                            if (_this.currentVolume <= _this.minVolume) {
+                                _this.fadeOutStarted = false;
+                                _this.injector.stop();
+                                _this.injector = null;
+                                Script.clearInterval(_this.fadeOutTimer);
+                            }
+                        }, this.fadeOutDurationTimeStep);
+                    }
+                },
+                getURL: function () {
+                    return this.url;
+                },
+                getDurationSeconds: function () {
+                    if (this.sound.downloaded) {
+                        return this.sound.duration;
+                    }
+                },
+                getDurationMS: function () {
+                    if (this.sound.downloaded) {
+                        return this.sound.duration * this.SECS_TO_MS;
+                    }
+                },
+                play: function(restart) {
+                    console.log("play")
+                    if (this.fadeInStarted || this.fadeOutStarted) {
+                        return;
+                    }
+
+                    if (this.injector && this.injector.isPlaying() && !restart) {
+                        console.log("stop")
+
+                        this.stop();
+                        return;
+                    }
+                    if (this.injector && this.injector.isPlaying() && restart) {
+                        console.log("restart")
+                        this.unload();
+                        this.play();
+                        return;
+                    }
+                    this.playSoundStaticPosition();
+                },
+                playSoundStaticPosition: function (injectorOptions, bufferTime, onCompleteCallback, args) {
+                    console.log("playSoundStaticPosition")
+                    var _this = this;
+                    var presetInjectorOptions = {};
+                    this.position !== null && (presetInjectorOptions.position = this.position);
+                    this.orientation !== null && (presetInjectorOptions.orientation = this.orientation);
+                    this.volume !== null && (presetInjectorOptions.volume = this.maxVolume);
+                    this.loop !== null && (presetInjectorOptions.loop = this.loop);
+                    this.localOnly !== null && (presetInjectorOptions.localOnly = this.localOnly);
+                    this.pitch !== null && (presetInjectorOptions.pitch = this.pitch);
+
+                    this.injectorOptions = this.injectorOptions || presetInjectorOptions;
+                    if (this.sound.downloaded) {
+
+                        this.shouldFadeIn && this.changeCurrentVolume(this.minVolume);
+                        this.injector = Audio.playSound(this.sound, injectorOptions);
+                        this.shouldFadeIn && this.fadeIn();
+                        var soundLength = this.getDurationMS();
+
+                        if (bufferTime && typeof bufferTime === "number") {
+                            soundLength = soundLength + bufferTime;
+                        }
+                        var injector = this.injector;
+
+                        if (!this.loop && this.shouldFadeOut && !this.fadeOutStarted) {
+                            var startFadeOutTime = soundLength - this.fadeOutTime;
+                            Script.setTimeout(function(){
+                                _this.fadeOut();
+                            }, startFadeOutTime);
+                        }
+
+                        if (!this.loop) {
+                            Script.setTimeout(function () {
+
+                                if (injector) {
+                                    injector.stop();
+                                    injector = null;
+                                }
+
+                                if (onCompleteCallback) {
+                                    onCompleteCallback(args);
+                                }
+
+                            }, soundLength);
+                        }
+                    }
+                },
+                stop: function(){
+                    console.log("stop");
+                    
+                    if (this.shouldFadeOut && !this.fadeOutStarted) {
+                        this.fadeOutStarted = true;
+                        this.fadeOut();
+                    } else {
+                        this.unload();
+                    }
+                },
+                isLoaded: function () {
+                    console.log("isLoaded");
+
+                    return this.sound.downloaded;
+                },
+                updateOptions: function(options){
+                    var finalObject = {};
+                    Object.keys(options).forEach(function(arg){
+                        if (typeof options[arg] !== "undefined") {
+                            finalObject[arg] = options[arg];
+                        }
+                    });
+                    this.injector && this.injector.setOptions(finalObject);
+                },
+                unload: function () {
+                    console.log("unload");
+
+                    if (this.injector) {
+                        this.injector.stop();
+                        this.injector = null;
+                    }
+                }
+            };
             
-            // function Audio(){
-            //     this.audioStore = {};
+            function AudioLibrary() {
+                this.audioStore = {};
+            }
+            
+            AudioLibrary.prototype.addAudio = function(name, audioObject) {
+                console.log("addAudio");
 
-            // }
+                this.audioStore[name] = new Sound(audioObject.url, name);
+                this.audioStore[name].key = audioObject.key;
+                audioObject.shouldFadeIn !== 'undefined' && this.audioStore[name].changeShouldFadeIn(audioObject.shouldFadeIn);
+                audioObject.shouldFadeOut !== 'undefined' && this.audioStore[name].changeShouldFadeOut(audioObject.shouldFadeOut);
+                audioObject.fadeInTime !== 'undefined' && this.audioStore[name].changeFadeInTime(audioObject.fadeInTime);
+                audioObject.fadeOutTime !== 'undefined' && this.audioStore[name].changeFadeOutTime(audioObject.fadeOutTime);
+                audioObject.maxVolume !== 'undefined' && this.audioStore[name].changeMaxVolume(audioObject.maxVolume);
+                audioObject.position !== 'undefined' && this.audioStore[name].changePosition(audioObject.position);
+                audioObject.orientation !== 'undefined' && this.audioStore[name].changeOrientation(audioObject.orientation);
+                audioObject.loop !== 'undefined' && this.audioStore[name].changeLoop(audioObject.loop);
+                audioObject.pitch !== 'undefined' && this.audioStore[name].changePitch(audioObject.pitch);
 
-            // Audio.prototype.addAudio = function() {
+                dataStore.mapping[audioObject.key] = new Mapping(name, audioObject.key, AUDIO);
+            };
 
-            // };
+            AudioLibrary.prototype.renameAudio = function (oldName, newName) {
+                console.log("renameAudio");
 
-            // Audio.prototype.renameAudio = function () {
+                this.audioStore[newName] = this.audioStore[oldName];
+                this.audioStore[newName].name = newName;
+                delete this.audioStore[oldName];
+            };
 
-            // };
+            AudioLibrary.prototype.removeAudio = function (name) {
+                console.log("removeAudio");
 
-            // Audio.prototype.removeAudio = function () {
+                if (this.audioStore[name]) {
+                    this.audioStore[name].unload();
+                }
+                delete this.audioStore[name];
+            };
 
-            // };
+            AudioLibrary.prototype.assignAudioToKey = function (name, key) {
+                console.log("assignAudioToKey");
 
-            // Audio.prototype.assignAudioToKey = function () {
+                this.audioStore[name].key = key;
+                dataStore.mapping[key] = new Mapping(name, key, AUDIO);
+            };
 
-            // };
+            AudioLibrary.prototype.playAudio = function (name) {
+                console.log("playAudio");
 
-            // Audio.prototype.playAudio = function () {
+                this.audioStore[name].play();
+            };
 
-            // };
+            AudioLibrary.prototype.stopAudio = function (name) {
+                console.log("stopAudio");
 
-            // Audio.prototype.startFadeIn = function () {
+                this.audioStore[name].stop();
+            };
 
-            // };
+            AudioLibrary.prototype.changeFadeOptions = function (name, fadeOptions) {
+                console.log("changeFadeOptions");
 
-            // Audio.prototype.startFadeOut = function () {
+                this.audioStore[name].changeShouldFadeIn(fadeOptions.shouldFadeIn);
+                this.audioStore[name].changeShouldFadeOut(fadeOptions.shouldFadeOut);
+                this.audioStore[name].changeFadeInTime(fadeOptions.fadeInTime);
+                this.audioStore[name].changeFadeOutTime(fadeOptions.fadeOutTime);
+                this.audioStore[name].changeLoop(fadeOptions.loop);
+            };
 
-            // };
+            AudioLibrary.prototype.changeVolumeOptions= function (name, volumeOptions) {
+                console.log("changeVolumeOptions");
 
+                this.audioStore[name].minVolume = volumeOptions.minVolume;
+                this.audioStore[name].maxVolume = volumeOptions.maxVolume;
+            };
 
+            AudioLibrary.prototype.changePose = function(name, pose){
+                console.log("changePose");
+                pose.position && this.audioStore[name].changePosition(pose.position);
+                pose.orientation && this.audioStore[name].changePosition(pose.orientation);
+            };
 
         // Light
         // /////////////////////////////////////////////////////////////////////////
@@ -293,8 +522,9 @@
                 this.current = {};
                 this.running = {};
                 this.isRunning = false;
+                this.percentChange = 0.01;
                 
-                this.zoneExcludes = ["intensity", "falloffRadius"]
+                this.zoneExcludes = ["intensity", "falloffRadius"];
                 propsToWatch.forEach(function(property){
                     if (isZone) {
                         if (this.zoneExcludes.indexOf(property) > -1){
@@ -347,6 +577,7 @@
 
             Light.prototype.runningCheck = function(){
                 var runningKeys = Object.keys(this.running).length;
+                console.log("runningKeys", runningKeys);
                 if (runningKeys > 0) {
                     this.isRunning = true;
                     return true;
@@ -357,7 +588,7 @@
             };
 
             Light.prototype.startAnimation = function(){
-                console.log("STARTING LIGHT ANIMATION")
+                console.log("STARTING LIGHT ANIMATION");
                 var _this = this;
                 Object.keys(this.from).forEach(function(property){
                     var fromValue = 0;
@@ -395,9 +626,11 @@
                     innerKey = Object.keys(this.from[property])[0];
 
                     if (typeof this.from[property].value === 'undefined') {
-                        _this.current[property][innerKey].timer = Script.setInterval(animationUpdate, this.transitionDurationStep);
+                        _this.current[property][innerKey].timer = 
+                            Script.setInterval(animationUpdate, this.transitionDurationStep);
                     } else {
-                        _this.current[property].timer = Script.setInterval(animationUpdate, this.transitionDurationStep);
+                        _this.current[property].timer = 
+                            Script.setInterval(animationUpdate, this.transitionDurationStep);
                     }
                     this.running[property] = true;
                     function animationUpdate(){
@@ -432,10 +665,12 @@
                             }
                             _this.updateCurrentProperty(property, newValue, true);
                         }
+                        var current = 0;
+                        var to = 0;
                         if (typeof _this.from[property].value === 'undefined'){ 
                             innerKey = Object.keys(_this.from[property])[0];
-                            var current = _this.current[property][innerKey].value;
-                            var to = _this.to[property][innerKey].value;
+                            current = _this.current[property][innerKey].value;
+                            to = _this.to[property][innerKey].value;
                             if (_this.current[property][innerKey].direction === DIRECTION_INCREASE &&
                                 current >= to){
                                 _this.stopAnimation(property, innerKey);
@@ -447,8 +682,8 @@
                                 _this.stopAnimation(property, innerKey);
                             } 
                         } else {
-                            var current = _this.current[property].value;
-                            var to = _this.to[property].value;
+                            current = _this.current[property].value;
+                            to = _this.to[property].value;
                             if (_this.current[property].direction === DIRECTION_INCREASE &&
                                 current >= to){
                                 delete _this.running[property];
@@ -502,7 +737,7 @@
                     var innerKey = Object.keys(value)[0];
                     var newValue;
 
-                    if (typeof value[innerKey].value === 'undefined')  {
+                    if (typeof value[innerKey].value === 'undefined') {
                         newValue = value[innerKey];
                     } else {
                         newValue = value[innerKey].value;
@@ -530,17 +765,19 @@
 
             Light.prototype.updateTransitionDuration = function(newTransitionDuration){
                 this.transitionDuration = newTransitionDuration;
-                this.transitionDurationStep = this.transitionDuration * 0.01;
+                this.transitionDurationStep = this.transitionDuration * this.percentChange;
                 this.updateChange();
             };
 
             Light.prototype.updateChange = function(){
-                var keys = Object.keys(this.current).forEach(function(key){
+                Object.keys(this.current).forEach(function(key){
                     if (typeof this.current[key].value !== 'undefined') {
-                        this.current[key].changeStep = Math.abs(this.from[key].value - this.to[key].value) * 0.01;
+                        this.current[key].changeStep = 
+                            Math.abs(this.from[key].value - this.to[key].value) * this.percentChange;
                     } else {
                         var innerKey = Object.keys(this.current[key]);
-                        this.current[key][innerKey].changeStep = Math.abs(this.from[key][innerKey].value - this.to[key][innerKey].value) * 0.01;
+                        this.current[key][innerKey].changeStep = 
+                            Math.abs(this.from[key][innerKey].value - this.to[key][innerKey].value) * this.percentChange;
                     }
                 }, this);
             };
@@ -560,19 +797,19 @@
                 this.transitionStore = {};
                 this.tempSnapshot = {};
                 this.currentSnap = {};
-                this.alwaysTransition = true;
-                this.defaultTransitionTime = 10000 ;
+                this.alwaysTransitionSnaps = true;
+                this.defaultTransitionTime = 1000 ;
                 this.previousTransition = null;
                 this.nextTransition = null;
             }
 
             Snapshots.prototype.changeDefaultTransitionTime = function(newTransitionTime) {
                 this.defaultTransitionTime = newTransitionTime;
-            }
+            };
 
-            Snapshots.prototype.changeAlwaysTransition = function(shouldAlwaysTransition) {
-                this.alwaysTransition = shouldAlwaysTransition;
-            }
+            Snapshots.prototype.changeAlwaysTransitionSnaps = function(shouldAlwaysTransitionSnaps) {
+                this.alwaysTransitionSnaps = shouldAlwaysTransitionSnaps;
+            };
 
             Snapshots.prototype.addSnapshot = function(name) {
                 this.tempSnapshot.name = name;
@@ -581,6 +818,7 @@
             };
 
             Snapshots.prototype.forceAddSnapshot = function(name, snapshot){
+                snapshot.name = name;
                 this.snapshotStore[name] = snapshot;
             };
 
@@ -617,16 +855,20 @@
                         }
                     }, this);
                 }, this);
-            }
+            };
             
             Snapshots.prototype.loadSnapshot = function(snapshot){
-                if (this.alwaysTransition) {
+                if (this.alwaysTransitionSnaps) {
                     this.takeSnapshot(); 
                     this.addSnapshot("alwaysTransition"); 
-                    this.startTransition("alwaysTransition", snapshot, this.defaultTransitionTime);
+                    if (!runningCheck()) {
+                        this.startTransition("alwaysTransition", snapshot, this.defaultTransitionTime);
+                    }
                 } else {
                     this.getSnapshotLightkeys(snapshot).forEach(function(light){
-                        if (light === "key") return;
+                        if (light === "key") {
+                            return;
+                        }
     
                         this.getSnapshotPropertyKeys(snapshot, light).forEach(function(property){
                             lights[light].updateCurrentProperty(
@@ -646,7 +888,9 @@
             };
 
             Snapshots.prototype.getSnapshotPropertyKeys = function(snapshot, light){
-                if (light === "key") return;
+                if (light === "key") {
+                    return;
+                }
                 return Object.keys(this.snapshotStore[snapshot][light]);
             };
 
@@ -672,12 +916,15 @@
 
             Snapshots.prototype.assignTransitionToKey = function(name, key) {
                 this.transitionStore[name].key = key;
+                dataStore.mapping[key] = new Mapping(name, key, TRANSITION);
             };
 
             Snapshots.prototype.startTransition = function(from, to, duration) {
-                console.log("starting transition")
+                console.log("starting transition");
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") return;
+                    if (light === "key") {
+                        return;
+                    }
                     this.getSnapshotPropertyKeys(from, light).forEach(function(property){
                         var zoneExcludes = ["intensity", "falloffRadius"];
                         if (light.toLowerCase().indexOf("zone") > -1 && zoneExcludes.indexOf(property) > -1){
@@ -690,7 +937,9 @@
                 }, this);
 
                 this.getSnapshotLightkeys(to).forEach(function(light){
-                    if (light === "key") return;
+                    if (light === "key") {
+                        return;
+                    }
                     this.getSnapshotPropertyKeys(to, light).forEach(function(property){
                         lights[light].updateToProperty(
                             property, this.snapshotStore[to][light][property]
@@ -699,23 +948,29 @@
                 }, this);
                 
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") return;
+                    if (light === "key") {
+                        return;
+                    }
                     lights[light].updateTransitionDuration(duration);
                 });
 
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") return;
+                    if (light === "key") {
+                        return;
+                    }
                     lights[light].startAnimation();
                 });
 
             };
 
             Snapshots.prototype.executeTransitionByName = function(name){
-                console.log("execute transition")
+                console.log("execute transition");
 
                 var from = this.transitionStore[name].from;
                 var to = this.transitionStore[name].to;
                 var duration = this.transitionStore[name].duration;
+                var check = runningCheck();
+                console.log("check:", check)
                 if (!runningCheck()) {
                     this.startTransition(from, to, duration);
                 }
@@ -751,6 +1006,9 @@
             var keys = Object.keys(lights);
             for (var i = 0; i < keys.length; i++) {
                 var runningCheck = lights[keys[i]].runningCheck();
+                console.log("running Check key", keys[i]);
+                console.log("running Check", runningCheck);
+
                 if (runningCheck === true) {
                     return true;
                 }
@@ -762,23 +1020,38 @@
     // /////////////////////////////////////////////////////////////////////////
         
         function registerLights(){
-            lights[LIGHTS_MC_CENTER_SPOT] = Entities.findEntitiesByName(LIGHTS_MC_CENTER_SPOT, MyAvatar.position, 25);
-            lights[LIGHTS_STAGE_ACCENT] = Entities.findEntitiesByName(LIGHTS_STAGE_ACCENT, MyAvatar.position, 25);
-            lights[LIGHTS_ACCENT_SPOT_STAGE] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_STAGE, MyAvatar.position, 25);
-            lights[LIGHTS_HOUSE] = Entities.findEntitiesByName(LIGHTS_HOUSE, MyAvatar.position, 25);
-            lights[LIGHTS_ZONE_STAGE] = Entities.findEntitiesByName(LIGHTS_ZONE_STAGE, MyAvatar.position, 25);
+            var SEARCH_DISTANCE = 25;
+            lights[LIGHTS_MC_CENTER_SPOT] = 
+                Entities.findEntitiesByName(LIGHTS_MC_CENTER_SPOT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_STAGE_ACCENT] = 
+                Entities.findEntitiesByName(LIGHTS_STAGE_ACCENT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_ACCENT_SPOT_STAGE] = 
+                Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_STAGE, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_HOUSE] = 
+                Entities.findEntitiesByName(LIGHTS_HOUSE, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_ZONE_STAGE] = 
+                Entities.findEntitiesByName(LIGHTS_ZONE_STAGE, MyAvatar.position, SEARCH_DISTANCE);
 
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_LEFT, MyAvatar.position, 25);
-            lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT] = Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_RIGHT, MyAvatar.position, 25);
-            lights[LIGHTS_ACCENT_SPOT_HOUSE] = lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].concat(lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT]);
+            lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT] = 
+                Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_LEFT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT] = 
+                Entities.findEntitiesByName(LIGHTS_ACCENT_SPOT_HOUSE_RIGHT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_ACCENT_SPOT_HOUSE] = 
+                lights[LIGHTS_ACCENT_SPOT_HOUSE_LEFT].concat(lights[LIGHTS_ACCENT_SPOT_HOUSE_RIGHT]);
 
-            lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT] = Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT, MyAvatar.position, 25);
-            lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT] = Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT, MyAvatar.position, 25);
-            lights[LIGHTS_STAGE_SPOT_MAIN] = lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT].concat(lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT]);
+            lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT] = 
+                Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT] = 
+                Entities.findEntitiesByName(LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_STAGE_SPOT_MAIN] = 
+                lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_LEFT].concat(lights[LIGHTS_STAGE_SPOT_MAIN_STAGE_RIGHT]);
 
-            lights[LIGHTS_UPSTAGE_FILL_LEFT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_LEFT, MyAvatar.position, 25);
-            lights[LIGHTS_UPSTAGE_FILL_RIGHT] = Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_RIGHT, MyAvatar.position, 25);
-            lights[LIGHTS_UPSTAGE_FILL] = lights[LIGHTS_UPSTAGE_FILL_LEFT].concat(lights[LIGHTS_UPSTAGE_FILL_RIGHT]);
+            lights[LIGHTS_UPSTAGE_FILL_LEFT] = 
+                Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_LEFT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_UPSTAGE_FILL_RIGHT] = 
+                Entities.findEntitiesByName(LIGHTS_UPSTAGE_FILL_RIGHT, MyAvatar.position, SEARCH_DISTANCE);
+            lights[LIGHTS_UPSTAGE_FILL] = 
+                lights[LIGHTS_UPSTAGE_FILL_LEFT].concat(lights[LIGHTS_UPSTAGE_FILL_RIGHT]);
 
             var lightKeys = Object.keys(lights);
             lightKeys.forEach(function(lightKey){
@@ -851,7 +1124,7 @@
 
         function renameSnapshot(){
             //
-        }{
+        }
 
         function removeSnapshot(){
             //
@@ -877,15 +1150,26 @@
             //
         }
 
+        function changeDefaultTransitionTime(newTime){
+            dataStore.snapshots.changeDefaultTransitionTime(newTime);
+            ui.updateUI(dataStore);
+        }
+
+        function changeAlwaysTransitionSnaps(){
+            dataStore.snapshots.alwaysTransitionSnaps = !dataStore.snapshots.alwaysTransitionSnaps;
+            ui.updateUI(dataStore);
+        }
+
         function scriptEnding(){
             Controller.keyPressEvent.connect(keyPressHandler);
 
             var lightKeys = Object.keys(lights);
-            lightKeys.forEach(function(lightKey){
-                if (lightKeys[lightKey].intensityAnimationTimer !== null) {
-                    Script.clearTimeout(lightKeys[lightKey].intensityAnimationTime);
-                }
-            })
+            // ##TODO FIX THIS 
+            // lightKeys.forEach(function(lightKey){
+            //     if (lightKeys[lightKey].intensityAnimationTimer !== null && typeof lightKey === "string") {
+            //         lightKeys[lightKey].clearTimers();
+            //     }
+            // });
         }
 
     function keyPressHandler(event) {
@@ -898,7 +1182,9 @@
                     dataStore.snapshots.executeTransitionByName(dataStore.mapping[event.text].name);
                     break;
                 case AUDIO:
+                    dataStore.audio.playAudio(dataStore.mapping[event.text].name);
                     break;
+
             }
         }
     }
@@ -919,6 +1205,25 @@
             registerLights();
             registerDefaults();
 
+            var audio_url = "https://hifi-content.s3.amazonaws.com/milad/ROLC/Reference/Sounds/SdDrop17-MP3.mp3";
+            var audio_key = "o";
+            var audio_name = "Dope Song";
+            var audio_test_object = {
+                url: audio_url,
+                name: audio_name,
+                key: audio_key,
+                shouldFadeIn: false,
+                shouldFadeOut: false,
+                fadeInTime: 3000,
+                fadeOutTime: 3000,
+                maxVolume: 1.0,
+                position: MyAvatar.position,
+                orientation: MyAvatar.orientation,
+                loop: false,
+                pitch: 2
+            }
+
+            dataStore.audio.addAudio(audio_name, audio_test_object);
             Script.scriptEnding.connect(scriptEnding);
         }
 
@@ -972,10 +1277,10 @@
                     removeTransition();
                     break;
                 case CHANGE_DEFAULT_TRANSITION_TIME:
-                    changeDefaultTransitionTime();
+                    changeDefaultTransitionTime(data.value);
                     break;
-                case CHANGE_ALWAYS_TRANSITION:
-                    changeAlwaysTransition();
+                case CHANGE_ALWAYS_TRANSITION_SNAPS:
+                    changeAlwaysTransitionSnaps();
                     break;
                 default: 
             }
@@ -985,7 +1290,7 @@
     // Main
     // /////////////////////////////////////////////////////////////////////////
         startup();
-}()); // END LOCAL_SCOPE
+})(); // END LOCAL_SCOPE
 
 /*
 

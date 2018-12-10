@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 (function() {
 
     "use strict";
@@ -14,267 +15,283 @@
             NEW_ANIMATION = "new_animation",
             UPDATE_ANIMATION_NAME = "update_animation_name",
             ADD_LIGHT = "add_light",
-
+            CHANGE_ALWAYS_TRANSITION_SNAPS = "changeAlwaysTransitionSnaps",
+            CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
             UPDATE_UI = BUTTON_NAME + "_update_ui",
             
-            EVENTBRIDGE_SETUP_DELAY = 1000
+            EVENTBRIDGE_SETUP_DELAY = 100
         ;
 
     // Components
     // /////////////////////////////////////////////////////////////////////////
-
-        Vue.component('config', {
-            props: ["current_animation", "animations"],
-            data: function(){
-                return {
-                    newName: "",
-                    editing: false,
-                    editingJSONURL: false,
-                    selectedAnimation: "",
-                    showAnimations: false
+        Vue.component('snapshots', {
+            props: ['snapshots', "always_transition_snaps", "default_transition_time"],
+            methods: {
+                toggleShowNewSnap: function(){
+                    this.showNewSnapshot = !this.showNewSnapshot;
                 }
             },
+            data: function(){
+                return {
+                    showNewSnapshot: false
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" data-target="#snapshot-body">
+                        <h5>Snapshots</h5>
+                    </div>
+                    <div  class="collapse card-body" id="snapshot-body">
+                        <configuration :always_transition_snaps="always_transition_snaps" :default_transition_time="default_transition_time"></configuration>
+                        <snapshot v-for="snapshot in snapshots" :snapshot="snapshot"></snapshot>
+                        <new_snapshot v-if="showNewSnapshot"></new_snapshot>
+                        <button v-if="!showNewSnapshot" class="btn btn-primary" v-on:click="toggleShowNewSnap">Add new snapshot</button>
+                    </div>
+                </div>
+            `
+        });
+
+        Vue.component('configuration', {
+            props: ['snapshots', "always_transition_snaps", "default_transition_time"],
             methods: {
-                toggleAnimations(){
-                    this.showAnimations = !this.showAnimations;
-                },
-                editName(name){
-                    this.editing = true;
-                },
-                newAnimation(){
+                alwaysTransitionSnaps: function(){
                     EventBridge.emitWebEvent(JSON.stringify({
-                        type: NEW_ANIMATION
+                        type: CHANGE_ALWAYS_TRANSITION_SNAPS
                     }));
                 },
-                updateName(name){
-                    this.editing = false;
+                onBlur: function(){
                     EventBridge.emitWebEvent(JSON.stringify({
-                        type: UPDATE_ANIMATION_NAME,
-                        value: {
-                            newName: name,
-                            oldName: this.current_animation
-                        }
+                        type: CHANGE_DEFAULT_TRANSITION_TIME,
+                        value: this.newTransitionTime
                     }));
-                    this.newName = "";
-                },
-                selectAnimation(animation){
-                    this.selectedAnimation = animation;
-                    this.toggleAnimations();
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: LOAD_ANIMATION,
-                        value: animation
-                    }));
-                },
-                loadAnimation(){
-                    
+                }
+
+            },
+            data: function () {
+                return {
+                    newTransitionTime: this.default_transition_time
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" data-target="#configuration-body">
+                        <h5>Snapshot Configuration</h5>
+                    </div>
+                    <div class="card-body collapse" id="configuration-body">
+                        <span class="form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="checkbox" :checked="always_transition_snaps" v-on:click="alwaysTransitionSnaps()">
+                            <label class="form-check-label" for="checkbox">Transition Snapshots</label>
+                        </span>
+                        <div class="input-group mb-1 ">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text font-weight-bold">Default Transition Time</span>
+                            </div>
+                            <input type="number" min="0" v-on:blur="onBlur" v-model="newTransitionTime" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            `
+        })
+
+        Vue.component('new_snapshot', {
+            props: [],
+            methods: {
+                saveSnapShot: function () {
+                    this.$parent.showNewSnapshot = false;
+                }
+            },
+            data: function () {
+                return {
+
                 }
             },
             template: /*html*/`
                 <div class="card">
                     <div class="card-header">
-                        <div>
-                            <strong>Current Animation Name: {{current_animation}}</strong> 
-                        </div>
-                        <button class="btn-sm btn-primary mt-1 mr-1 float-left" v-on:click="newAnimation()">New Animation</button>
-                        <button class="btn-sm btn-primary mt-1 mr-1 float-right" v-if="!editing" v-on:click="editName()">Edit Name</button>
-                        <div v-if="editing">
-                            <input id="new-name" type="text" class="form-control" v-model="newName">
-                            <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="updateName(newName)">Update Name</button>
-                        </div>
+                        <h5>New Snapshot</h5>
                     </div>
                     <div class="card-body">
-                        <div class="dropdown">
-                            <ul class="dropdown-type">
-                                <button class="btn-sm btn-primary mt-1 mr-1 float-left" id="toggle_animation" v-on:click="toggleAnimations()">
-                                    Animations
-                                </button>
-                                <div id="nameDropdown" class="dropdown-items" :class="{ show: showAnimations }">
-                                    <li v-for="(animation, key) in animations" v-on:click="selectAnimation(key)">{{ key }}</li>
-                                </div>
-                            </ul>
-                        </div>
+                        test
+                        <button class="btn btn-primary" v-on:click="saveSnapShot">Save Snapshot</button>
                     </div>
                 </div>
             `
         })
 
-        Vue.component('setting', {
-            props: ["name", "to", "from", "duration"],
+        Vue.component('snapshot', {
+            props: ['snapshot'],
             methods: {
-                removeLight(){
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: REMOVE_LIGHT,
-                        value: "name"
-                    }));
-                }   
+
             },
-            template: /*html*/`
-                <div class="list-complete-item p-2 main-font-size">
-                    <div class="row">
-                        <div class="col">
-                            <span>Name::</span> {{name}}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <span>from:</span> {{from}}
-                        </div>
-                        <div class="col">
-                            <span>to:</span> {{to}}
-                        </div>
-
-                        <div class="col">
-                            <span>duration:</span> {{duration}}
-                        </div>
-                        <div class="col">
-                            <span class="delete" v-on:click="removeLight">
-                                <i class="float-right mr-2 fas fa-times"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `
-        })
-
-        Vue.component('light-add', {
-            props: ["animations", "current_animation", "choices"],
-            data: function(){
+            data: function () {
                 return {
-                    name: "",
-                    from: 0,
-                    to: 0,
-                    duration: 3000,
-                    showNames: false
-                }
-            },
-            computed: {
-                lightsLeft: function(){
-                    var current;
-                    console.log("this.animations:" + JSON.stringify(this.animations));
-                    console.log("this.current_animation:" + JSON.stringify(this.current_animation));
 
-                    if (!this.animations[this.current_animation]) {
-                        current = [];
-                    } else {
-                        current = this.animations[this.current_animation].map(function(light){ return light.name });
-                    }
-                    console.log("this.choices:" + JSON.stringify(this.choices))
-                    console.log("current:" + JSON.stringify(current))
-
-                    var keys = this.choices
-                        .filter(function(key){
-                            console.log("key:" + JSON.stringify(key))
-                            console.log("index:" + current.indexOf(key) === -1);
-                            return current.indexOf(key) === -1;
-                        }, this)
-                    return keys;
-                }
-            },
-            methods: {
-                toggleNames(){
-                    this.showNames = !this.showNames;
-                },
-                selectName(name){
-                    this.name = name;
-                    this.toggleNames();
-                },
-                addLight(){
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: ADD_LIGHT,
-                        value: {
-                            name: this.name,
-                            from: this.from,
-                            to: this.to,
-                            duration: this.duration
-                        }
-                    }));
-                    this.name = "";
-                    this.from = 0;
-                    this.to = 0;
-                    this.duration = 3000;
-                    this.showNames = false;
-                    this.$parent.showLightAdd = false;
-
-                },
-                removeDance(){
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: REMOVE_DANCE,
-                        value: this.index
-                    }));
-                },
-                onBlur(){
-                    EventBridge.emitWebEvent(JSON.stringify({
-                        type: UPDATE_DANCE_ARRAY,
-                        value: {
-                            dance: this.dance,
-                            index: this.index
-                        }
-                    }));
-                },
-                onClicked(){
-                    this.clicked = !this.clicked;
                 }
             },
             template: /*html*/`
-                <div class="list-complete-item p-2 main-font-size">
-                    <div class="card-header transparent">
-                        <span class="font-weight-bold white-text"> Add Light </span>
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" :data-target="'#' + snapshot.name">
+                        <h5>{{snapshot.name}}</h5>
+                        <span>Key: {{snapshot.key}}</span>
                     </div>
-                    <form class="form-inline" onsubmit="event.preventDefault()">
-                        <div class="row">
-                            <div class="col">
-                                <div class="input-group mb-1 ">
-                                    <div class="dropdown" style:="width: 100px;">
-                                        <ul class="dropdown-type" style:="width: 100px;">
-                                            <button class="btn-sm btn-primary mt-1 mr-1 float-left" id="selectedLightName" style:="width: 100px;" v-on:click="toggleNames()">
-                                                Light Names
-                                            </button>
-                                            <div id="nameDropdown" class="dropdown-items" style:="width: 100px;" :class="{ show: showNames }">
-                                                <li v-for="light in lightsLeft" style:="width: 100px;" v-on:click="selectName(light)">{{ light }}</li>
-                                            </div>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <span class="main-font-size font-weight-bold">{{name}}</span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="input-group mb-1">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text main-font-size font-weight-bold">From</span>
-                                    </div>
-                                    <input type="text" v-model="from" class="form-control main-font-size" placeholder="0">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="input-group mb-1">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text font-weight-bold">To</span>
-                                    </div>
-                                    <input type="text" v-model="to" class="form-control main-font-size" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="input-group mb-1">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text main-font-size font-weight-bold">Duration</span>
-                                    </div>
-                                    <input type="text" v-model="duration" class="form-control main-font-size" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <button id="add-light" v-on:click="addLight" type="button" class="btn-sm btn-primary m-3">Add Light</button>
+                    <div class="card-body collapse" :id="snapshot.name">
+                        test
+                    </div>
                 </div>
             `
         })
+
+        Vue.component('transitions', {
+            props: ['transitions'],
+            methods: {
+                toggleShowNewTransition: function () {
+                    this.showNewTransition = !this.showNewTransition;
+                }
+            },
+            data: function () {
+                return {
+                    showNewTransition: false
+
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" data-target="#transitions-body">
+                        <h5>Transitions</h5>
+                    </div>
+                    <div class="card-body collapse" id="transitions-body">
+                        <transition v-for="transition in transitions" :transition="transition"></transition>
+                        <new_transition v-if="showNewTransition"></new_transition>
+                        <button v-if="!showNewTransition" class="btn btn-primary" v-on:click="toggleShowNewTransition">Add new transition</button>
+                    </div>
+                </div>
+            `
+        });
+
+
+        Vue.component('transition', {
+            props: ['transition'],
+            methods: {
+
+            },
+            data: function () {
+                return {
+
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" :data-target="'#' + transition.name">
+                        <h5>{{transition.name}}</h5>
+                        <span>Key: {{transition.key}}</span>
+                    </div>
+                    <div class="card-body collapse" :id="transition.name">
+                        test
+                    </div>
+                </div>
+            `
+        })
+
+        Vue.component('new_transition', {
+            props: [],
+            methods: {
+                saveTransition: function () {
+                    this.$parent.showNewTransition = false;
+                }
+            },
+            data: function () {
+                return {
+
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header">
+                        <h5>this is a new transition</h5>
+                    </div>
+                    <div class="card-body">
+                        test
+                        <button class="btn btn-primary" v-on:click="saveTransition">Save Transition</button>
+                    </div>
+                </div>
+            `
+        })
+
+        Vue.component('audio_library', {
+            props: ['audio'],
+            methods: {
+                toggleShowNewSound: function () {
+                    this.showNewSound = !this.showNewSound;
+                }
+            },
+            data: function () {
+                return {
+                    showNewSound: false
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" data-target="#audio_library-body">
+                        <h5>Audio</h5>
+                    </div>
+                    <div class="card-body collapse" id="audio_library-body">
+                        <sound v-for="sound in audio" :sound="sound"></sound>
+                        <new_sound v-if="showNewSound"></new_sound>
+                        <button v-if="!showNewSound" class="btn btn-primary" v-on:click="toggleShowNewSound">Add new Sound</button>
+                    </div>
+                </div>
+            `
+        });
+
+        Vue.component('sound', {
+            props: ['sound'],
+            methods: {
+
+            },
+            data: function () {
+                return {
+
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header" data-toggle="collapse" :data-target="'#' + sound.name">
+                        <h5>{{sound.name}}</h5>
+                        <span>Key: {{sound.key}}</span>
+
+                    </div>
+                    <div class="card-body collapse" :id="sound.name">
+                        test
+                    </div>
+                </div>
+            `
+        });
+
+        Vue.component('new_sound', {
+            props: [''],
+            methods: {
+                saveSound: function () {
+                    this.$parent.showNewSound = false;
+                }
+            },
+            data: function () {
+                return {
+
+                }
+            },
+            template: /*html*/`
+                <div class="card">
+                    <div class="card-header">
+                        <h5>this is a new sound</h5>       
+                    </div>
+                    <div class="card-body">
+                        Save Sound
+                    <button class="btn btn-primary" v-on:click="saveSound">Save Sound</button>
+                    </div>
+                </div>
+            `
+        });
+
 
     // App
     // /////////////////////////////////////////////////////////////////////////
@@ -340,3 +357,4 @@
     // /////////////////////////////////////////////////////////////////////////    
         onLoad();
 }());
+

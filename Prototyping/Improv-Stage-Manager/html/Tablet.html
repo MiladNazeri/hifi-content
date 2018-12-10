@@ -12,31 +12,14 @@
 
     <body>
         <div class="container" id="app">
-            <config class="m-3" 
-                :animations="dataStore.animations.animationGroup"
-                :current_animation="dataStore.currentAnimation">
-            </config>
-
-            <setting class="m-3" 
-                v-for="n in dataStore.animations.animationGroup[dataStore.currentAnimation]"
-                :name="n.name"
-                :to="n.to"
-                :from="n.from"
-                :duration="n.duration"
-            >
-            </setting>
-
-            <light-add class="m-3"
-                v-if="showLightAdd"
-                :animations="dataStore.animations.animationGroup"
-                :current_animation="dataStore.currentAnimation"
-                :choices="dataStore.choices"
-            >
-            </light-add>
-        
-            <button id="new-light" v-if="!showLightAdd" v-on:click="toggleShowLightAdd" type="button" class="btn-sm btn-primary m-3">New light</button>
-            <button id="animate" v-on:click="animate" type="button" class="btn-sm btn-primary m-3">Animate</button>
-
+            <snapshots 
+                v-if="dataStore.snapshots.snapshotStore" 
+                :snapshots="dataStore.snapshots.snapshotStore" 
+                :always_transition_snaps="dataStore.snapshots.alwaysTransitionSnaps" 
+                :default_transition_time="dataStore.snapshots.defaultTransitionTime">
+            </snapshots>
+            <transitions v-if="dataStore.snapshots.transitionStore" v-bind:transitions="dataStore.snapshots.transitionStore"></transitions>
+            <audio_library v-if="dataStore.audio.audioStore" v-bind:audio="dataStore.audio.audioStore"></audio_library>
         </div>
         <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
