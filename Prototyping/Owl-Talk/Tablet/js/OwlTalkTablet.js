@@ -1,19 +1,21 @@
 (function () {
     var EVENT_BRIDGE_OPEN_MESSAGE = "eventBridgeOpen",
-        BUTTON_NAME = "OVR-TALK",
+        BUTTON_NAME = "OWL-TALK",
         UPDATE_UI = BUTTON_NAME + "_update_ui",
         SAVE_JSON = "saveJSON",
         EVENTBRIDGE_SETUP_DELAY = 200,
-        connection = new WebSocket('ws://tan-cheetah.glitch.me/');
+        // connection = new WebSocket('ws://tan-cheetah.glitch.me/'),
+        SEND_MESSAGE = BUTTON_NAME + "SEND_MESSAGE",
+        TOGGLE_DISPLAY_NAMES = "toggleDisplayNames";
 
-    connection.onopen = function () {
-        console.log("on open");
-        // connection is opened and ready to use
-    };
+    // connection.onopen = function () {
+    //     console.log("on open");
+    //     // connection is opened and ready to use
+    // };
 
-    connection.onerror = function (error) {
-        // an error occurred when sending/receiving data
-    };
+    // connection.onerror = function (error) {
+    //     // an error occurred when sending/receiving data
+    // };
 
     // connection.onmessage = function (message) {
     //     try {
@@ -27,8 +29,15 @@
     // };
 
     Vue.component('chat', {
-        props: ["history", "username"],
+        props: ["history", "username", "showdisplaynames"],
         methods: {
+            toggleDisplayNames: function () {
+
+                EventBridge.emitWebEvent(JSON.stringify({
+                    type: TOGGLE_DISPLAY_NAMES
+                }));
+
+            }
         },
         computed: {
             formatedMessage() {
@@ -45,9 +54,7 @@
         },
         template: `
             <div class="card">
-                <div class="card-header">
-                    History
-                </div>
+                <button class="btn-sm mt-2 mr-2" v-bind:class="{ 'btn-primary': !showdisplaynames, 'btn-warning': showdisplaynames }" v-on:click="toggleDisplayNames()">Toggle Display Names</button>
                 <div class="card-body">
                     <div v-for="item in history">
                         {{ item.author }} :: {{ item.text }}
@@ -58,7 +65,7 @@
     })
 
     Vue.component('usernamelist', {
-        props: ["users"],
+        props: ["users", "showdisplaynames"],
         methods: {
 
         },
@@ -88,7 +95,7 @@
     })
 
     Vue.component('input-text', {
-        props: ["users"],
+        props: ["users", "showdisplaynames"],
         data: function(){
             return {
                 input_text: "",
@@ -116,22 +123,48 @@
                     message: this.input_text,
                     to: this.checkedNames
                 }
-                connection.send(JSON.stringify(message));
+
+                EventBridge.emitWebEvent(JSON.stringify({
+                    type: SEND_MESSAGE,
+                    info: JSON.stringify(message),
+                    text: this.input_text
+                }));
+    
                 this.input_text = "";
             }
         },
+        computed: {
+            names: function() {
+                // for name in names
+
+                var nameToShow = this.showdisplaynames ? "displayName" : "username";
+                
+                return this.users.map(function(user) {
+                    return user[nameToShow];
+                });
+
+            }
+        },
         template: `
-            <div>
+            <div class="pt-2">
                 <input id="input" type="text" maxlength="40" class="form-control" v-model="input_text"  @keyup.enter="sendInput(input_text)" />
-                <button class="btn-sm btn-primary mt-1 mr-1" v-on:click="sendInput(input_text)">Send Chat</button>
-                <div class="card">  
-                    <div class="card-header">
-                        Connected Users:
+                <button class="btn-sm btn-primary mt-2 mr-2" v-on:click="sendInput(input_text)">Send Chat</button>
+                <div class="pt-2">
+
+                    <div class="card">
+
+                        <div class="card-header">
+                            Connected Users:
+                        </div>
+                        <div class="card-body">
+                            <div v-for="name in names">
+                                <input type="checkbox" :id="name" :value="name" v-model="checkedNames">
+                                <label :for="name">{{ name }}</label>
+                            </div>
+                        </div>
+
                     </div>
-                    <div v-for="username in users">
-                        <input type="checkbox" :id="username" :value="username" v-model="checkedNames">
-                        <label :for="username">{{ username }}</label>
-                    </div>
+
                 </div>
             </div>
         `
@@ -142,11 +175,16 @@
         data: {
             settings: {
                 username: "",
+                showDisplayNames: true,
                 history: [
-                    {to: [], author: "cat", message: "test"}, 
-                    {to: [], author: "cat", message: "test2"} 
+                    {to: [], author: "UN_cat", message: "test"}, 
+                    {to: [], author: "UN_cat", message: "test2"} 
                 ],
-                connectedUsernames: ["hello", "cat", "dog"]
+                connectedUsers: [
+                    {username: "UN_hello", displayName: "DN_robin"}, 
+                    {username: "UN_cat", displayName: "DN_cat"}, 
+                    {username: "UN_dog", displayName: "DN_dog"}, 
+                ]
             }
         }
     });
@@ -160,10 +198,11 @@
                 case UPDATE_UI:
                     app.settings = data.value;
                     break;
-                case SAVE_JSON:
-                    saveJSON(data.value);
-                    break;
+                // case SAVE_JSON:
+                //     saveJSON(data.value);
+                //     break;
                 default:
+                    break;
             }
         } catch (e) {
             console.log(e)
@@ -183,7 +222,6 @@
             EventBridge.emitWebEvent(JSON.stringify({
                 type: EVENT_BRIDGE_OPEN_MESSAGE
             }));
-
 
         }, EVENTBRIDGE_SETUP_DELAY);
     }

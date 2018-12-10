@@ -13,15 +13,55 @@
          
     Script.require("./Polyfills.js")();
     var AppUi = Script.require('appUi');
+    
+    var CONNECTION_TIMEOUT = 3000;
+    var SCRIPT_NAME = "OwlTalk.js";
+    var heartbeat = {
+
+        willRefreshFlag: false,
+        lastSent: "",
+
+        start: function (lastMessage) {
+            print("HEARTBEAT", JSON.stringify(this));
+            print("HEARTBEAT",this.lastSent);
+            this.willRefreshFlag = true;
+            this.lastSent = lastMessage;
+            print("HEARTBEAT", this.lastSent, JSON.stringify(this));
+            
+            var _this = this;
+
+            Script.setTimeout(function () {
+                print("HEARTBEAT", _this.lastSent, JSON.stringify(_this));
+                if (_this.willRefreshFlag === true) {
+                    _this.refreshScript();
+                }
+            }, CONNECTION_TIMEOUT);
+        },
+
+        refreshScript: function () {
+            // refresh script
+            ScriptDiscoveryService.stopScript(Script.resolvePath("./" + SCRIPT_NAME), true);
+            this.reset();
+        },
+
+        reset: function () {
+            this.willRefreshFlag = false;
+            this.lastSent = "";
+        }
+
+    };
+
+    var REFRESH_TIME = 1000;
 
     var SHOW_TEXT_DURATION = 8000,
         BUFFER = 1000,
         hideTime = null; // ms
     
     // Tablet
-    var BUTTON_NAME = "OVR-TALK",
-        APP_URL = Script.resolvePath('./Tablet/OverlayTalker-Tablet.html?123'),
-        EVENT_BRIDGE_OPEN_MESSAGE = "eventBridgeOpen";
+    var BUTTON_NAME = "OWL-TALK",
+        APP_URL = Script.resolvePath('./Tablet/OwlTalkTablet.html?12345'),
+        EVENT_BRIDGE_OPEN_MESSAGE = "eventBridgeOpen",
+        SEND_MESSAGE = BUTTON_NAME + "SEND_MESSAGE";
 
     // Init
     var ui = null,
@@ -31,35 +71,48 @@
         lastText = "",
         currentLength = 0,
         UPDATE_UI = BUTTON_NAME + "_update_ui",
-        connection = new WebSocket('ws://tan-cheetah.glitch.me/');
+        connection = new WebSocket('ws://tan-cheetah.glitch.me/', "hello");
 
     // MESSAGE TYPES
     var NEW_USER = "newUser",
         REMOVE_USER = "removeUser",
-        UPDATE_CONNECTED_USERNAMES = "updateConnectedUsernames";
+        UPDATE_CONNECTED_USERS = "updateconnectedUsers",
+        TOGGLE_DISPLAY_NAMES = "toggleDisplayNames";
         
     // Websocket
-
     connection.onopen = function () {
         // connection is opened and ready to use
         console.log("on open");
-        connection.send(JSON.stringify({ type: NEW_USER, username: username }));  
+        sendUserInfo(); 
     };
+
+    function sendUserInfo() {
+        connection.send(JSON.stringify({ type: NEW_USER, username: username, displayName: MyAvatar.displayName }));
+    }
 
     connection.onclose = function () {
         // connection is closing
-        console.log("on close");
-        // connection.send(JSON.stringify({ type: REMOVE_USER, username: username })); 
+        console.log("Websocket on close");
+        connection.send(JSON.stringify({ type: REMOVE_USER, username: username })); 
     };
 
     connection.onerror = function (error) {
         // an error occurred when sending/receiving data
+        console.log("WebSocket on error: ", error);
+        Script.setTimeout(function () {
+            heartbeat.refreshScript();
+        }, REFRESH_TIME);
     };
 
 
     connection.onmessage = function (message) {
         console.log("got message", message);
-        console.log("ROBIN 1", JSON.stringify(message));
+        console.log("ROBIN -1", heartbeat.lastSent, JSON.stringify(message));
+
+        if (JSON.stringify(message).indexOf(heartbeat.lastSent) !== -1) {
+            print("ROBIN REFRESH SCRIPT");
+            heartbeat.reset();
+        }
 
         try {
             var json = JSON.parse(message.data);
@@ -68,14 +121,14 @@
             return;
         }
 
-        if (json.type === UPDATE_CONNECTED_USERNAMES) {
-            console.log('Robin Update Connected Usernames: ', JSON.stringify(message.data));
-            settings.connectedUsernames = json.data;
+        if (json.type === UPDATE_CONNECTED_USERS) {
+            console.log('Robin Update Connected Users: ', JSON.stringify(message.data));
+            settings.connectedUsers = json.data;
         } else {
 
             // IMPROVEMENT could push the new MyMessage on the end of the message list
+            // Check if we should show the messages because latest message is for me
             var latestMessage = json.data.slice(-1)[0];
-
             
             var isAuthor = latestMessage.author === username;
             var onToList = latestMessage.to.length === 0 || latestMessage.to.indexOf(username) !== -1;
@@ -113,9 +166,15 @@
 
     // Collections
     var defaultSettings = {
+
             username: username,
-            history: [{ message: "test3" }, { message: "test4" }],
-            connectedUsernames: []
+            showDisplayNames: false,
+            history: [
+                { message: "test3" },
+                { message: "test4" }
+            ],
+            connectedUsers: []
+            
         },
         settings = {};
 
@@ -131,11 +190,18 @@
             // onOpened: onOpened
         });
 
+        if (!HMD.active) {
+            ui.open();
+        }
+
         Script.scriptEnding.connect(scriptEnding);
+        // MyAvatar.displayNameChanged.connect(); // *** 
+
         HMD.displayModeChanged.connect(function(isHMDMode){
             hide();
             show();
         });
+
     }
 
     function doUIUpdate() {
@@ -156,6 +222,29 @@
             case EVENT_BRIDGE_OPEN_MESSAGE:
                 doUIUpdate();
                 break;
+            case SEND_MESSAGE:
+
+                console.log("ROBIN 100", message.info, message.text);
+
+                var info = message.info; // JSON.stringified in the Tablet
+                var text = message.text; // JSON.stringified in the Tablet
+                connection.send(info);
+                heartbeat.start(text);
+
+                break;
+            case TOGGLE_DISPLAY_NAMES: 
+                console.log("ROBIN 1000 Toggle them displaynames!", settings.showDisplayNames);
+
+                settings.showDisplayNames = !settings.showDisplayNames;
+
+                // getText();
+                // show();
+
+                doUIUpdate();
+
+                // go through history and replace username / displayname inside the authors doubel check "un/dn ::"
+
+                break;
         }
     }
 
@@ -173,11 +262,14 @@
             // if ((settings.history.length - 1) === index) {
             //     lastLine = item.author + " :: " + item.text;
             // } else {
+
+            var author = settings.showDisplayNames ? item.author.displayName : item.author.username;
+
             if ((settings.history.length - 1) === index) { 
-                currentLine = "\n" + item.author + " :: " + item.text + "\n";
+                currentLine = "\n" + author + " :: " + item.text + "\n";
                 lines += 1;
             } else {
-                currentLine = item.author + " :: " + item.text + "\n";
+                currentLine = author + " :: " + item.text + "\n";
             }
             maxLineLength = maxLineLength > currentLine.length ? maxLineLength : currentLine.length;
             text += currentLine;

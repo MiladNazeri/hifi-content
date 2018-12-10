@@ -1,25 +1,3 @@
-(function () {
-    console.log("running ws test");
-    var WEBSOCKET_URL = "ws://tan-cheetah.glitch.me/";
-
-    const TEST_MESSAGE = "This is a test message.";
-
-    var webSocket = new WebSocket(WEBSOCKET_URL);
-
-    webSocket.onmessage = function (event) {
-        webSocket.close();
-    };
-    webSocket.onopen = function (event) {
-        console.log("on open")
-        webSocket.send(TEST_MESSAGE);
-    };
-    webSocket.onclose = function (event) {
-    };
-
-})();
-
-
-
 "use strict";
 
 process.title = 'node-chat';
@@ -33,7 +11,7 @@ var webSocketServerPost = process.env.PORT,
 
 // COLLECTION
 var history = [],
-    connectedUsernames = [],
+    connectedUsers = [],
     clients = [];
 
 // CONST
@@ -47,6 +25,8 @@ function htmlEntities(str) {
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+console.log("hi");
+
 var server = http.createServer((request, response) => { });
 
 server.listen(webSocketServerPost, () => {
@@ -57,11 +37,6 @@ server.listen(webSocketServerPost, () => {
 var wsServer = new WebSocketServer({ httpServer: server });
 
 wsServer.on('request', (request) => {
-    //   console.log(test, Object.keys(request));
-
-    //   for (var i = 0; i < Object.keys(request); i++) {
-    //     console.log(
-    //   }
 
     console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
 
@@ -69,24 +44,25 @@ wsServer.on('request', (request) => {
 
     var index = clients.push(connection) - 1;
 
-    console.log((new Date()) + ' Connection accepted.');
+    console.log((new Date()) + ' Connection accepted.', request.origin, request.protocol, connection.protocol);
 
     if (history.length > 0) {
         connection.sendUTF(
             JSON.stringify({
                 type: MESSAGE,
                 data: history.slice(-10),
-                connectedUsernames: connectedUsernames
+                connectedUsers: connectedUsers
             })
         )
     }
 
     // MESSAGE TYPES
-    var TYPE = "type";
-    var NEW_USER = "newUser";
-    var REMOVE_USER = "removeUser";
-    var MESSAGE = "message";
-    var USERNAME = "username";
+    var TYPE = "type",
+        NEW_USER = "newUser",
+        REMOVE_USER = "removeUser",
+        USERNAME = "username",
+        DISPLAYNAME = "displayName",
+        UPDATE_CONNECTED_USERS = "updateconnectedUsers";
 
     connection.on('message', (message) => {
         // var parseMessage = JSON.parse(message);
@@ -97,33 +73,51 @@ wsServer.on('request', (request) => {
                 console.log(e);
             }
             console.log((new Date()) + ' Received Message from message.utf8Data');
+            
+            console.log("ROBIN", JSON.stringify(parsedMessage));
 
-            var type = parsedMessage[TYPE];
-
+            var type = parsedMessage[TYPE] || "message";
             var json;
 
             switch (type) {
                 case NEW_USER:
                     var username = parsedMessage[USERNAME];
-                    addUser(username);
+                    var displayName = parsedMessage[DISPLAYNAME];
+                    addUserOrUpdateDisplayName(username, displayName);
+              
+                    json = JSON.stringify({
+                        type: UPDATE_CONNECTED_USERS,
+                        data: connectedUsers
+                    });
+                    
                     break;
                 case REMOVE_USER:
                     var username = parsedMessage[USERNAME];
                     removeUser(username);
+                
+                    console.log("Remove user", username);
+                
+                    json = JSON.stringify({
+                        type: UPDATE_CONNECTED_USERS,
+                        data: connectedUsers
+                    });
+                    
                     break;
                 default:
                     // regular message
 
-                    var obj = {
+                    var messageObj = {
                         time: (new Date()).getTime(),
+                        to: parsedMessage.to,
                         text: parsedMessage.message,
-                        author: parsedMessage.name || "miladn"
+                        author: parsedMessage.author || "default"
                     };
-                    history.push(obj);
+                    history.push(messageObj);
                     history = history.slice(-100);
 
-                    var sendHistory = history.slice(-10);
-                    var json = JSON.stringify({
+                    // var sendHistory = history.slice(-10);
+                    var sendHistory = history;
+                    json = JSON.stringify({
                         type: MESSAGE,
                         data: sendHistory
                     });
@@ -141,20 +135,43 @@ wsServer.on('request', (request) => {
     });
 
     function removeUser(username) {
-        var index = connectedUsernames.indexOf(username);
-        if (index !== -1) {
-            connectedUsernames.splice(index, 1);
+        var index = getUserIndex(username); 
+        
+        connectedUsers.indexOf(username);
+        if (index) {
+            connectedUsers.splice(index, 1);
         }
     }
 
-    function addUser(username) {
-        if (connectedUsernames.indexOf(username) === -1) {
-            connectedUsernames.push(username);
+    function addUserOrUpdateDisplayName(username, displayName) {
+        var index = getUserIndex(username);
+
+        if (!index) {
+            // add user to list
+            var newUser = {};
+            newUser[USERNAME] = username;
+            newUser[DISPLAYNAME] = displayName;
+
+            connectedUsers.push(newUser);
+        } else {
+            connectedUsers[index][DISPLAYNAME] = displayName;
         }
+    }
+
+    function getUserIndex(username) {
+        var index;
+        
+        connectedUsers.map((user, idx) => {
+            if (user.username === username) {
+                index = idx;
+            }
+        });
+
+        return index;
     }
 
     connection.on('close', (connection) => {
-        console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
+        console.log((new Date()) + " Peer " + connection.remoteAddresses + " disconnected.");
         clients.splice(index, 1);
     });
 })
