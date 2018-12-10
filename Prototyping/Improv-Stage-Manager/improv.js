@@ -40,13 +40,18 @@
             LOAD_SNAPSHOT = "load_snapshot",
             ASSIGN_SNAPSHOT_TO_KEY = "assignSnapshotToKey",
             RENAME_SNAPSHOT = "renameSnapshot",
-            REMOVE_SNAPSHOT = "removeSnapshot",
+            REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
+            SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
             
             ADD_TRANSITION = "addTransition",
             EXECUTE_TRANSITION_BY_NAME = "executeTransitionByName",
             ASSIGN_TRANSITION_TO_KEY = "assignTransitionToKey",
             RENAME_TRANSITION = "renameTransition",
             REMOVE_TRANSITION = "removeTransition",
+
+            SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
+            ADD_SOUND = "ADD_SOUND",
+            REMOVE_SOUND = "REMOVE_SOUND",
 
             CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
             CHANGE_ALWAYS_TRANSITION_SNAPS = "changeAlwaysTransitionSnaps",
@@ -122,6 +127,8 @@
                         key: "y"
                     }
                 },
+                currentPosition: [0,0,0],
+                currentOrientation: [0,0,0,0],
                 choices: [
                     LIGHTS_ACCENT_SPOT_HOUSE,
                     LIGHTS_STAGE_SPOT_MAIN,
@@ -206,7 +213,7 @@
                 },
                 changeOrientation: function(orientation) {
                     console.log("changing Orientation")
-                    this.changeOrientation = orientation;
+                    this.orientation = orientation;
                     if (this.injector) {
                         this.injector.setOptions({ orientation: this.orientation });
                     }
@@ -440,8 +447,8 @@
 
                 this.audioStore[name] = new Sound(audioObject.url, name);
                 this.audioStore[name].key = audioObject.key;
-                audioObject.shouldFadeIn !== 'undefined' && this.audioStore[name].changeShouldFadeIn(audioObject.shouldFadeIn);
-                audioObject.shouldFadeOut !== 'undefined' && this.audioStore[name].changeShouldFadeOut(audioObject.shouldFadeOut);
+                audioObject.fadeInTime > 0 !== 'undefined' && this.audioStore[name].changeShouldFadeIn(true);
+                audioObject.fadeOutTime > 0 !== 'undefined' && this.audioStore[name].changeShouldFadeOut(true);
                 audioObject.fadeInTime !== 'undefined' && this.audioStore[name].changeFadeInTime(audioObject.fadeInTime);
                 audioObject.fadeOutTime !== 'undefined' && this.audioStore[name].changeFadeOutTime(audioObject.fadeOutTime);
                 audioObject.maxVolume !== 'undefined' && this.audioStore[name].changeMaxVolume(audioObject.maxVolume);
@@ -492,8 +499,8 @@
             AudioLibrary.prototype.changeFadeOptions = function (name, fadeOptions) {
                 console.log("changeFadeOptions");
 
-                this.audioStore[name].changeShouldFadeIn(fadeOptions.shouldFadeIn);
-                this.audioStore[name].changeShouldFadeOut(fadeOptions.shouldFadeOut);
+                this.audioStore[name].changeShouldFadeIn(fadeOptions.fadeInTime > 0);
+                this.audioStore[name].changeShouldFadeOut(fadeOptions.fadeOutTime > 0);
                 this.audioStore[name].changeFadeInTime(fadeOptions.fadeInTime);
                 this.audioStore[name].changeFadeOutTime(fadeOptions.fadeOutTime);
                 this.audioStore[name].changeLoop(fadeOptions.loop);
@@ -828,6 +835,7 @@
             };
 
             Snapshots.prototype.removeSnapshot = function(name) {
+                console.log("reoving snapshot: ", name)
                 delete this.snapshotStore[name];
             };
 
@@ -1115,6 +1123,8 @@
 
         function loadSnapshot(snapshot){
             dataStore.currentAnimation = snapshot;
+        
+
             ui.updateUI(dataStore);
         }
 
@@ -1126,8 +1136,9 @@
             //
         }
 
-        function removeSnapshot(){
-            //
+        function removeSnapshot(name){
+            dataStore.snapshots.removeSnapshot(name);
+            ui.updateUI(dataStore);
         }
 
         function addTransition(){
@@ -1157,6 +1168,32 @@
 
         function changeAlwaysTransitionSnaps(){
             dataStore.snapshots.alwaysTransitionSnaps = !dataStore.snapshots.alwaysTransitionSnaps;
+            ui.updateUI(dataStore);
+        }
+
+        function addSound(newSound) {
+            dataStore.audio.addAudio(newSound.name, newSound);
+            ui.updateUI(dataStore);
+        }
+
+        function saveSoundEdit(oldSound, newSound){
+            if (oldSound.key !== newSound.key){
+                dataStore.audio.removeAudio(oldSound.name)
+            }
+            dataStore.audio.addAudio(newSound.name, newSound);
+            ui.updateUI(dataStore);
+        }
+
+        function removeSound(sound){
+            dataStore.audio.removeAudio(sound);
+            ui.updateUI(dataStore);
+        }
+
+        function saveSnapshotEdit(oldSnapshot, newSnapshot){
+            if (oldSnapshot.key !== newSnapshot.key) {
+                dataStore.audio.removeAudio(oldSnapshot.name)
+            }
+            dataStore.audio.addAudio(newSnapshot.name, newSnapshot);
             ui.updateUI(dataStore);
         }
 
@@ -1229,6 +1266,8 @@
 
         function updateUI(dataStore) {
             console.log("UPDATE UI");
+            dataStore.currentPosition = MyAvatar.position;
+            dataStore.currentOrientation = MyAvatar.orientation;
             var messageObject = {
                 type: UPDATE_UI,
                 value: dataStore  
@@ -1259,7 +1298,7 @@
                     renameSnapshot();
                     break;
                 case REMOVE_SNAPSHOT:
-                    removeSnapshot();
+                    removeSnapshot(data.value);
                     break;
                 case ADD_TRANSITION:
                     addTransition();
@@ -1281,6 +1320,18 @@
                     break;
                 case CHANGE_ALWAYS_TRANSITION_SNAPS:
                     changeAlwaysTransitionSnaps();
+                    break;
+                case SAVE_SOUND_EDIT: 
+                    saveSoundEdit(data.value.oldSound, data.value.newSound);
+                    break;
+                case ADD_SOUND:
+                    addSound(data.value);
+                    break;
+                case REMOVE_SOUND:
+                    removeSound(data.value);
+                    break;
+                case SAVE_SNAPSHOT_EDIT:
+                    saveSnapshotEdit(data.value.oldSnapshot, data.value.newSnapshot);
                     break;
                 default: 
             }
