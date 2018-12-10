@@ -18,6 +18,8 @@
 
             REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
             SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
+            SAVE_NEW_SNAPSHOT = "SAVE_NEW_SNAPSHOT",
+
 
             SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
             ADD_SOUND = "ADD_SOUND",
@@ -46,6 +48,12 @@
                         showNewSnapshot: false
                     }
                 },
+                computed: {
+                    filteredSnapshots: function(){
+                        delete this.snapshots["alwaysTransition"];
+                        return this.snapshots;
+                    }
+                },
                 template: /*html*/`
                     <div class="card">
                         <div class="card-header" data-toggle="collapse" data-target="#snapshot-body">
@@ -53,7 +61,7 @@
                         </div>
                         <div  class="collapse card-body" id="snapshot-body">
                             <configuration :always_transition_snaps="always_transition_snaps" :default_transition_time="default_transition_time"></configuration>
-                            <snapshot v-for="snapshot in snapshots" :snapshot="snapshot"></snapshot>
+                            <snapshot v-for="snapshot in filteredSnapshots" :snapshot="snapshot"></snapshot>
                             <new_snapshot v-if="showNewSnapshot"></new_snapshot>
                             <button v-if="!showNewSnapshot" class="btn btn-primary" v-on:click="toggleShowNewSnap">Add new snapshot</button>
                         </div>
@@ -162,17 +170,24 @@
             })
 
             Vue.component('edit_snapshot', {
-                props: ['snapshot'],
+                props: ['snapshot', "new"],
                 methods: {
                     saveEdit: function () {
                         this.$parent.editMode = false;
-                        EventBridge.emitWebEvent(JSON.stringify({
-                            type: SAVE_SNAPSHOT_EDIT,
-                            value: {
-                                oldSnapshot: this.snapshot,
-                                newSnapshot: this.newSnapshot
-                            }
-                        }));
+                        if (this.new){
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_NEW_SNAPSHOT,
+                                value: this.newSnapshot
+                            }));
+                        } else {
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_SNAPSHOT_EDIT,
+                                value: {
+                                    oldSnapshot: this.snapshot,
+                                    newSnapshot: this.newSnapshot
+                                }
+                            }));
+                        }
                     },
                     cancelEdit: function () {
                         this.newSnapshot = Object.assign({}, this.snapshot);
@@ -204,26 +219,31 @@
             Vue.component('new_snapshot', {
                 props: [],
                 methods: {
-                    saveSnapShot: function () {
+                    saveSnapshot: function () {
                         this.$parent.showNewSnapshot = false;
+                    }
+                },
+                watch: {
+                    editMode: function (oldProp, newProp) {
+                        if (oldProp !== newProp) {
+                            this.$parent.showNewSnapshot = false;
+                        }
                     }
                 },
                 data: function () {
                     return {
-
+                        editMode: true,
+                        newSnapshot: {
+                            name: "",
+                            key: "",
+                        }
                     }
                 },
                 template: /*html*/`
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>New Snapshot</h5>
-                            </div>
-                            <div class="card-body">
-                                test
-                                <button class="btn btn-primary" v-on:click="saveSnapShot">Save Snapshot</button>
-                            </div>
-                        </div>
-                    `
+                    <div class="card">
+                        <edit_snapshot v-if="editMode" :new="true" :snapshot="newSnapshot" ></edit_snapshot>
+                    </div>
+                `
             })
         
          // Transitions

@@ -42,6 +42,8 @@
             RENAME_SNAPSHOT = "renameSnapshot",
             REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
             SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
+            SAVE_NEW_SNAPSHOT = "SAVE_NEW_SNAPSHOT",
+
             
             ADD_TRANSITION = "addTransition",
             EXECUTE_TRANSITION_BY_NAME = "executeTransitionByName",
@@ -1193,7 +1195,14 @@
             if (oldSnapshot.key !== newSnapshot.key) {
                 dataStore.audio.removeAudio(oldSnapshot.name)
             }
-            dataStore.audio.addAudio(newSnapshot.name, newSnapshot);
+            dataStore.snapshot.forceAddSnapshot(newSnapshot.name, newSnapshot);
+            ui.updateUI(dataStore);
+        }
+
+        function saveNewSnapshot(newSnapshot){
+            dataStore.snapshots.takeSnapshot();
+            dataStore.snapshots.addSnapshot(newSnapshot.name);
+            dataStore.snapshots.assignSnapshotToKey(newSnapshot.name, newSnapshot.key);
             ui.updateUI(dataStore);
         }
 
@@ -1332,6 +1341,9 @@
                     break;
                 case SAVE_SNAPSHOT_EDIT:
                     saveSnapshotEdit(data.value.oldSnapshot, data.value.newSnapshot);
+                    break;
+                case SAVE_NEW_SNAPSHOT:
+                    saveNewSnapshot(data.value);
                     break;
                 default: 
             }
