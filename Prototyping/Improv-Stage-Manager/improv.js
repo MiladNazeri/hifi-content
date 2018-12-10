@@ -1326,6 +1326,7 @@
                 value: dataStore  
             };
             ui.sendToHtml(messageObject);
+            // saveSettings();
         }
 
         function onMessage(data) {
