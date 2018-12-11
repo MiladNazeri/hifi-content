@@ -10,28 +10,30 @@
 /* global AccountServices  */
 
 (function () {
-         
+
     Script.require("./Polyfills.js")();
     var AppUi = Script.require('appUi');
-    
+
     var CONNECTION_TIMEOUT = 3000;
     var SCRIPT_NAME = "OwlTalk.js";
+
+    var DEBUG = false;
+
     var heartbeat = {
 
         willRefreshFlag: false,
         lastSent: "",
 
         start: function (lastMessage) {
-            print("HEARTBEAT", JSON.stringify(this));
-            print("HEARTBEAT",this.lastSent);
+            if (DEBUG) {
+                console.log("HEARTBEAT", this.lastSent);
+            }
             this.willRefreshFlag = true;
             this.lastSent = lastMessage;
-            print("HEARTBEAT", this.lastSent, JSON.stringify(this));
-            
+
             var _this = this;
 
             Script.setTimeout(function () {
-                print("HEARTBEAT", _this.lastSent, JSON.stringify(_this));
                 if (_this.willRefreshFlag === true) {
                     _this.refreshScript();
                 }
@@ -56,7 +58,7 @@
     var SHOW_TEXT_DURATION = 8000,
         BUFFER = 1000,
         hideTime = null; // ms
-    
+
     // Tablet
     var BUTTON_NAME = "OWL-TALK",
         APP_URL = Script.resolvePath('./Tablet/OwlTalkTablet.html?12345'),
@@ -71,20 +73,28 @@
         lastText = "",
         currentLength = 0,
         UPDATE_UI = BUTTON_NAME + "_update_ui",
-        connection = new WebSocket('ws://tan-cheetah.glitch.me/', "hello");
+        connection = new WebSocket('ws://wiry-occupation.glitch.me/');
 
     // MESSAGE TYPES
     var NEW_USER = "newUser",
         REMOVE_USER = "removeUser",
         UPDATE_CONNECTED_USERS = "updateconnectedUsers",
         TOGGLE_DISPLAY_NAMES = "toggleDisplayNames";
-        
+
     // Websocket
     connection.onopen = function () {
         // connection is opened and ready to use
-        console.log("on open");
-        sendUserInfo(); 
+        if (DEBUG) {
+            console.log("on open");
+        }
+        sendUserInfo();
     };
+
+    function onDisplayNameChanged() {
+        sendUserInfo();
+        settings.me.displayName = MyAvatar.displayName;
+        doUIUpdate();
+    }
 
     function sendUserInfo() {
         connection.send(JSON.stringify({ type: NEW_USER, username: username, displayName: MyAvatar.displayName }));
@@ -92,13 +102,17 @@
 
     connection.onclose = function () {
         // connection is closing
-        console.log("Websocket on close");
-        connection.send(JSON.stringify({ type: REMOVE_USER, username: username })); 
+        if (DEBUG) {
+            console.log("Websocket on close");
+        }
+        connection.send(JSON.stringify({ type: REMOVE_USER, username: username }));
     };
 
     connection.onerror = function (error) {
         // an error occurred when sending/receiving data
-        console.log("WebSocket on error: ", error);
+        if (DEBUG) {
+            console.log("WebSocket on error: ", error);
+        }
         Script.setTimeout(function () {
             heartbeat.refreshScript();
         }, REFRESH_TIME);
@@ -106,34 +120,45 @@
 
 
     connection.onmessage = function (message) {
-        console.log("got message", message);
-        console.log("ROBIN -1", heartbeat.lastSent, JSON.stringify(message));
+        if (DEBUG) {
+            console.log("got message", message);
+            console.log("ROBIN -1", heartbeat.lastSent, JSON.stringify(message));
+        }
 
         if (JSON.stringify(message).indexOf(heartbeat.lastSent) !== -1) {
-            print("ROBIN REFRESH SCRIPT");
+            if (DEBUG) {
+                console.log("ROBIN REFRESH SCRIPT");
+            }
             heartbeat.reset();
         }
 
         try {
             var json = JSON.parse(message.data);
         } catch (e) {
-            console.log('Invalid JSON: ', message.data);
+            if (DEBUG) {
+                console.log('Invalid JSON: ', message.data);
+            }
             return;
         }
 
         if (json.type === UPDATE_CONNECTED_USERS) {
-            console.log('Robin Update Connected Users: ', JSON.stringify(message.data));
+            if (DEBUG) {
+                console.log('Robin Update Connected Users: ', JSON.stringify(message.data));
+            }
+
             settings.connectedUsers = json.data;
         } else {
 
             // IMPROVEMENT could push the new MyMessage on the end of the message list
             // Check if we should show the messages because latest message is for me
             var latestMessage = json.data.slice(-1)[0];
-            
-            var isAuthor = latestMessage.author === username;
+
+            var isAuthor = latestMessage.author.username === username;
             var onToList = latestMessage.to.length === 0 || latestMessage.to.indexOf(username) !== -1;
-            
-            console.log("ROBIN 5", isAuthor, onToList);
+
+            if (DEBUG) {
+                console.log("ROBIN 5", isAuthor, onToList);
+            }
 
             if (isAuthor || onToList) {
                 var myMessages = getMyMessages(json.data);
@@ -144,7 +169,7 @@
                 show();
             }
         }
-        
+
         doUIUpdate();
     };
 
@@ -152,7 +177,7 @@
     function getMyMessages(list) {
 
         var myMessages = list.filter(function (message) {
-            var isAuthor = message.author === username;
+            var isAuthor = message.author.username === username;
 
             // empty to list sends to everyone
             // else find my username on to list
@@ -167,15 +192,15 @@
     // Collections
     var defaultSettings = {
 
-            username: username,
-            showDisplayNames: false,
-            history: [
-                { message: "test3" },
-                { message: "test4" }
-            ],
-            connectedUsers: []
-            
-        },
+        me: { username: username, displayName: MyAvatar.displayName },
+        showDisplayNames: false,
+        history: [
+            { message: "test3" },
+            { message: "test4" }
+        ],
+        connectedUsers: []
+
+    },
         settings = {};
 
     settings = Object.assign({}, defaultSettings);
@@ -195,9 +220,9 @@
         }
 
         Script.scriptEnding.connect(scriptEnding);
-        // MyAvatar.displayNameChanged.connect(); // *** 
+        MyAvatar.displayNameChanged.connect(onDisplayNameChanged); // *** 
 
-        HMD.displayModeChanged.connect(function(isHMDMode){
+        HMD.displayModeChanged.connect(function (isHMDMode) {
             hide();
             show();
         });
@@ -224,7 +249,9 @@
                 break;
             case SEND_MESSAGE:
 
-                console.log("ROBIN 100", message.info, message.text);
+                if (DEBUG) {
+                    console.log("ROBIN 100", message.info, message.text);
+                }
 
                 var info = message.info; // JSON.stringified in the Tablet
                 var text = message.text; // JSON.stringified in the Tablet
@@ -232,13 +259,15 @@
                 heartbeat.start(text);
 
                 break;
-            case TOGGLE_DISPLAY_NAMES: 
-                console.log("ROBIN 1000 Toggle them displaynames!", settings.showDisplayNames);
+            case TOGGLE_DISPLAY_NAMES:
+                if (DEBUG) {
+                    console.log("ROBIN 1000 Toggle them displaynames!", settings.showDisplayNames);
+                }
 
                 settings.showDisplayNames = !settings.showDisplayNames;
 
-                // getText();
-                // show();
+                hide();
+                show();
 
                 doUIUpdate();
 
@@ -255,17 +284,15 @@
             maxLineLength = 0,
             lastLine = "";
 
-        console.log("ROBIN 2 ", JSON.stringify(settings.history));
-        
-        settings.history.forEach(function (item, index) {
+        if (DEBUG) {
+            console.log("ROBIN 2 ", JSON.stringify(settings.history));
+        }
 
-            // if ((settings.history.length - 1) === index) {
-            //     lastLine = item.author + " :: " + item.text;
-            // } else {
+        settings.history.forEach(function (item, index) {
 
             var author = settings.showDisplayNames ? item.author.displayName : item.author.username;
 
-            if ((settings.history.length - 1) === index) { 
+            if ((settings.history.length - 1) === index) {
                 currentLine = "\n" + author + " :: " + item.text + "\n";
                 lines += 1;
             } else {
@@ -275,7 +302,7 @@
             text += currentLine;
             lines++;
         });
-        // });
+
         currentText = text;
         currentLength = maxLineLength;
         currentLines = lines;
@@ -288,12 +315,17 @@
 
     // Cleanup
     function scriptEnding() {
-        console.log("### in script ending");
+
+        if (DEBUG) {
+            console.log("### in script ending");
+        }
         hide();
 
         // connection is closing
-        console.log("on close");
-        connection.send(JSON.stringify({ type: REMOVE_USER, username: username })); 
+        if (DEBUG) {
+            console.log("on close");
+        }
+        connection.send(JSON.stringify({ type: REMOVE_USER, username: username }));
 
         connection.close();
 
@@ -307,7 +339,9 @@
 
         resetHideTime();
 
-        console.log("CALLING SHOW");
+        if (DEBUG) {
+            console.log("CALLING SHOW");
+        }
         getText();
 
         // Create both overlays in case user switches desktop/HMD mode.
@@ -317,7 +351,9 @@
             DESKTOP_FONT_SIZE = 20.0,
             HMD_FONT_SIZE = 0.10; // m
 
-        console.log("RECORDING TEXT", recordingText);
+        if (DEBUG) {
+            console.log("RECORDING TEXT", recordingText);
+        }
         if (HMD.active) {
 
             var chatLength = currentLength / 2 * HMD_FONT_SIZE;
@@ -343,25 +379,6 @@
                 drawInFront: true,
                 visible: true
             });
-
-            // lastTextOverlay = Overlays.addOverlay("text3d", {
-            //     text: lastText,
-            //     dimensions: {
-            //         x: chatLength, 
-            //         y: HMD_FONT_SIZE
-            //     },
-            //     parentID: MyAvatar.sessionUUID,
-            //     parentJointIndex: CAMERA_JOINT_INDEX,
-            //     localPosition: { x: -0.2, y: 1.0 - chatHeight / 2, z: -2.5 },
-            //     color: { red: 255, green: 100, blue: 100 },
-            //     alpha: 1.0,
-            //     lineHeight: HMD_FONT_SIZE,
-            //     backgroundAlpha: 0.4,
-            //     ignoreRayIntersection: true,
-            //     isFacingAvatar: true,
-            //     drawInFront: true,
-            //     visible: true
-            // });
 
         } else {
             // 2D overlay on desktop.
@@ -392,7 +409,7 @@
         function resetHideTime() {
             hideTime = Date.now() + SHOW_TEXT_DURATION;
         }
-    
+
         function checkHideTime() {
             if (hideTime < Date.now()) {
                 hide();

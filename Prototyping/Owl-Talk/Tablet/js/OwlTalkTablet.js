@@ -50,6 +50,9 @@
                     .split("{").join("")
                     .split("}").join("<br>").replace(/"/g, "");
                 return newMessage;
+            },
+            renderName() {
+                return this.showdisplaynames ? "displayName" : "username";
             }
         },
         template: `
@@ -57,7 +60,7 @@
                 <button class="btn-sm mt-2 mr-2" v-bind:class="{ 'btn-primary': !showdisplaynames, 'btn-warning': showdisplaynames }" v-on:click="toggleDisplayNames()">Toggle Display Names</button>
                 <div class="card-body">
                     <div v-for="item in history">
-                        {{ item.author }} :: {{ item.text }}
+                        {{ item.author[renderName] }} :: {{ item.text }}
                     </div>
                 </div>
             </div>
@@ -117,9 +120,11 @@
                 });
 
                 this.checkedNames = toList;
+
+                console.log("sendInput", text);
                 
                 var message = {
-                    author: this.$parent.settings.username,
+                    author: this.$parent.settings.me,
                     message: this.input_text,
                     to: this.checkedNames
                 }
@@ -134,13 +139,14 @@
             }
         },
         computed: {
-            names: function() {
+            connectedUsers: function() {
                 // for name in names
 
                 var nameToShow = this.showdisplaynames ? "displayName" : "username";
                 
                 return this.users.map(function(user) {
-                    return user[nameToShow];
+                    user.nameToShow = user[nameToShow];
+                    return user;
                 });
 
             }
@@ -157,9 +163,9 @@
                             Connected Users:
                         </div>
                         <div class="card-body">
-                            <div v-for="name in names">
-                                <input type="checkbox" :id="name" :value="name" v-model="checkedNames">
-                                <label :for="name">{{ name }}</label>
+                            <div v-for="user in connectedUsers">
+                                <input type="checkbox" :id="user.username" :value="user.username" v-model="checkedNames">
+                                <label :for="user.username">{{ user.nameToShow }}</label>
                             </div>
                         </div>
 
@@ -174,7 +180,7 @@
         el: '#app',
         data: {
             settings: {
-                username: "",
+                me: { username: "UN_me", displayName: "DN_me"},
                 showDisplayNames: true,
                 history: [
                     {to: [], author: "UN_cat", message: "test"}, 
