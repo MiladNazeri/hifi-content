@@ -2,31 +2,10 @@
     var EVENT_BRIDGE_OPEN_MESSAGE = "eventBridgeOpen",
         BUTTON_NAME = "OWL-TALK",
         UPDATE_UI = BUTTON_NAME + "_update_ui",
-        SAVE_JSON = "saveJSON",
         EVENTBRIDGE_SETUP_DELAY = 200,
-        // connection = new WebSocket('ws://tan-cheetah.glitch.me/'),
         SEND_MESSAGE = BUTTON_NAME + "SEND_MESSAGE",
         TOGGLE_DISPLAY_NAMES = "toggleDisplayNames";
 
-    // connection.onopen = function () {
-    //     console.log("on open");
-    //     // connection is opened and ready to use
-    // };
-
-    // connection.onerror = function (error) {
-    //     // an error occurred when sending/receiving data
-    // };
-
-    // connection.onmessage = function (message) {
-    //     try {
-    //         var json = JSON.parse(message.data);
-    //       } catch (e) {
-    //         console.log('Invalid JSON: ', message.data);
-    //         return;
-    //       }
-    //       app.settings.history = json.data;
-    //     // handle incoming message
-    // };
 
     Vue.component('chat', {
         props: ["history", "username", "showdisplaynames"],
@@ -62,36 +41,6 @@
                     <div v-for="item in history">
                         {{ item.author[renderName] }} :: {{ item.text }}
                     </div>
-                </div>
-            </div>
-        `
-    })
-
-    Vue.component('usernamelist', {
-        props: ["users", "showdisplaynames"],
-        methods: {
-
-        },
-        // computed: {
-        //     formatedMessage() {
-        //         console.log("FORMATTED MESSAGES")
-        //         var newMessage = JSON.stringify(this.message)
-        //             .replace(/\\n/g, "<br>")
-        //             .replace(/\"/g, "")
-        //             .replace(/\\t/g, "    ")
-        //             .split(",").join("<br>\   ")
-        //             .split("{").join("")
-        //             .split("}").join("<br>").replace(/"/g, "");
-        //         return newMessage;
-        //     }
-        // },
-        template: `
-            <div class="card">
-                <div class="card-header">
-                    Connected Users:
-                </div>
-                <div v-for="username in users">
-                    <p>{{ username }}</p>
                 </div>
             </div>
         `

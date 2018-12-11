@@ -25,8 +25,6 @@ function htmlEntities(str) {
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-console.log("hi");
-
 var server = http.createServer((request, response) => { });
 
 server.listen(webSocketServerPost, () => {
