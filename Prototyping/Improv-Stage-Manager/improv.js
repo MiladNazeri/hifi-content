@@ -1015,12 +1015,41 @@
             return null;
         }
 
+        var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
+        var request = Script.require('./request.js').request;
+
         function saveSettings(){
-            Settings.setValue(SETTINGS_STRING, dataStore);
+            var settings = {}
+            settings.snapshots = dataStore.snapshots;
+            settings.audio = dataStore.audio;
+            settings.mapping = dataStore.mapping;
+            
+            Settings.setValue(SETTINGS_STRING, settings);
+
+            var request = new XMLHttpRequest();
+            var encode = encodeURLParams({
+                type: "save", 
+                settings: JSON.stringify(settings)
+            })
+            request.open('GET', googleScript + "?" + encode);
+            request.timeout = 10000;
+            request.send();
         }
 
+        var encode = encodeURLParams({
+            type: "get"
+        })
+        var url = googleScript  + "?" + encode;
         function loadSettings(){
-            dataStore = Settings.getValue(SETTINGS_STRING);
+            var settings;
+            
+            request(url, function (error, data) {
+                if (!error) {
+                    settings = data.results;
+                    console.log("results", JSON.stringify(settings));
+                }
+            });
+            // dataStore = Settings.getValue(SETTINGS_STRING);
         }
 
         function runningCheck(){
@@ -1036,6 +1065,16 @@
             }
             return false;
         }
+
+    function encodeURLParams(params) {
+        var paramPairs = [];
+        for (var key in params) {
+            paramPairs.push(key + "=" + params[key]);
+        }
+        return paramPairs.join("&");
+    }
+
+
 
     // Procedural Functions
     // /////////////////////////////////////////////////////////////////////////
@@ -1326,7 +1365,8 @@
                 value: dataStore  
             };
             ui.sendToHtml(messageObject);
-            // saveSettings();
+            saveSettings();
+            loadSettings();
         }
 
         function onMessage(data) {
