@@ -21,10 +21,12 @@
     // /////////////////////////////////////////////////////////////////////////
         var 
             AppUi = Script.require('appUi'),
-            defaults = Script.require('./defaults.js')
+            defaults = Script.require('./defaults.js'),
+            request = Script.require('./request.js').request
         ;
 
         Script.require(Script.resolvePath('./Polyfills.js'));
+
 
     // Consts
     // /////////////////////////////////////////////////////////////////////////
@@ -165,6 +167,8 @@
             //     : oldSettings
             dataStore = defaultDataStore
         ;
+        console.log("running loadSettings");
+        loadSettings();
 
     // Constructors
     // /////////////////////////////////////////////////////////////////////////
@@ -445,11 +449,12 @@
             
             function AudioLibrary() {
                 this.audioStore = {};
+                this.audioObjects = {};
             }
             
             AudioLibrary.prototype.addAudio = function(name, audioObject) {
                 console.log("addAudio");
-
+                this.audioObjects[name] = audioObject;
                 this.audioStore[name] = new Sound(audioObject.url, name);
                 this.audioStore[name].key = audioObject.key;
                 audioObject.fadeInTime > 0 !== 'undefined' && this.audioStore[name].changeShouldFadeIn(true);
@@ -1015,13 +1020,14 @@
             return null;
         }
 
-        var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
-        var request = Script.require('./request.js').request;
+        
 
         function saveSettings(){
-            var settings = {}
+            var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
+            var settings = {};
             settings.snapshots = dataStore.snapshots;
             settings.audio = dataStore.audio;
+            console.log(JSON.stringify(settings.audio));
             settings.mapping = dataStore.mapping;
             
             Settings.setValue(SETTINGS_STRING, settings);
@@ -1036,20 +1042,49 @@
             request.send();
         }
 
-        var encode = encodeURLParams({
-            type: "get"
-        })
-        var url = googleScript  + "?" + encode;
+
         function loadSettings(){
+            console.log("### load settings running now");
+            var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
+            var encode = encodeURLParams({
+                type: "get"
+            })
             var settings;
-            
+            var url = googleScript + "?" + encode;
             request(url, function (error, data) {
                 if (!error) {
-                    settings = data.results;
-                    console.log("results", JSON.stringify(settings));
+                    settings = JSON.parse(data);
+                    var keys = Object.keys(settings);
+                    console.log("!!!KEYS", JSON.stringify(keys));
+                    console.log("!!!settings", JSON.stringify(settings.audio));
+                    console.log("!!!transitions", JSON.stringify(settings.snapshots.transitionStore));
+                    console.log("!!!snapshots", JSON.stringify(settings.snapshots.snapshotStore));
+
+
+                    dataStore.mapping = settings.mapping;
+                    Object.keys(settings.snapshots.snapshotStore).forEach(function(snapshot){
+                        dataStore.snapshots.forceAddSnapshot(snapshot, settings.snapshots.snapshotStore[snapshot]);
+                        dataStore.snapshots.assignSnapshotToKey(snapshot, settings.snapshots.snapshotStore[snapshot].key);
+                    });
+                    Object.keys(settings.snapshots.transitionStore).forEach(function(transition){
+                        var refrencedTransition = settings.snapshots.transitionStore[transition];
+                        var name = refrencedTransition.name;
+                        var from = refrencedTransition.from;
+                        var to = refrencedTransition.to;
+                        var duration = refrencedTransition.duration;
+                        var key = refrencedTransition.key;
+                        dataStore.snapshots.addTransition(name, from, to, duration, key);
+                    });
+                    Object.keys(settings.audio.audioObjects).forEach(function(audio){
+                        dataStore.audio.addAudio(audio, settings.audio.audioObjects[audio]);
+                    });
+                    ui.updateUI(dataStore);
+                } else {
+                    console.log("error");
                 }
             });
             // dataStore = Settings.getValue(SETTINGS_STRING);
+
         }
 
         function runningCheck(){
@@ -1352,9 +1387,10 @@
                 orientation: [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)],
                 loop: false,
                 pitch: 2
-            }
+            };
 
             dataStore.audio.addAudio(audio_name, audio_test_object);
+
             Script.scriptEnding.connect(scriptEnding);
         }
 
@@ -1366,7 +1402,6 @@
             };
             ui.sendToHtml(messageObject);
             saveSettings();
-            loadSettings();
         }
 
         function onMessage(data) {
