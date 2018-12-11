@@ -21,7 +21,7 @@
     // /////////////////////////////////////////////////////////////////////////
         var 
             AppUi = Script.require('appUi'),
-            defaults = Script.require('./defaults.js')
+            defaults = Script.require('./defaults.js?' + Date.now())
         ;
 
         Script.require(Script.resolvePath('./Polyfills.js'));
@@ -80,9 +80,11 @@
             LIGHTS_STAGE_SPOT_MAIN = "Lights_Stage_Spot_Main",
             LIGHTS_UPSTAGE_FILL = "Lights_Upstage-Fill",
 
+            COLOR = "color",
             INTENSITY = "intensity",
             FALLOFF_RADIUS = "falloffRadius",
             VISIBLE = "visible",
+
             KEYLIGHT = "keyLight",
             AMBIENT_LIGHT = "ambientLight",
             AMBIENT_INTENSITY = "ambientIntensity",
@@ -148,7 +150,9 @@
                 SnapshotProperties: [
                     INTENSITY,
                     FALLOFF_RADIUS,
+                    COLOR,
                     [KEYLIGHT, INTENSITY],
+                    [KEYLIGHT, COLOR],
                     [AMBIENT_LIGHT, AMBIENT_INTENSITY]
                 ],
                 mapping: {},
@@ -574,7 +578,8 @@
                             value: null,
                             changeStep: null,
                             direction: null,
-                            timer: null
+                            timer: null,
+                            amount: null
                         };
                     }   
                 }, this);
@@ -610,14 +615,14 @@
                         innerKey = Object.keys(this.from[property])[0];
                         fromValue = this.from[property][innerKey].value;
                         toValue = this.to[property][innerKey].value;
+                        console.log("about to send values", innerKey, JSON.stringify(fromValue), JSON.stringify(toValue));
                         _this.updateCurrentProperty(property, this.from[property], true);
-
                     } else {
                         fromValue = this.from[property].value;
                         toValue = this.to[property].value;
+                        console.log("about to send values", innerKey, JSON.stringify(fromValue), JSON.stringify(toValue));
                         _this.updateCurrentProperty(property, this.from[property].value, true);
                     }
-
                     if (fromValue > toValue){
                         if (typeof this.from[property].value === 'undefined'){ 
                             innerKey = Object.keys(this.from[property])[0];
@@ -630,6 +635,12 @@
                             _this.current[property][innerKey].direction = DIRECTION_INCREASE; 
                         } else {
                             _this.current[property].direction = DIRECTION_INCREASE; 
+                        }
+                    } else if (property.indexOf(COLOR) || innerKey.indexOf(COLOR)){
+                        if (typeof this.from[property].value === 'undefined'){  
+                            _this.current[property][innerKey].direction = COLOR; 
+                        } else {
+                            _this.current[property].direction = COLOR; 
                         }
                     } else {
                         return;
@@ -649,6 +660,7 @@
                         var newValue = 0;
                         var oldValue = 0;
                         var changeStep = 0;
+                        var amount = 0;
 
                         if (typeof _this.from[property].value === 'undefined'){ 
                             innerKey = Object.keys(_this.from[property])[0];
@@ -656,6 +668,15 @@
                                 oldValue = _this.current[property][innerKey].value;
                                 changeStep = _this.current[property][innerKey].changeStep;
                                 newValue = oldValue + changeStep;
+                            } else if (_this.current[property][innerKey].direction === COLOR) {
+                                changeStep = _this.current[property][innerKey].changeStep;
+                                _this.current[property][innerKey].amount += changeStep;
+                                amount = _this.current[property][innerKey].amount;
+                                newValue = _this.colorMixer(
+                                    _this.from[property][innerKey].value,
+                                    _this.to[property][innerKey].value,
+                                    amount
+                                );
                             } else {
                                 oldValue = _this.current[property][innerKey].value;
                                 changeStep = _this.current[property][innerKey].changeStep;
@@ -670,6 +691,15 @@
                                 oldValue = _this.current[property].value;
                                 changeStep = _this.current[property].changeStep;
                                 newValue = oldValue + changeStep;
+                            } else if (_this.current[property].direction === COLOR) {
+                                changeStep = _this.current[property].changeStep;
+                                _this.current[property].amount += changeStep;
+                                amount = _this.current[property].amount;
+                                newValue = _this.colorMixer(
+                                    _this.from[property].value,
+                                    _this.to[property].value,
+                                    amount
+                                );
                             } else {
                                 oldValue = _this.current[property].value;
                                 changeStep = _this.current[property].changeStep;
@@ -692,7 +722,13 @@
                                 current <= to){
                                 delete _this.running[property];
                                 _this.stopAnimation(property, innerKey);
-                            } 
+                            }
+                            if (_this.current[property][innerKey].direction === COLOR &&
+                                _this.current[property][innerKey].amount > 99) {
+                                    _this.stopAnimation(property, innerKey);
+                                    delete _this.running[property];
+                                    _this.current[property][innerKey].amount = 0;
+                            }
                         } else {
                             current = _this.current[property].value;
                             to = _this.to[property].value;
@@ -705,7 +741,13 @@
                                current <= to){
                                 delete _this.running[property];
                                 _this.stopAnimation(property);
-                            } 
+                            }
+                            if (_this.current[property].direction === COLOR &&
+                                _this.current[property].amount > 99) {
+                                    _this.stopAnimation(property);
+                                    delete _this.running[property];
+                                    _this.current[property].amount = 0;
+                            }
                         }
                     }
                 }, this);
@@ -727,17 +769,23 @@
             };
 
             Light.prototype.updateFromProperty = function(property, value) {
-                if (typeof value !== "number"){
+                console.log("updateFromProperty")
+                console.log("property:", JSON.stringify(property))
+                console.log("value:", JSON.stringify(value))
+                console.log("this.from", JSON.stringify(this.from));
+                if (typeof value !== "number" && typeof value.red === "undefined"){
                     var innerKey = Object.keys(value)[0];
                     this.from[property][innerKey].value = value[innerKey];
                 } else {
                     this.from[property].value = value;
                 }
+                console.log("this.from", JSON.stringify(this.from));
             };
 
             Light.prototype.updateToProperty = function(property, value) {
                 if (typeof value !== "number"){
                     var innerKey = Object.keys(value)[0];
+                    console.log("to:", JSON.stringify(this.to));
                     this.to[property][innerKey].value = value[innerKey];
                 } else {
                     this.to[property].value = value;
@@ -799,8 +847,21 @@
                     Entities.editEntity(light, this.editGroup);
                 }, this);
                 this.editGroup = {};
+            };  
+
+            Light.prototype.colorChageChannelMixer = function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
+                var channelA = colorChannelA * amountToMix;
+                var channelB = colorChannelB * (1-amountToMix);
+                return parseInt(channelA+channelB);
             };
-        
+
+            Light.prototype.colorMixer = function colorMixer(rgbA, rgbB, amountToMix){
+                var r = this.colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+                var g = this.colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+                var b = this.colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+                return [r,g,b];
+            };
+
         // Snapshots
         // /////////////////////////////////////////////////////////////////////////
             function Snapshots(){
@@ -884,6 +945,7 @@
                         }
     
                         this.getSnapshotPropertyKeys(snapshot, light).forEach(function(property){
+                            console.log("Updating property")
                             lights[light].updateCurrentProperty(
                                 property, this.snapshotStore[snapshot][light][property], false
                             );
@@ -951,6 +1013,10 @@
                         if (light.toLowerCase().indexOf("zone") > -1 && zoneExcludes.indexOf(property) > -1){
                             return;
                         }
+                        console.log("about to update from property");
+                        console.log("light", light);
+                        console.log("property", property);
+
                         lights[light].updateFromProperty(
                             property, this.snapshotStore[from][light][property]
                         );
