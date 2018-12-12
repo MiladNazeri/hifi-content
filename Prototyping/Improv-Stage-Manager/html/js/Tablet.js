@@ -30,7 +30,7 @@
             CHANGE_DEFAULT_TRANSITION_TIME = "CHANGE_DEFAULT_TRANSITION_TIME",
             UPDATE_UI = BUTTON_NAME + "_update_ui",
             
-            EVENTBRIDGE_SETUP_DELAY = 100
+            EVENTBRIDGE_SETUP_DELAY = 500;
         ;
 
     // Components
@@ -131,7 +131,7 @@
                     <div class="card">
                         <div class="card-header" data-toggle="collapse" :data-target="'#' + snapshot.name">
                             <h5>{{snapshot.name}}</h5>
-                            <span>Key: {{snapshot.key}}</span> <span class="icon icon-close float-right" @click="removeSnapshot"></span>
+                            <span>Key: {{snapshot.key}}</span> <span class="icon icon-close pencil float-right" @click="removeSnapshot"></span>
                         </div>
                         <div class="card-body collapse" :id="snapshot.name">
                             <display_snapshot v-if="!editMode" :snapshot="snapshot"></display_snapshot>
@@ -155,7 +155,7 @@
                 },
                 template: /*html*/`
                     <div>
-                        <div class="icon icon-edit-pencil" v-on:click="edit">
+                        <div class="icon icon-edit-pencil pencil" v-on:click="edit">
                         </div>
                         <div>
                             <h5>name: </h5>
@@ -293,7 +293,7 @@
                     <div class="card">
                         <div class="card-header" data-toggle="collapse" :data-target="'#' + transition.name">
                             <h5>{{transition.name}}</h5>
-                            <span>Key: {{transition.key}}</span> <span class="icon icon-close float-right" @click="removeTransition"></span>
+                            <span>Key: {{transition.key}}</span> <span class="icon icon-close pencil float-right" @click="removeTransition"></span>
                         </div>
                         <div class="card-body collapse" :id="transition.name">
                             <display_transition v-if="!editMode" :transition="transition"></display_transition>
@@ -317,7 +317,7 @@
                 },
                 template: /*html*/`
                     <div>
-                        <div class="icon icon-edit-pencil" v-on:click="edit">
+                        <div class="icon icon-edit-pencil pencil" v-on:click="edit">
                         </div>
                         <div>
                             <h5>name: </h5>
@@ -336,7 +336,7 @@
                             <p>{{transition.to}}</p>
                         </div>
                         <div>
-                            <h5>duration: </h5>
+                            <h5>duration (ms): </h5>
                             <p>{{transition.duration}}</p>
                         </div>
                         
@@ -431,8 +431,8 @@
                             <p>Selected To: {{newTransition.to}}</p>                     
                         </div>
                         <div>
-                            <h5>duration: </h5>
-                            <input type="number" class="form-control" min="0"v-model="newTransition.duration">
+                            <h5>duration (ms): </h5>
+                            <input type="number" class="form-control" min="0" v-model="newTransition.duration">
                         </div>
                         <div>
                             <button class="btn btn-primary" v-on:click="saveEdit">Save Edit</button>
@@ -522,7 +522,7 @@
                     <div class="card">
                         <div class="card-header" data-toggle="collapse" :data-target="'#' + sound.name">
                             <h5>{{sound.name}}</h5>
-                            <span>Key: {{sound.key}}</span> <span class="icon icon-close float-right" @click="removeSound"></span>
+                            <span>Key: {{sound.key}}</span> <span class="icon icon-close pencil float-right" @click="removeSound"></span>
                         </div>
                         <div class="card-body collapse" :id="sound.name">
                             <display_sound v-if="!editMode" :sound="sound" :current_position="current_position" :current_orientation="current_orientation"></display_sound>
@@ -546,7 +546,7 @@
                 },
                 template: /*html*/`
                     <div>
-                        <div class="icon icon-edit-pencil" v-on:click="edit">
+                        <div class="icon icon-edit-pencil pencil" v-on:click="edit">
                         </div>
                         <div>
                             <h5>name: </h5>
@@ -592,6 +592,7 @@
                 props: ['sound', 'current_position', 'current_orientation'],
                 methods: {
                     saveEdit: function(){ 
+                        console.log("THIS.NEW_Sound " + JSON.stringify(this.newSound));
                         this.$parent.editMode = false;
                         EventBridge.emitWebEvent(JSON.stringify({
                             type: SAVE_SOUND_EDIT,
@@ -665,15 +666,15 @@
                         </div>
                         <div>
                             <h5>max volume: </h5>
-                            <input type="number" min="0" max="1.0" class="form-control" v-model="newSound.maxVolume">
+                            <input type="number" class="form-control" max="1.0" min="0.0" v-model="newSound.maxVolume">
                         </div>
                         <div>
-                            <h5>fade in time: </h5>
-                            <input type="number" class="form-control" v-model="newSound.fadeInTime">
+                            <h5>fade in time (ms): </h5>
+                            <input type="number" class="form-control" min="0.0" v-model="newSound.fadeInTime">
                         </div>
                         <div>
-                            <h5>fade out time: </h5>
-                            <input type="number" class="form-control" v-model="newSound.fadeOutTime">
+                            <h5>fade out time (ms): </h5>
+                            <input type="number" class="form-control" min="0.0" v-model="newSound.fadeOutTime">
                         </div>
                         <div>
                             <h5>loop </h5>

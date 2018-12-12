@@ -27,7 +27,7 @@
 
         Script.require(Script.resolvePath('./Polyfills.js'));
 
-
+    console.log("\n\n\n\nTEST TEST 2");
     // Consts
     // /////////////////////////////////////////////////////////////////////////
         var 
@@ -168,7 +168,7 @@
             dataStore = defaultDataStore
         ;
         console.log("running loadSettings");
-        loadSettings();
+
 
     // Constructors
     // /////////////////////////////////////////////////////////////////////////
@@ -253,20 +253,20 @@
                 },
                 changeFadeInTime: function(time) {
                     console.log("changing fadeintime")
-
+                    time = Math.max(time, 0);
                     this.fadeInTime = time;
-                    this.fadeInTime * this.percentChange;
+                    this.fadeInDurationTimeStep = this.fadeInTime * this.percentChange;
                 },
                 changeFadeOutTime: function(time){
                     console.log("changing fadeouttime")
-
+                    time = Math.max(time, 0);
                     this.fadeOutTime = time;
-                    this.fadeOutTime * this.percentChange;
+                    this.fadeOutDurationTimeStep = this.fadeOutTime * this.percentChange;
                 },
                 changeMaxVolume: function (volume) {
                     console.log("changing maxvolume")
-
-                    this.maxVolume = Math.max(volume, 1.0);
+                    volume = Math.max(volume, 0);
+                    this.maxVolume = Math.min(volume, 1.0);
                     this.fadeLevelStep = this.maxVolume * this.percentChange;
                 },
                 changeCurrentVolume: function (volume) {
@@ -291,7 +291,7 @@
                 },
                 fadeIn: function () {
                     console.log("fadeIn")
-
+                    
                     var _this = this;
                     this.fadeInStarted = true;
                     if (this.injector && this.injector.isPlaying()){
@@ -301,11 +301,17 @@
 
                             _this.currentVolume += _this.fadeLevelStep;
                             _this.currentVolume = Math.min(_this.maxVolume, _this.currentVolume);
-                            _this.injector.setOptions({ volume: _this.currentVolume });
-                            if (_this.currentVolume >= _this.maxVolume) {
-                                _this.fadeInStarted = false;
+                            if (_this.injector){
+                                console.log("VOLUME: ", JSON.stringify(_this.injector.options));
+                                _this.injector.setOptions({ volume: _this.currentVolume });
+                                if (_this.currentVolume >= _this.maxVolume) {
+                                    _this.fadeInStarted = false;
+                                    Script.clearInterval(_this.fadeInTimer);
+                                }
+                            } else {
                                 Script.clearInterval(_this.fadeInTimer);
                             }
+
                         }, this.fadeInDurationTimeStep);
                     }
                 },
@@ -316,20 +322,24 @@
                     this.fadeOutStarted = true;
                     if (this.injector && this.injector.isPlaying()) {
                         console.log("_this.currentVolume", _this.currentVolume)
-                        console.log("_this.minVolume", _this.minVolume);
-                        console.log("_this.fadeLevelStep", _this.fadeLevelStep);
                         this.fadeOutTimer = Script.setInterval(function () {
                             console.log("stopping fade out");
                             _this.currentVolume -= _this.fadeLevelStep;
                             console.log(" _this.currentVolume After", _this.currentVolume)
                             _this.currentVolume = Math.max(_this.minVolume, _this.currentVolume);
-                            _this.injector.setOptions({ volume: _this.currentVolume });
-                            if (_this.currentVolume <= _this.minVolume) {
-                                _this.fadeOutStarted = false;
-                                _this.injector.stop();
-                                _this.injector = null;
+                            if (_this.injector){
+                                console.log("VOLUME: ",JSON.stringify(_this.injector.options));
+                                _this.injector.setOptions({ volume: _this.currentVolume });
+                                if (_this.currentVolume <= _this.minVolume) {
+                                    _this.fadeOutStarted = false;
+                                    _this.injector.stop();
+                                    _this.injector = null;
+                                    Script.clearInterval(_this.fadeOutTimer);
+                                }
+                            } else {
                                 Script.clearInterval(_this.fadeOutTimer);
                             }
+
                         }, this.fadeOutDurationTimeStep);
                     }
                 },
@@ -453,14 +463,17 @@
             }
             
             AudioLibrary.prototype.addAudio = function(name, audioObject) {
-                console.log("addAudio");
+                console.log("addAudio", JSON.stringify(audioObject));
+                if (this.audioStore[name]){
+                    this.audioStore[name].unload();
+                }
                 this.audioObjects[name] = audioObject;
                 this.audioStore[name] = new Sound(audioObject.url, name);
                 this.audioStore[name].key = audioObject.key;
-                audioObject.fadeInTime > 0 !== 'undefined' && this.audioStore[name].changeShouldFadeIn(true);
-                audioObject.fadeOutTime > 0 !== 'undefined' && this.audioStore[name].changeShouldFadeOut(true);
-                audioObject.fadeInTime !== 'undefined' && this.audioStore[name].changeFadeInTime(audioObject.fadeInTime);
-                audioObject.fadeOutTime !== 'undefined' && this.audioStore[name].changeFadeOutTime(audioObject.fadeOutTime);
+                audioObject.fadeInTime > 0 && this.audioStore[name].changeShouldFadeIn(true);
+                audioObject.fadeOutTime > 0 && this.audioStore[name].changeShouldFadeOut(true);
+                audioObject.fadeInTime && this.audioStore[name].changeFadeInTime(audioObject.fadeInTime);
+                audioObject.fadeOutTime && this.audioStore[name].changeFadeOutTime(audioObject.fadeOutTime);
                 audioObject.maxVolume !== 'undefined' && this.audioStore[name].changeMaxVolume(audioObject.maxVolume);
                 audioObject.position !== 'undefined' && this.audioStore[name].changePosition(audioObject.position);
                 audioObject.orientation !== 'undefined' && this.audioStore[name].changeOrientation(audioObject.orientation);
@@ -485,6 +498,8 @@
                     this.audioStore[name].unload();
                 }
                 delete this.audioStore[name];
+                delete dataStore.mapping[this.audioStore[name].key];
+
             };
 
             AudioLibrary.prototype.assignAudioToKey = function (name, key) {
@@ -847,6 +862,7 @@
             Snapshots.prototype.removeSnapshot = function(name) {
                 console.log("reoving snapshot: ", name)
                 delete this.snapshotStore[name];
+                delete dataStore.mapping[this.snapshotStore[name].key];
             };
 
             Snapshots.prototype.assignSnapshotToKey = function(name, key) {
@@ -927,6 +943,7 @@
             Snapshots.prototype.removeTransition = function(name){
                 console.log("Removing Transition");
                 delete this.transitionStore[name];
+                delete dataStore.mapping[this.transitionStore[name].key];
             };
 
             Snapshots.prototype.renameTransition = function(oldName, newName){
@@ -1020,10 +1037,9 @@
             return null;
         }
 
-        
-
         function saveSettings(){
-            var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
+            console.log("SAVING SETTINGS");
+            var googleScript = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
             var settings = {};
             settings.snapshots = dataStore.snapshots;
             settings.audio = dataStore.audio;
@@ -1031,24 +1047,23 @@
             settings.mapping = dataStore.mapping;
             
             Settings.setValue(SETTINGS_STRING, settings);
-
-            var request = new XMLHttpRequest();
             var encode = encodeURLParams({
                 type: "save", 
                 settings: JSON.stringify(settings)
-            })
-            request.open('GET', googleScript + "?" + encode);
-            request.timeout = 10000;
-            request.send();
+            });
+            request(googleScript + "?" + encode, function (error, data) {
+                if (error) {
+                    console.log(error);
+                }
+            });
         }
-
 
         function loadSettings(){
             console.log("### load settings running now");
-            var googleScript = "https://script.google.com/macros/s/AKfycbxdCYg7pcKIPF6L9PWKkKnZfD02CMpx6-GLRN8ZYbv09cpN2RGs/exec";
+            var googleScript = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
             var encode = encodeURLParams({
                 type: "get"
-            })
+            });
             var settings;
             var url = googleScript + "?" + encode;
             request(url, function (error, data) {
@@ -1060,31 +1075,29 @@
                     console.log("!!!transitions", JSON.stringify(settings.snapshots.transitionStore));
                     console.log("!!!snapshots", JSON.stringify(settings.snapshots.snapshotStore));
 
-
                     dataStore.mapping = settings.mapping;
                     Object.keys(settings.snapshots.snapshotStore).forEach(function(snapshot){
                         dataStore.snapshots.forceAddSnapshot(snapshot, settings.snapshots.snapshotStore[snapshot]);
                         dataStore.snapshots.assignSnapshotToKey(snapshot, settings.snapshots.snapshotStore[snapshot].key);
                     });
-                    Object.keys(settings.snapshots.transitionStore).forEach(function(transition){
-                        var refrencedTransition = settings.snapshots.transitionStore[transition];
-                        var name = refrencedTransition.name;
-                        var from = refrencedTransition.from;
-                        var to = refrencedTransition.to;
-                        var duration = refrencedTransition.duration;
-                        var key = refrencedTransition.key;
-                        dataStore.snapshots.addTransition(name, from, to, duration, key);
-                    });
-                    Object.keys(settings.audio.audioObjects).forEach(function(audio){
-                        dataStore.audio.addAudio(audio, settings.audio.audioObjects[audio]);
-                    });
-                    ui.updateUI(dataStore);
+                    // Object.keys(settings.snapshots.transitionStore).forEach(function(transition){
+                    //     var refrencedTransition = settings.snapshots.transitionStore[transition];
+                    //     var name = refrencedTransition.name;
+                    //     var from = refrencedTransition.from;
+                    //     var to = refrencedTransition.to;
+                    //     var duration = refrencedTransition.duration;
+                    //     var key = refrencedTransition.key;
+                    //     dataStore.snapshots.addTransition(name, from, to, duration, key);
+                    // });
+                    // Object.keys(settings.audio.audioObjects).forEach(function(audio){
+                    //     dataStore.audio.addAudio(audio, settings.audio.audioObjects[audio]);
+                    // });
+                    // ui.updateUI(dataStore);
                 } else {
                     console.log("error");
                 }
             });
             // dataStore = Settings.getValue(SETTINGS_STRING);
-
         }
 
         function runningCheck(){
@@ -1101,15 +1114,13 @@
             return false;
         }
 
-    function encodeURLParams(params) {
-        var paramPairs = [];
-        for (var key in params) {
-            paramPairs.push(key + "=" + params[key]);
+        function encodeURLParams(params) {
+            var paramPairs = [];
+            for (var key in params) {
+                paramPairs.push(key + "=" + params[key]);
+            }
+            return paramPairs.join("&");
         }
-        return paramPairs.join("&");
-    }
-
-
 
     // Procedural Functions
     // /////////////////////////////////////////////////////////////////////////
@@ -1261,11 +1272,13 @@
         }
 
         function addSound(newSound) {
+            console.log("IN ADD SOUND", JSON.stringify(newSound));
             dataStore.audio.addAudio(newSound.name, newSound);
             ui.updateUI(dataStore);
         }
 
         function saveSoundEdit(oldSound, newSound){
+            console.log("IN SAVE SOUND EDIT SOUND", JSON.stringify(newSound));
             if (oldSound.key !== newSound.key){
                 dataStore.audio.removeAudio(oldSound.name)
             }
@@ -1338,22 +1351,22 @@
             // });
         }
 
-    function keyPressHandler(event) {
-        if (dataStore.mapping[event.text]) {
-            switch (dataStore.mapping[event.text].type){
-                case SNAPSHOT:
-                    dataStore.snapshots.loadSnapshot(dataStore.mapping[event.text].name);
-                    break;
-                case TRANSITION:
-                    dataStore.snapshots.executeTransitionByName(dataStore.mapping[event.text].name);
-                    break;
-                case AUDIO:
-                    dataStore.audio.playAudio(dataStore.mapping[event.text].name);
-                    break;
+        function keyPressHandler(event) {
+            if (dataStore.mapping[event.text]) {
+                switch (dataStore.mapping[event.text].type){
+                    case SNAPSHOT:
+                        dataStore.snapshots.loadSnapshot(dataStore.mapping[event.text].name);
+                        break;
+                    case TRANSITION:
+                        dataStore.snapshots.executeTransitionByName(dataStore.mapping[event.text].name);
+                        break;
+                    case AUDIO:
+                        dataStore.audio.playAudio(dataStore.mapping[event.text].name);
+                        break;
 
+                }
             }
         }
-    }
 
     // Tablet
     // /////////////////////////////////////////////////////////////////////////
@@ -1390,7 +1403,7 @@
             };
 
             dataStore.audio.addAudio(audio_name, audio_test_object);
-
+            // loadSettings();
             Script.scriptEnding.connect(scriptEnding);
         }
 
@@ -1402,6 +1415,7 @@
             };
             ui.sendToHtml(messageObject);
             saveSettings();
+
         }
 
         function onMessage(data) {
@@ -1478,6 +1492,8 @@
                     break;
                 case UPDATE_ORIENTATION:
                     updateOrientation();
+                    break;
+                default:
 
             }
         }
