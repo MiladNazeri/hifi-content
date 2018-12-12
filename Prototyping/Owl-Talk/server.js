@@ -79,6 +79,9 @@ wsServer.on('request', (request) => {
 
             switch (type) {
                 case NEW_USER:
+
+                    console.log("NEW USER or UPDATE DISPLAY NAME");
+                    
                     var username = parsedMessage[USERNAME];
                     var displayName = parsedMessage[DISPLAYNAME];
                     addUserOrUpdateDisplayName(username, displayName);
@@ -145,6 +148,7 @@ wsServer.on('request', (request) => {
         var index = getUserIndex(username);
 
         if (!index) {
+            console.log("ADD USER", index);
             // add user to list
             var newUser = {};
             newUser[USERNAME] = username;
@@ -152,6 +156,7 @@ wsServer.on('request', (request) => {
 
             connectedUsers.push(newUser);
         } else {
+            console.log("UPDATE DN", index, displayName);
             connectedUsers[index][DISPLAYNAME] = displayName;
         }
     }

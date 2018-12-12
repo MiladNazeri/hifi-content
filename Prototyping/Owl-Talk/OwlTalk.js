@@ -17,7 +17,7 @@
     var CONNECTION_TIMEOUT = 3000;
     var SCRIPT_NAME = "OwlTalk.js";
 
-    var DEBUG = false;
+    var DEBUG = true;
 
     var heartbeat = {
 
@@ -68,6 +68,7 @@
     // Init
     var ui = null,
         username = AccountServices.username,
+        displayName = MyAvatar.displayName,
         currentText = "",
         currentLines = 0,
         lastText = "",
@@ -90,14 +91,41 @@
         sendUserInfo();
     };
 
+    function onLoggedInChanged() {
+        
+        // remove old username from the server
+        connection.send(JSON.stringify({ type: REMOVE_USER, username: username, displayName: MyAvatar.displayName }));
+        
+        // update with new username
+        username = AccountServices.username;
+        displayName = MyAvatar.displayName;
+        settings.me.username = username;
+
+        sendUserInfo();
+
+        doUIUpdate();
+    }
+
+    function checkDisplayNameChanged() {
+        if (displayName !== MyAvatar.displayName) {
+            onDisplayNameChanged();
+            return true;
+        }
+
+        return false;
+    }
+
     function onDisplayNameChanged() {
+
+        displayName = MyAvatar.displayName;
+
         sendUserInfo();
         settings.me.displayName = MyAvatar.displayName;
         doUIUpdate();
     }
 
     function sendUserInfo() {
-        connection.send(JSON.stringify({ type: NEW_USER, username: username, displayName: MyAvatar.displayName }));
+        connection.send(JSON.stringify({ type: NEW_USER, username: username, displayName: displayName }));
     }
 
     connection.onclose = function () {
@@ -120,6 +148,9 @@
 
 
     connection.onmessage = function (message) {
+
+        checkDisplayNameChanged();
+
         if (DEBUG) {
             console.log("got message", message);
             console.log("ROBIN -1", heartbeat.lastSent, JSON.stringify(message));
@@ -191,16 +222,15 @@
 
     // Collections
     var defaultSettings = {
+            me: { username: username, displayName: MyAvatar.displayName },
+            showDisplayNames: false,
+            history: [
+                { message: "test3" },
+                { message: "test4" }
+            ],
+            connectedUsers: []
 
-        me: { username: username, displayName: MyAvatar.displayName },
-        showDisplayNames: false,
-        history: [
-            { message: "test3" },
-            { message: "test4" }
-        ],
-        connectedUsers: []
-
-    },
+        },
         settings = {};
 
     settings = Object.assign({}, defaultSettings);
@@ -220,7 +250,7 @@
         }
 
         Script.scriptEnding.connect(scriptEnding);
-        MyAvatar.displayNameChanged.connect(onDisplayNameChanged); // *** 
+        AccountServices.loggedInChanged.connect(onLoggedInChanged);
 
         HMD.displayModeChanged.connect(function (isHMDMode) {
             hide();
@@ -253,8 +283,17 @@
                     console.log("ROBIN 100", message.info, message.text);
                 }
 
+                var changed = checkDisplayNameChanged();
                 var info = message.info; // JSON.stringified in the Tablet
                 var text = message.text; // JSON.stringified in the Tablet
+                
+                if (changed) {
+                    var updatedInfo = JSON.parse(info);
+                    updatedInfo.author = settings.me;
+
+                    info = JSON.stringify(updatedInfo);
+                }
+                
                 connection.send(info);
                 heartbeat.start(text);
 
@@ -328,6 +367,7 @@
         connection.send(JSON.stringify({ type: REMOVE_USER, username: username }));
 
         connection.close();
+        AccountServices.loggedInChanged.disconnect(onLoggedInChanged);
 
     }
 
