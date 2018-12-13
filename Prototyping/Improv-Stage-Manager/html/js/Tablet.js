@@ -8,9 +8,12 @@
         var 
             BUTTON_NAME = "IMPROV", // !important update in Example.js as well, MUST match Example.js
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
+            SAVE_JSON = "SAVE_JSON",
 
             CREATE_LIGHT_ANIMATION = "create_light_animation",
             START_ANIMATION = "start_animation",
+
+            SAVE_SETTINGS = "SAVE_SETTINGS",
 
             REMOVE_SNAPSHOT = "REMOVE_SNAPSHOT",
             SAVE_SNAPSHOT_EDIT = "SAVE_SNAPSHOT_EDIT",
@@ -21,6 +24,7 @@
             REMOVE_TRANSITION = "REMOVE_TRANSITION",
 
             SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
+            SAVE_NEW_SOUND = "SAVE_NEW_SOUND",
             ADD_SOUND = "ADD_SOUND",
             REMOVE_SOUND = "REMOVE_SOUND",
             UPDATE_POSITION = "UPDATE_POSITION",
@@ -165,6 +169,10 @@
                             <h5>key: </h5>
                             <p>{{snapshot.key}}</p>
                         </div>
+                        <div>
+                            <h5>Transition Duration: </h5>
+                            <p>{{snapshot.transitionTime}}</p>
+                        </div>
                     </div>
                 `
             })
@@ -209,6 +217,11 @@
                             <h5>key: </h5>
                             <input type="text" class="form-control" v-model="newSnapshot.key">
                         </div>
+                        <div>
+                            <h5>transition time: </h5>
+                            <input type="text" class="form-control" v-model="newSnapshot.transitionTime">
+                        </div>
+                        <div>
                             <button class="btn btn-primary" v-on:click="saveEdit">Save Edit</button>
                             <button class="btn btn-warning" v-on:click="cancelEdit">Cancel Edit</button>
                         </div>
@@ -236,6 +249,7 @@
                         newSnapshot: {
                             name: "",
                             key: "",
+                            transitionTime: 0
                         }
                     }
                 },
@@ -589,18 +603,25 @@
             })
 
             Vue.component('edit_sound', {
-                props: ['sound', 'current_position', 'current_orientation'],
+                props: ['sound', 'current_position', 'current_orientation', 'new'],
                 methods: {
                     saveEdit: function(){ 
                         console.log("THIS.NEW_Sound " + JSON.stringify(this.newSound));
                         this.$parent.editMode = false;
-                        EventBridge.emitWebEvent(JSON.stringify({
-                            type: SAVE_SOUND_EDIT,
-                            value: {
-                                oldSound: this.sound,
-                                newSound: this.newSound
-                            }
-                        }));
+                        if (this.new){
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_NEW_SOUND,
+                                value: this.newSound
+                            }));
+                        } else {
+                            EventBridge.emitWebEvent(JSON.stringify({
+                                type: SAVE_SOUND_EDIT,
+                                value: {
+                                    oldSound: this.sound,
+                                    newSound: this.newSound
+                                }
+                            }));
+                        }
                     },
                     cancelEdit: function(){
                         this.newSound = Object.assign({}, this.sound);
@@ -678,7 +699,7 @@
                         </div>
                         <div>
                             <h5>loop </h5>
-                            <input type="checkbox" :checked="newSound.loop">
+                            <input type="checkbox" :checked="newSound.loop" v-model="newSound.loop">
                         </div>
                         <div>
                             <h5>Position (0,0,0)</h5>
@@ -730,7 +751,7 @@
                 },
                 template: /*html*/`
                     <div class="card">
-                        <edit_sound v-if="editMode" :sound="newSound" :current_position="current_position" :current_orientation="current_orientation"></edit_sound>
+                        <edit_sound v-if="editMode" :sound="newSound" :new="true" :current_position="current_position" :current_orientation="current_orientation"></edit_sound>
                     </div>
                 `
             });
@@ -746,12 +767,17 @@
                 },
                 createLight: function(){
                     EventBridge.emitWebEvent(JSON.stringify({
-                        type: CREATE_LIGHT_ANIMATION
+                        type: SAVE_JSON
                     }));
                 },
                 animate: function(){
                     EventBridge.emitWebEvent(JSON.stringify({
                         type: START_ANIMATION
+                    }));
+                },
+                saveSettings: function(){
+                    EventBridge.emitWebEvent(JSON.stringify({
+                        type: SAVE_JSON
                     }));
                 }
             },
@@ -763,6 +789,32 @@
             }
         });
 
+        // function saveJSON(){
+        //     console.log("\n\n\n!!!!SAVING JSON!!!")
+        //     var url = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
+        //         var settings = {};
+                
+        //         settings.snapshots = app.dataStore.snapshots
+        //         settings.audio = app.dataStore.audio;
+        //         settings.mapping = app.dataStore.mapping;
+        //         settings.time = Date.now();
+        //         function success() {
+        //             console.log("SUCCESS");
+        //         }
+        //         function error() {
+        //             console.log("ERROR");
+        //         }
+
+        //         $.ajax({
+        //             type: "POST",
+        //             url: url,
+        //             traditional: true,
+        //             processData: false, 
+        //             data: JSON.stringify(settings),
+        //             success: success,
+        //             error: error
+        //         });
+        // }
     // Procedural
     // /////////////////////////////////////////////////////////////////////////
         function onScriptEventReceived(message) {
@@ -770,6 +822,32 @@
             try {
                 data = JSON.parse(message);
                 switch (data.type) {
+                    case SAVE_JSON:
+                        console.log("\n\n\n!!!!SAVING JSON!!!")
+                        var url = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
+                            var settings = {};
+                            
+                            settings.snapshots = app.dataStore.snapshots
+                            settings.audio = app.dataStore.audio;
+                            settings.mapping = app.dataStore.mapping;
+                            settings.time = Date.now();
+                            function success() {
+                                console.log("SUCCESS");
+                            }
+                            function error() {
+                                console.log("ERROR");
+                            }
+
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                traditional: true,
+                                processData: false, 
+                                data: JSON.stringify(settings),
+                                success: success,
+                                error: error
+                            });
+                        break;
                     case UPDATE_UI:
                             app.dataStore = data.value;
                         break;

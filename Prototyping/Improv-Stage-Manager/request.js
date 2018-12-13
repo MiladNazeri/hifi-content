@@ -30,6 +30,7 @@ module.exports = {
                     contentType = !error && httpRequest.getResponseHeader('content-type');
                 if (!error && contentType.indexOf('application/json') === 0) { // ignoring charset, etc.
                     try {
+                        console.log(JSON.stringify(response))
                         response = JSON.parse(response);
                     } catch (e) {
                         error = e;

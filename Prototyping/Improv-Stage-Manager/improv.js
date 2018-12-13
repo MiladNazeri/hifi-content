@@ -22,12 +22,12 @@
         var 
             AppUi = Script.require('appUi'),
             defaults = Script.require('./defaults.js'),
-            request = Script.require('./request.js').request
+            request = Script.require('./request.js?' + Date.now()).request
         ;
 
         Script.require(Script.resolvePath('./Polyfills.js'));
 
-    console.log("\n\n\n\nTEST TEST 2");
+    // console.log("\n\n\n\nTEST TEST 2");
     // Consts
     // /////////////////////////////////////////////////////////////////////////
         var 
@@ -35,7 +35,8 @@
             BUTTON_NAME = "IMPROV", // !important update in Tablet.js as well, MUST match Example.js
             
             EVENT_BRIDGE_OPEN_MESSAGE = BUTTON_NAME + "_eventBridgeOpen",
-
+            SAVE_JSON = "SAVE_JSON",
+            SAVE_SETTINGS = "SAVE_SETTINGS",
             // SNAPSHOT CONSTS
             TAKE_SNAPSHOT = "takeSnapshot",
             ADD_SNAPSHOT = "addSnapshot",
@@ -55,6 +56,7 @@
             SAVE_TRANSITION_EDIT = "SAVE_TRANSITION_EDIT",
 
             SAVE_SOUND_EDIT = "SAVE_SOUND_EDIT",
+            SAVE_NEW_SOUND = "SAVE_NEW_SOUND",
             ADD_SOUND = "ADD_SOUND",
             REMOVE_SOUND = "REMOVE_SOUND",
             UPDATE_POSITION = "UPDATE_POSITION",
@@ -167,7 +169,7 @@
             //     : oldSettings
             dataStore = defaultDataStore
         ;
-        console.log("running loadSettings");
+        // console.log("running loadSettings");
 
 
     // Constructors
@@ -184,7 +186,7 @@
                 this.url = url;
                 this.name = name;
                 this.sound = SoundCache.getSound(url);
-                console.log(this.sound);
+                // console.log(this.sound);
                 this.injector;
                 this.SECS_TO_MS = 1000;
                 this.fadeInTimer = null;
@@ -206,7 +208,7 @@
                 this.currentVolume = 1.0;
                 this.position = null;
                 this.orientation = null;
-                this.pitch = null;
+                this.pitch = 1;
                 this.loop = false;
                 this.secondOffset = null;
                 this.localOnly = false;          
@@ -214,21 +216,21 @@
 
             Sound.prototype = {
                 changePosition: function(position) {
-                    console.log("changing Position")
+                    // console.log("changing Position");
                     this.position = position;
                     if (this.injector) {
                         this.injector.setOptions({ position: this.position});
                     }
                 },
                 changeOrientation: function(orientation) {
-                    console.log("changing Orientation")
+                    // console.log("changing Orientation");
                     this.orientation = orientation;
                     if (this.injector) {
                         this.injector.setOptions({ orientation: this.orientation });
                     }
                 },
                 changeSecondOffset: function(secondOffset) {
-                    console.log("changing offset")
+                    // console.log("changing offset");
 
                     this.secondOffset = secondOffset;
                     if (this.injector) {
@@ -236,7 +238,7 @@
                     }
                 },
                 changeLoop: function(shouldLoop) {
-                    console.log("changing loop")
+                    //// console.log("changing loop");
 
                     this.loop = shouldLoop;
                     if (this.injector) {
@@ -244,7 +246,7 @@
                     }
                 },
                 changePitch: function(pitch) {
-                    console.log("changing pitch")
+                    // console.log("changing pitch");
 
                     this.pitch = pitch;
                     if (this.injector) {
@@ -252,57 +254,57 @@
                     }
                 },
                 changeFadeInTime: function(time) {
-                    console.log("changing fadeintime")
+                    // console.log("changing fadeintime");
                     time = Math.max(time, 0);
                     this.fadeInTime = time;
                     this.fadeInDurationTimeStep = this.fadeInTime * this.percentChange;
                 },
                 changeFadeOutTime: function(time){
-                    console.log("changing fadeouttime")
+                    // console.log("changing fadeouttime");
                     time = Math.max(time, 0);
                     this.fadeOutTime = time;
                     this.fadeOutDurationTimeStep = this.fadeOutTime * this.percentChange;
                 },
                 changeMaxVolume: function (volume) {
-                    console.log("changing maxvolume")
+                    // console.log("changing maxvolume");
                     volume = Math.max(volume, 0);
                     this.maxVolume = Math.min(volume, 1.0);
                     this.fadeLevelStep = this.maxVolume * this.percentChange;
                 },
                 changeCurrentVolume: function (volume) {
-                    console.log("changing currentvolume")
-                    console.log("volume:", volume);
+                    // console.log("changing currentvolume");
+                    // console.log("volume:", volume);
                     this.currentVolume = volume;
                     if (this.injector) {
-                        console.log("setting options")
-                        console.log("this.currentVolume", this.currentVolume);
+                        // console.log("setting options");
+                        // console.log("this.currentVolume", this.currentVolume);
                         this.injector.setOptions({ volume: this.currentVolume });
                     }
                 },
                 changeShouldFadeIn: function (shouldFadeIn) {
-                    console.log("changeShouldFadeIn")
+                    // console.log("changeShouldFadeIn");
 
                     this.shouldFadeIn = shouldFadeIn;
                 },
                 changeShouldFadeOut: function (shouldFadeOut) {
-                    console.log("changeShouldFadeOut")
+                    // console.log("changeShouldFadeOut");
 
                     this.shouldFadeOut = shouldFadeOut;
                 },
                 fadeIn: function () {
-                    console.log("fadeIn")
+                    // console.log("fadeIn");
                     
                     var _this = this;
                     this.fadeInStarted = true;
                     if (this.injector && this.injector.isPlaying()){
                         this.fadeInTimer = Script.setInterval(function(){
-                            console.log("Starting fade in")
-                            console.log("_this.currentVolume", _this.currentVolume)
+                            // console.log("Starting fade in");
+                            // console.log("_this.currentVolume", _this.currentVolume);
 
                             _this.currentVolume += _this.fadeLevelStep;
                             _this.currentVolume = Math.min(_this.maxVolume, _this.currentVolume);
                             if (_this.injector){
-                                console.log("VOLUME: ", JSON.stringify(_this.injector.options));
+                                // console.log("VOLUME: ", JSON.stringify(_this.injector.options));
                                 _this.injector.setOptions({ volume: _this.currentVolume });
                                 if (_this.currentVolume >= _this.maxVolume) {
                                     _this.fadeInStarted = false;
@@ -316,19 +318,19 @@
                     }
                 },
                 fadeOut: function () {
-                    console.log("fadeOut")
+                    // console.log("fadeOut");
 
                     var _this = this;
                     this.fadeOutStarted = true;
                     if (this.injector && this.injector.isPlaying()) {
-                        console.log("_this.currentVolume", _this.currentVolume)
+                        // console.log("_this.currentVolume", _this.currentVolume);
                         this.fadeOutTimer = Script.setInterval(function () {
-                            console.log("stopping fade out");
+                            // console.log("stopping fade out");
                             _this.currentVolume -= _this.fadeLevelStep;
-                            console.log(" _this.currentVolume After", _this.currentVolume)
+                            // console.log(" _this.currentVolume After", _this.currentVolume);
                             _this.currentVolume = Math.max(_this.minVolume, _this.currentVolume);
                             if (_this.injector){
-                                console.log("VOLUME: ",JSON.stringify(_this.injector.options));
+                                // console.log("VOLUME: ",JSON.stringify(_this.injector.options));
                                 _this.injector.setOptions({ volume: _this.currentVolume });
                                 if (_this.currentVolume <= _this.minVolume) {
                                     _this.fadeOutStarted = false;
@@ -357,19 +359,19 @@
                     }
                 },
                 play: function(restart) {
-                    console.log("play")
+                    console.log("play");
                     if (this.fadeInStarted || this.fadeOutStarted) {
                         return;
                     }
 
                     if (this.injector && this.injector.isPlaying() && !restart) {
-                        console.log("stop")
+                        // console.log("stop");
 
                         this.stop();
                         return;
                     }
                     if (this.injector && this.injector.isPlaying() && restart) {
-                        console.log("restart")
+                        // console.log("restart");
                         this.unload();
                         this.play();
                         return;
@@ -377,7 +379,7 @@
                     this.playSoundStaticPosition();
                 },
                 playSoundStaticPosition: function (injectorOptions, bufferTime, onCompleteCallback, args) {
-                    console.log("playSoundStaticPosition")
+                    console.log("playSoundStaticPosition");
                     var _this = this;
                     var presetInjectorOptions = {};
                     this.position !== null && (presetInjectorOptions.position = this.position);
@@ -385,13 +387,14 @@
                     this.volume !== null && (presetInjectorOptions.volume = this.maxVolume);
                     this.loop !== null && (presetInjectorOptions.loop = this.loop);
                     this.localOnly !== null && (presetInjectorOptions.localOnly = this.localOnly);
-                    this.pitch !== null && (presetInjectorOptions.pitch = this.pitch);
+                    this.pitch !== null && (presetInjectorOptions.pitch = this.pitch)
+
 
                     this.injectorOptions = this.injectorOptions || presetInjectorOptions;
                     if (this.sound.downloaded) {
-
+                        this.injectorOptions = { loop: true};
                         this.shouldFadeIn && this.changeCurrentVolume(this.minVolume);
-                        this.injector = Audio.playSound(this.sound, injectorOptions);
+                        this.injector = Audio.playSound(this.sound, this.injectorOptions);
                         this.shouldFadeIn && this.fadeIn();
                         var soundLength = this.getDurationMS();
 
@@ -401,6 +404,7 @@
                         var injector = this.injector;
 
                         if (!this.loop && this.shouldFadeOut && !this.fadeOutStarted) {
+                            console.log("STOPPING THE AUDIOING !this.loop")
                             var startFadeOutTime = soundLength - this.fadeOutTime;
                             Script.setTimeout(function(){
                                 _this.fadeOut();
@@ -409,7 +413,7 @@
 
                         if (!this.loop) {
                             Script.setTimeout(function () {
-
+                                console.log("STOPPING THE AUDIOING !this.loop")
                                 if (injector) {
                                     injector.stop();
                                     injector = null;
@@ -421,10 +425,11 @@
 
                             }, soundLength);
                         }
+                        console.log("LOOPING")
                     }
                 },
                 stop: function(){
-                    console.log("stop");
+                    // console.log("stop");
                     
                     if (this.shouldFadeOut && !this.fadeOutStarted) {
                         this.fadeOutStarted = true;
@@ -434,7 +439,7 @@
                     }
                 },
                 isLoaded: function () {
-                    console.log("isLoaded");
+                    // console.log("isLoaded");
 
                     return this.sound.downloaded;
                 },
@@ -448,7 +453,7 @@
                     this.injector && this.injector.setOptions(finalObject);
                 },
                 unload: function () {
-                    console.log("unload");
+                    // console.log("unload");
 
                     if (this.injector) {
                         this.injector.stop();
@@ -462,7 +467,7 @@
                 this.audioObjects = {};
             }
             
-            AudioLibrary.prototype.addAudio = function(name, audioObject) {
+            AudioLibrary.prototype.saveNewSound = function(name, audioObject) {
                 console.log("addAudio", JSON.stringify(audioObject));
                 if (this.audioStore[name]){
                     this.audioStore[name].unload();
@@ -470,21 +475,34 @@
                 this.audioObjects[name] = audioObject;
                 this.audioStore[name] = new Sound(audioObject.url, name);
                 this.audioStore[name].key = audioObject.key;
+                this.audioStore[name].changeLoop(audioObject.loop);
                 audioObject.fadeInTime > 0 && this.audioStore[name].changeShouldFadeIn(true);
                 audioObject.fadeOutTime > 0 && this.audioStore[name].changeShouldFadeOut(true);
-                audioObject.fadeInTime && this.audioStore[name].changeFadeInTime(audioObject.fadeInTime);
-                audioObject.fadeOutTime && this.audioStore[name].changeFadeOutTime(audioObject.fadeOutTime);
+                audioObject.fadeInTime && this.audioStore[name].changeFadeInTime(parseInt(audioObject.fadeInTime));
+                audioObject.fadeOutTime && this.audioStore[name].changeFadeOutTime(parseInt((audioObject.fadeOutTime)));
                 audioObject.maxVolume !== 'undefined' && this.audioStore[name].changeMaxVolume(audioObject.maxVolume);
                 audioObject.position !== 'undefined' && this.audioStore[name].changePosition(audioObject.position);
                 audioObject.orientation !== 'undefined' && this.audioStore[name].changeOrientation(audioObject.orientation);
-                audioObject.loop !== 'undefined' && this.audioStore[name].changeLoop(audioObject.loop);
-                audioObject.pitch !== 'undefined' && this.audioStore[name].changePitch(audioObject.pitch);
+                audioObject.pitch !== 'undefined' && this.audioStore[name].changePitch(audioObject.pitch || 1);
+
 
                 dataStore.mapping[audioObject.key] = new Mapping(name, audioObject.key, AUDIO);
             };
 
+            AudioLibrary.prototype.saveSoundEdit = function(name, audioObject){
+                this.audioStore[name].changeLoop(audioObject.loop);
+                audioObject.fadeInTime > 0 && this.audioStore[name].changeShouldFadeIn(true);
+                audioObject.fadeOutTime > 0 && this.audioStore[name].changeShouldFadeOut(true);
+                audioObject.fadeInTime && this.audioStore[name].changeFadeInTime(parseInt(audioObject.fadeInTime));
+                audioObject.fadeOutTime && this.audioStore[name].changeFadeOutTime(parseInt((audioObject.fadeOutTime)));
+                audioObject.maxVolume !== 'undefined' && this.audioStore[name].changeMaxVolume(audioObject.maxVolume);
+                audioObject.position !== 'undefined' && this.audioStore[name].changePosition(audioObject.position);
+                audioObject.orientation !== 'undefined' && this.audioStore[name].changeOrientation(audioObject.orientation);
+                audioObject.pitch !== 'undefined' && this.audioStore[name].changePitch(audioObject.pitch || 1);
+            };
+
             AudioLibrary.prototype.renameAudio = function (oldName, newName) {
-                console.log("renameAudio");
+                // console.log("renameAudio");
 
                 this.audioStore[newName] = this.audioStore[oldName];
                 this.audioStore[newName].name = newName;
@@ -492,37 +510,37 @@
             };
 
             AudioLibrary.prototype.removeAudio = function (name) {
-                console.log("removeAudio");
+                // console.log("removeAudio");
 
                 if (this.audioStore[name]) {
                     this.audioStore[name].unload();
                 }
-                delete this.audioStore[name];
                 delete dataStore.mapping[this.audioStore[name].key];
+                delete this.audioStore[name];
 
             };
 
             AudioLibrary.prototype.assignAudioToKey = function (name, key) {
-                console.log("assignAudioToKey");
+                // console.log("assignAudioToKey");
 
                 this.audioStore[name].key = key;
                 dataStore.mapping[key] = new Mapping(name, key, AUDIO);
             };
 
             AudioLibrary.prototype.playAudio = function (name) {
-                console.log("playAudio");
+                // console.log("playAudio");
 
                 this.audioStore[name].play();
             };
 
             AudioLibrary.prototype.stopAudio = function (name) {
-                console.log("stopAudio");
+                // console.log("stopAudio");
 
                 this.audioStore[name].stop();
             };
 
             AudioLibrary.prototype.changeFadeOptions = function (name, fadeOptions) {
-                console.log("changeFadeOptions");
+                // console.log("changeFadeOptions");
 
                 this.audioStore[name].changeShouldFadeIn(fadeOptions.fadeInTime > 0);
                 this.audioStore[name].changeShouldFadeOut(fadeOptions.fadeOutTime > 0);
@@ -532,14 +550,14 @@
             };
 
             AudioLibrary.prototype.changeVolumeOptions= function (name, volumeOptions) {
-                console.log("changeVolumeOptions");
+                // console.log("changeVolumeOptions");
 
                 this.audioStore[name].minVolume = volumeOptions.minVolume;
                 this.audioStore[name].maxVolume = volumeOptions.maxVolume;
             };
 
             AudioLibrary.prototype.changePose = function(name, pose){
-                console.log("changePose");
+                // console.log("changePose");
                 pose.position && this.audioStore[name].changePosition(pose.position);
                 pose.orientation && this.audioStore[name].changePosition(pose.orientation);
             };
@@ -609,7 +627,7 @@
 
             Light.prototype.runningCheck = function(){
                 var runningKeys = Object.keys(this.running).length;
-                console.log("runningKeys", runningKeys);
+                // console.log("runningKeys", runningKeys);
                 if (runningKeys > 0) {
                     this.isRunning = true;
                     return true;
@@ -620,7 +638,7 @@
             };
 
             Light.prototype.startAnimation = function(){
-                console.log("STARTING LIGHT ANIMATION");
+                // console.log("STARTING LIGHT ANIMATION");
                 var _this = this;
                 Object.keys(this.from).forEach(function(property){
                     var fromValue = 0;
@@ -860,14 +878,18 @@
             };
 
             Snapshots.prototype.removeSnapshot = function(name) {
-                console.log("reoving snapshot: ", name)
-                delete this.snapshotStore[name];
+                // console.log("reoving snapshot: ", name);
                 delete dataStore.mapping[this.snapshotStore[name].key];
+                delete this.snapshotStore[name];
             };
 
             Snapshots.prototype.assignSnapshotToKey = function(name, key) {
                 this.snapshotStore[name].key = key;
                 dataStore.mapping[key] = new Mapping(name, key, SNAPSHOT);
+            };
+
+            Snapshots.prototype.changeSnapshotTransition = function(name, transitionTime) {
+                this.snapshotStore[name].transitionTime = transitionTime;
             };
 
             Snapshots.prototype.takeSnapshot = function(){
@@ -892,11 +914,14 @@
             };
             
             Snapshots.prototype.loadSnapshot = function(snapshot){
+                var DEFAULT_TRANSITION_TIME = 2000;
                 if (this.alwaysTransitionSnaps) {
                     this.takeSnapshot(); 
-                    this.addSnapshot("alwaysTransition"); 
+                    this.addSnapshot("alwaysTransition");
+                    this.changeSnapshotTransition("alwaysTransition", DEFAULT_TRANSITION_TIME);
+                    // console.log("this.snapshotStore[snapshot]", this.snapshotStore[snapshot]);
                     if (!runningCheck()) {
-                        this.startTransition("alwaysTransition", snapshot, this.defaultTransitionTime);
+                        this.startTransition("alwaysTransition", snapshot, this.snapshotStore[snapshot].transitionTime || this.defaultTransitionTime);
                     }
                 } else {
                     this.getSnapshotLightkeys(snapshot).forEach(function(light){
@@ -917,58 +942,69 @@
 
             Snapshots.prototype.getSnapshotLightkeys = function(snapshot){
                 return Object.keys(this.snapshotStore[snapshot]).filter(function(key){
-                    return key !== "name";
+                    return key !== "name" || key !== "transitionTime";
                 });
             };
 
             Snapshots.prototype.getSnapshotPropertyKeys = function(snapshot, light){
-                if (light === "key") {
+                // console.log("SNAPSHOT", JSON.stringify(snapshot));
+                // console.log("light", JSON.stringify(light));
+                // console.log("this.snapshotStore[snapshot]", JSON.stringify(this.snapshotStore[snapshot]));
+                // console.log("this.snapshotStore[snapshot]", JSON.stringify(this.snapshotStore[snapshot][light]));
+                // console.log("typeof light", typeof light)
+                if (light === "key" || light === "transitionTime" || light ==="name") {
+                    // console.log("Returning");
                     return;
                 }
+                
                 return Object.keys(this.snapshotStore[snapshot][light]);
             };
 
             Snapshots.prototype.addTransition = function(name, from, to, duration, key) {
-                console.log("Adding Transition");
+                // console.log("Adding Transition");
                 this.transitionStore[name] = {
                     name: name,
                     from: from,
                     to: to,
-                    duration: duration,
+                    duration: parseInt(duration),
                     key: key
                 };
                 dataStore.mapping[key] = new Mapping(name, key, TRANSITION);
             };
 
             Snapshots.prototype.removeTransition = function(name){
-                console.log("Removing Transition");
-                delete this.transitionStore[name];
+                // console.log("Removing Transition");
                 delete dataStore.mapping[this.transitionStore[name].key];
+                delete this.transitionStore[name];
             };
 
             Snapshots.prototype.renameTransition = function(oldName, newName){
-                console.log("renaming Transition");
+                // console.log("renaming Transition");
 
                 this.transitionStore[newName] = this.transitionStore[oldName];
                 delete this.transitionStore[oldName];
             };
 
             Snapshots.prototype.assignTransitionToKey = function(name, key) {
-                console.log("assigngg Transition to key")
+                // console.log("assigngg Transition to key");
 
                 this.transitionStore[name].key = key;
                 dataStore.mapping[key] = new Mapping(name, key, TRANSITION);
             };
 
             Snapshots.prototype.startTransition = function(from, to, duration) {
-                console.log("Starting transition")
+                // console.log("Starting transition");
 
-                console.log("starting transition");
+                // console.log("starting transition");
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") {
+                    if (light === "key" || light === "transitionTime" || light === "name") {
                         return;
                     }
+                    // console.log("LIGHT:", light);
+                    // console.log("FROM:", JSON.stringify(from));
+                    // console.log("WHAT HAPPENS WHEN I RUN this.getSnapshotPropertyKeys(from, light)", JSON.stringify(this.getSnapshotPropertyKeys(from, light)));
                     this.getSnapshotPropertyKeys(from, light).forEach(function(property){
+                        // console.log("in here getSnapshotproertykeys from");
                         var zoneExcludes = ["intensity", "falloffRadius"];
                         if (light.toLowerCase().indexOf("zone") > -1 && zoneExcludes.indexOf(property) > -1){
                             return;
@@ -980,7 +1016,7 @@
                 }, this);
 
                 this.getSnapshotLightkeys(to).forEach(function(light){
-                    if (light === "key") {
+                    if (light === "key" || light === "transitionTime" || light === "name") {
                         return;
                     }
                     this.getSnapshotPropertyKeys(to, light).forEach(function(property){
@@ -991,14 +1027,14 @@
                 }, this);
                 
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") {
+                    if (light === "key" || light === "transitionTime" || light === "name") {
                         return;
                     }
                     lights[light].updateTransitionDuration(duration);
                 });
 
                 this.getSnapshotLightkeys(from).forEach(function(light){
-                    if (light === "key") {
+                    if (light === "key" || light === "transitionTime" || light === "name") {
                         return;
                     }
                     lights[light].startAnimation();
@@ -1007,17 +1043,17 @@
             };
 
             Snapshots.prototype.executeTransitionByName = function(name){
-                console.log("execute transition");
+                // console.log("execute transition");
 
                 var from = this.transitionStore[name].from;
                 var to = this.transitionStore[name].to;
                 var duration = this.transitionStore[name].duration;
                 var check = runningCheck();
-                console.log("check:", check)
+                // console.log("check:", check);
                 if (!runningCheck()) {
                     this.startTransition(from, to, duration);
                 }
-                console.log("CURRENTY RUNNING");
+                // console.log("CURRENTY RUNNING");
             };
 
     // Collections
@@ -1041,21 +1077,32 @@
             console.log("SAVING SETTINGS");
             var googleScript = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
             var settings = {};
+            
             settings.snapshots = dataStore.snapshots;
             settings.audio = dataStore.audio;
-            console.log(JSON.stringify(settings.audio));
+            // console.log(JSON.stringify(settings.audio));
             settings.mapping = dataStore.mapping;
             
             Settings.setValue(SETTINGS_STRING, settings);
-            var encode = encodeURLParams({
-                type: "save", 
-                settings: JSON.stringify(settings)
-            });
-            request(googleScript + "?" + encode, function (error, data) {
-                if (error) {
-                    console.log(error);
-                }
-            });
+
+            // var options = {
+            //     url: googleScript,
+            //     method: 'POST',
+            //     body: settings
+            // };
+            // request(options, function (error, data) {
+            //     if (error) {
+            //         console.log(error);
+            //     } else {
+            //         console.log("no error");
+            //     }
+            // });
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', googleScript, false);
+            xhr.setRequestHeader('content-type', 'application/json');
+            xhr.send(JSON.stringify(settings));
+            console.log(xhr.status, xhr.statusText);
         }
 
         function loadSettings(){
@@ -1068,33 +1115,49 @@
             var url = googleScript + "?" + encode;
             request(url, function (error, data) {
                 if (!error) {
-                    settings = JSON.parse(data);
+                    console.log("type of data", typeof data);
+                    settings = data;
                     var keys = Object.keys(settings);
                     console.log("!!!KEYS", JSON.stringify(keys));
-                    console.log("!!!settings", JSON.stringify(settings.audio));
-                    console.log("!!!transitions", JSON.stringify(settings.snapshots.transitionStore));
-                    console.log("!!!snapshots", JSON.stringify(settings.snapshots.snapshotStore));
+                    console.log("!!!Audio", JSON.stringify(Object.keys(settings.audio.audioStore)));
+                    console.log("!!!transitions", JSON.stringify(Object.keys(settings.snapshots.transitionStore)));
+                    console.log("!!!snapshots", JSON.stringify(Object.keys(settings.snapshots.snapshotStore)));
 
                     dataStore.mapping = settings.mapping;
                     Object.keys(settings.snapshots.snapshotStore).forEach(function(snapshot){
+                        var defaultSnapKeys = Object.keys(dataStore.defaultSnapshots);
+                        if (defaultSnapKeys.indexOf(snapshot) > -1){
+                            console.log("snapshot:", snapshot)
+                            dataStore.snapshots.removeSnapshot(snapshot);
+                        }
+                        console.log("registering: ", snapshot);
                         dataStore.snapshots.forceAddSnapshot(snapshot, settings.snapshots.snapshotStore[snapshot]);
                         dataStore.snapshots.assignSnapshotToKey(snapshot, settings.snapshots.snapshotStore[snapshot].key);
                     });
-                    // Object.keys(settings.snapshots.transitionStore).forEach(function(transition){
-                    //     var refrencedTransition = settings.snapshots.transitionStore[transition];
-                    //     var name = refrencedTransition.name;
-                    //     var from = refrencedTransition.from;
-                    //     var to = refrencedTransition.to;
-                    //     var duration = refrencedTransition.duration;
-                    //     var key = refrencedTransition.key;
-                    //     dataStore.snapshots.addTransition(name, from, to, duration, key);
-                    // });
-                    // Object.keys(settings.audio.audioObjects).forEach(function(audio){
-                    //     dataStore.audio.addAudio(audio, settings.audio.audioObjects[audio]);
-                    // });
-                    // ui.updateUI(dataStore);
+                    Object.keys(settings.snapshots.transitionStore).forEach(function(transition){
+                        var defaultTransitionKeys = Object.keys(dataStore.defaultTransitions);
+                        if (defaultTransitionKeys.indexOf(transition) > -1){
+                            dataStore.snapshots.removeTransition(transition); 
+                            console.log("returning from: ", transition);
+                        }
+                        var refrencedTransition = settings.snapshots.transitionStore[transition];
+                        var name = refrencedTransition.name;
+                        var from = refrencedTransition.from;
+                        var to = refrencedTransition.to;
+                        var duration = refrencedTransition.duration;
+                        var key = refrencedTransition.key;
+                        dataStore.snapshots.addTransition(name, from, to, duration, key);
+                    });
+                    Object.keys(settings.audio.audioObjects).forEach(function(audio){
+                        if (audio.indexOf("Dope Song") > -1){
+                            console.log("returning from: ", audio);
+                            return;
+                        }
+                        dataStore.audio.saveNewSound(audio, settings.audio.audioObjects[audio]);
+                    });
+                    ui.updateUI(dataStore);
                 } else {
-                    console.log("error");
+                    console.log("error", JSON.stringify(error));
                 }
             });
             // dataStore = Settings.getValue(SETTINGS_STRING);
@@ -1104,8 +1167,8 @@
             var keys = Object.keys(lights);
             for (var i = 0; i < keys.length; i++) {
                 var runningCheck = lights[keys[i]].runningCheck();
-                console.log("running Check key", keys[i]);
-                console.log("running Check", runningCheck);
+                // console.log("running Check key", keys[i]);
+                // console.log("running Check", runningCheck);
 
                 if (runningCheck === true) {
                     return true;
@@ -1120,6 +1183,14 @@
                 paramPairs.push(key + "=" + params[key]);
             }
             return paramPairs.join("&");
+        }
+
+        function log(label, value, isActive) {
+            isActive = isActive || true;
+            if (!isActive) {
+                return;
+            }
+            print("\n" + label + "\n" + "***************************************\n", JSON.stringify(value));
         }
 
     // Procedural Functions
@@ -1192,9 +1263,11 @@
             var defaultSnapshotKeys = Object.keys(dataStore.defaultSnapshots);
 
             defaultSnapshotKeys.forEach(function(key, index){
+                var DEFAULT_TRANSITION_TIME = 2000;
                 var offset = 4;
                 dataStore.snapshots.forceAddSnapshot(key, dataStore.defaultSnapshots[key]);
                 dataStore.snapshots.assignSnapshotToKey(key, index + offset);
+                dataStore.snapshots.changeSnapshotTransition(key, DEFAULT_TRANSITION_TIME);
             });
 
             var defaultTransitionKeys = Object.keys(dataStore.defaultTransitions);
@@ -1224,6 +1297,7 @@
         
 
             ui.updateUI(dataStore);
+            
         }
 
         function assignSnapshotToKey(){
@@ -1256,7 +1330,7 @@
         }
 
         function removeTransition(name){
-            console.log("in removing transition");
+            // console.log("in removing transition");
             dataStore.snapshots.removeTransition(name);
             ui.updateUI(dataStore);
         }
@@ -1272,17 +1346,19 @@
         }
 
         function addSound(newSound) {
-            console.log("IN ADD SOUND", JSON.stringify(newSound));
-            dataStore.audio.addAudio(newSound.name, newSound);
+            // console.log("IN ADD SOUND", JSON.stringify(newSound));
+            dataStore.audio.saveNewSound(newSound.name, newSound);
             ui.updateUI(dataStore);
         }
 
         function saveSoundEdit(oldSound, newSound){
-            console.log("IN SAVE SOUND EDIT SOUND", JSON.stringify(newSound));
+            // console.log("IN SAVE SOUND EDIT SOUND", JSON.stringify(newSound));
             if (oldSound.key !== newSound.key){
-                dataStore.audio.removeAudio(oldSound.name)
+                // dataStore.audio.removeAudio(oldSound.name);
+                dataStore.mapping[this.audioStore[newSound.name]].key = newSound.key;
+                
             }
-            dataStore.audio.addAudio(newSound.name, newSound);
+            dataStore.audio.saveSoundEdit(newSound.name, newSound);
             ui.updateUI(dataStore);
         }
 
@@ -1295,14 +1371,18 @@
             if (oldSnapshot.key !== newSnapshot.key) {
                 dataStore.snapshot.removeSnapshot(oldSnapshot.name);
             }
-            dataStore.snapshot.forceAddSnapshot(newSnapshot.name, newSnapshot);
+            console.log("newSnapshot", JSON.stringify(newSnapshot));
+            console.log("DataStore", dataStore);
+            dataStore.snapshots.forceAddSnapshot(newSnapshot.name, newSnapshot);
             ui.updateUI(dataStore);
         }
 
         function saveNewSnapshot(newSnapshot){
+            var DEFAULT_TRANSITION_TIME = 2000;
             dataStore.snapshots.takeSnapshot();
             dataStore.snapshots.addSnapshot(newSnapshot.name);
             dataStore.snapshots.assignSnapshotToKey(newSnapshot.name, newSnapshot.key);
+            dataStore.snapshots.changeSnapshotTransition(newSnapshot.name, newSnapshot.transitionTime || DEFAULT_TRANSITION_TIME);
             ui.updateUI(dataStore);
         }
 
@@ -1329,14 +1409,27 @@
             ui.updateUI(dataStore);
         }
 
+        function saveNewSound(newSound){
+            // console.log("IN ADD SOUND", JSON.stringify(newSound));
+            dataStore.audio.saveNewSound(newSound.name, newSound);
+            ui.updateUI(dataStore);
+        }
+
         function updatePosition(){
             dataStore.currentPosition = [+MyAvatar.position.x.toFixed(3),+MyAvatar.position.y.toFixed(3),+MyAvatar.position.z.toFixed(3)];
+            console.log(JSON.stringify(dataStore.currentPosition));
             ui.updateUI(dataStore);
         }
 
         function updateOrientation(){
             dataStore.currentOrientation = [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)];
             ui.updateUI(dataStore);
+        }
+
+        function onClosed(){
+            console.log("this is being called");
+            // ui.sendToHtml({type: SAVE_JSON});
+            // saveSettings();
         }
 
         function scriptEnding(){
@@ -1352,6 +1445,7 @@
         }
 
         function keyPressHandler(event) {
+            console.log("Event", event.text);
             if (dataStore.mapping[event.text]) {
                 switch (dataStore.mapping[event.text].type){
                     case SNAPSHOT:
@@ -1371,12 +1465,13 @@
     // Tablet
     // /////////////////////////////////////////////////////////////////////////
         function startup() {
-            console.log("startUP");
+            // console.log("startUP");
             ui = new AppUi({
                 buttonName: BUTTON_NAME,
                 home: URL,
                 onMessage: onMessage,
-                updateUI: updateUI
+                updateUI: updateUI,
+                onClosed : onClosed
             });
 
             Controller.keyPressEvent.connect(keyPressHandler);
@@ -1398,32 +1493,31 @@
                 maxVolume: 1.0,
                 position: [+MyAvatar.position.x.toFixed(3),+MyAvatar.position.y.toFixed(3),+MyAvatar.position.z.toFixed(3)],
                 orientation: [+MyAvatar.orientation.x.toFixed(3), +MyAvatar.orientation.y.toFixed(3), +MyAvatar.orientation.z.toFixed(3), +MyAvatar.orientation.w.toFixed(3)],
-                loop: false,
+                loop: true,
                 pitch: 2
             };
 
-            dataStore.audio.addAudio(audio_name, audio_test_object);
-            // loadSettings();
+            dataStore.audio.saveNewSound(audio_name, audio_test_object);
+            loadSettings();
             Script.scriptEnding.connect(scriptEnding);
         }
 
         function updateUI(dataStore) {
-            console.log("UPDATE UI");
+            // console.log("UPDATE UI");
             var messageObject = {
                 type: UPDATE_UI,
                 value: dataStore  
             };
+            console.log("SEND TO HTML:", JSON.stringify(messageObject));
             ui.sendToHtml(messageObject);
-            saveSettings();
-
         }
 
         function onMessage(data) {
-            console.log(JSON.stringify(data));
+            // console.log(JSON.stringify(data));
             // EventBridge message from HTML script.
             switch (data.type) {
                 case EVENT_BRIDGE_OPEN_MESSAGE:
-                    console.log("EVENT BRIDGE");
+                    // console.log("EVENT BRIDGE");
                     ui.updateUI(dataStore);
                     break;
                 case TAKE_SNAPSHOT:
@@ -1457,7 +1551,7 @@
                     renameTransition();
                     break;
                 case REMOVE_TRANSITION:
-                    console.log("removing transition received");
+                    // console.log("removing transition received");
                     removeTransition(data.value);
                     break;
                 case CHANGE_DEFAULT_TRANSITION_TIME:
@@ -1472,11 +1566,19 @@
                 case ADD_SOUND:
                     addSound(data.value);
                     break;
+                case SAVE_NEW_SOUND:
+                    saveNewSound(data.value);
+                    break;
                 case REMOVE_SOUND:
                     removeSound(data.value);
                     break;
                 case SAVE_SNAPSHOT_EDIT:
                     saveSnapshotEdit(data.value.oldSnapshot, data.value.newSnapshot);
+                    break;
+                case SAVE_JSON:
+                    console.log("SAVING JSON FROM IMPROV");
+                    ui.updateUI(dataStore);
+                    ui.sendToHtml({type: SAVE_JSON});
                     break;
                 case SAVE_NEW_SNAPSHOT:
                     saveNewSnapshot(data.value);
@@ -1492,6 +1594,9 @@
                     break;
                 case UPDATE_ORIENTATION:
                     updateOrientation();
+                    break;
+                case SAVE_SETTINGS:
+                    saveSettings();
                     break;
                 default:
 
@@ -1526,13 +1631,14 @@
                     dataStore.snapshots.startTransition(data.value[0], data.value[1], data.value[2])
                     break;
                 case "addtransition":
-                    console.log("addtrasition");
+                    // console.log("addtrasition");
                     dataStore.snapshots.addTransition(data.value.name,data.value.from,data.value.to,data.value.duration,data.value.key);
-                    // console.log(JSON.stringify(dataStore.snapshots.transitionStore));
+                    // // console.log(JSON.stringify(dataStore.snapshots.transitionStore));
                     break;
                 case "executeTransitionByName":
-                    console.log("got execute transition");
-                    dataStore.snapshots.executeTransitionByName(data.value);
+                    // console.log("got execute transition");
+                    dataStore.s
+                    napshots.executeTransitionByName(data.value);
                     break;
                 case "saveSettings": 
                     saveSettings();
