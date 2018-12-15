@@ -147,7 +147,7 @@ wsServer.on('request', (request) => {
     function addUserOrUpdateDisplayName(username, displayName) {
         var index = getUserIndex(username);
 
-        if (!index) {
+        if (index === -1) {
             console.log("ADD USER", index);
             // add user to list
             var newUser = {};
@@ -162,7 +162,7 @@ wsServer.on('request', (request) => {
     }
 
     function getUserIndex(username) {
-        var index;
+        var index = -1;
         
         connectedUsers.map((user, idx) => {
             if (user.username === username) {

@@ -4,11 +4,12 @@
         UPDATE_UI = BUTTON_NAME + "_update_ui",
         EVENTBRIDGE_SETUP_DELAY = 200,
         SEND_MESSAGE = BUTTON_NAME + "SEND_MESSAGE",
+        TOGGLE_OVERLAYS = "toggleOverlays",
         TOGGLE_DISPLAY_NAMES = "toggleDisplayNames";
 
 
     Vue.component('chat', {
-        props: ["history", "username", "showdisplaynames"],
+        props: ["history", "username", "showdisplaynames", "showoverlays"],
         methods: {
             toggleDisplayNames: function () {
 
@@ -16,6 +17,11 @@
                     type: TOGGLE_DISPLAY_NAMES
                 }));
 
+            },
+            toggleOverlays: function () {
+                EventBridge.emitWebEvent(JSON.stringify({
+                    type: TOGGLE_OVERLAYS
+                }));
             }
         },
         computed: {
@@ -32,11 +38,15 @@
             },
             renderName() {
                 return this.showdisplaynames ? "displayName" : "username";
+            },
+            showOverlayText() {
+                return this.showoverlays ? "Showing Overlays" : "Hiding Overlays";
             }
         },
         template: `
             <div class="card">
                 <button class="btn-sm mt-2 mr-2" v-bind:class="{ 'btn-primary': !showdisplaynames, 'btn-warning': showdisplaynames }" v-on:click="toggleDisplayNames()">Toggle Display Names</button>
+                <button class="btn-sm mt-2 mr-2" v-bind:class="{ 'btn-primary': showoverlays, 'btn-warning': !showoverlays }" v-on:click="toggleOverlays()">{{ showOverlayText }}</button>
                 <div class="card-body">
                     <div v-for="item in history">
                         {{ item.author[renderName] }} :: {{ item.text }}
@@ -56,10 +66,10 @@
         },
         methods: {
             sendInput: function(text) {
-                console.log("sendInput", text);
+                console.log("sendInput" + JSON.stringify(this.checkedNames));
 
                 if (text.length === 0) {
-                    return;
+                    return;1
                 }
 
                 var users = this.users;
@@ -68,9 +78,9 @@
                     return users.indexOf(username) !== -1;
                 });
 
-                this.checkedNames = toList;
+                // this.checkedNames = toList;
 
-                console.log("sendInput", text);
+                console.log("sendInput" + text);
                 
                 var message = {
                     author: this.$parent.settings.me,
@@ -88,6 +98,7 @@
             }
         },
         computed: {
+
             connectedUsers: function() {
                 // for name in names
 

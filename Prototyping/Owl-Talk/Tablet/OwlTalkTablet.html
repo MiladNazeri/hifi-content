@@ -13,7 +13,7 @@
         <div class="container" id="app">
             <div class="p-2">
                 <h3>Owl Chat</h3>
-                <chat v-bind:username="settings.username" v-bind:history="settings.history" v-bind:showdisplaynames="settings.showDisplayNames"></chat>
+                <chat v-bind:username="settings.username" v-bind:history="settings.history" v-bind:showdisplaynames="settings.showDisplayNames" v-bind:showoverlays="settings.showOverlays"></chat>
                 <input-text v-bind:users="settings.connectedUsers" v-bind:showdisplaynames="settings.showDisplayNames"></input-text>
             </div>
         </div>

@@ -16,6 +16,8 @@
 
     var CONNECTION_TIMEOUT = 3000;
     var SCRIPT_NAME = "OwlTalk.js";
+    var showOverlays = false;
+    var TOGGLE_OVERLAYS = "toggleOverlays";
 
     var DEBUG = true;
 
@@ -224,6 +226,7 @@
     var defaultSettings = {
             me: { username: username, displayName: MyAvatar.displayName },
             showDisplayNames: false,
+            showOverlays: true,
             history: [
                 { message: "test3" },
                 { message: "test4" }
@@ -313,6 +316,14 @@
                 // go through history and replace username / displayname inside the authors doubel check "un/dn ::"
 
                 break;
+            case TOGGLE_OVERLAYS:
+                // showOverlays = !showOverlays;
+                settings.showOverlays = !settings.showOverlays;
+                hide();
+
+                doUIUpdate();
+
+                break;
         }
     }
 
@@ -377,8 +388,12 @@
 
     function show() {
 
+        if (!settings.showOverlays) {
+            return;
+        }
+        
         resetHideTime();
-
+        
         if (DEBUG) {
             console.log("CALLING SHOW");
         }
@@ -394,6 +409,7 @@
         if (DEBUG) {
             console.log("RECORDING TEXT", recordingText);
         }
+        
         if (HMD.active) {
 
             var chatLength = currentLength / 2 * HMD_FONT_SIZE;
