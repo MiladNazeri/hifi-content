@@ -517,6 +517,7 @@
                 }
                 delete dataStore.mapping[this.audioStore[name].key];
                 delete this.audioStore[name];
+                delete this.audioObjects[name];
 
             };
 
@@ -1118,10 +1119,10 @@
                     console.log("type of data", typeof data);
                     settings = data;
                     var keys = Object.keys(settings);
-                    console.log("!!!KEYS", JSON.stringify(keys));
-                    console.log("!!!Audio", JSON.stringify(Object.keys(settings.audio.audioStore)));
-                    console.log("!!!transitions", JSON.stringify(Object.keys(settings.snapshots.transitionStore)));
-                    console.log("!!!snapshots", JSON.stringify(Object.keys(settings.snapshots.snapshotStore)));
+                    // console.log("!!!KEYS", JSON.stringify(keys));
+                    console.log("!!!Audio", JSON.stringify(Object.keys(settings.audio.audioObjects)));
+                    // console.log("!!!transitions", JSON.stringify(Object.keys(settings.snapshots.transitionStore)));
+                    // console.log("!!!snapshots", JSON.stringify(Object.keys(settings.snapshots.snapshotStore)));
 
                     dataStore.mapping = settings.mapping;
                     Object.keys(settings.snapshots.snapshotStore).forEach(function(snapshot){
@@ -1508,7 +1509,7 @@
                 type: UPDATE_UI,
                 value: dataStore  
             };
-            console.log("SEND TO HTML:", JSON.stringify(messageObject));
+            // console.log("SEND TO HTML:", JSON.stringify(messageObject));
             ui.sendToHtml(messageObject);
         }
 

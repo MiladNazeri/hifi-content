@@ -105,11 +105,11 @@
                                 <input type="checkbox" class="form-check-input" id="checkbox" :checked="always_transition_snaps" v-on:click="alwaysTransitionSnaps()">
                                 <label class="form-check-label" for="checkbox">Transition Snapshots</label>
                             </span>
-                            <div class="input-group mb-1 ">
+                            <!-- <div class="input-group mb-1 ">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text font-weight-bold">Default Transition Time</span>
                                 </div>
-                                <input type="number" min="0" v-on:blur="onBlur" v-model="newTransitionTime" class="form-control">
+                                <input type="number" min="0" v-on:blur="onBlur" v-model="newTransitionTime" class="form-control"> -->
                             </div>
                         </div>
                     </div>
@@ -827,6 +827,7 @@
                         var url = "https://script.google.com/macros/s/AKfycbwEULyFTHC04hXdGpIt1iHKQse5qOwuQDEKTeT3pg6XCJt7NXlF/exec";
                             var settings = {};
                             
+                            console.log("\n\nAUDIO:\n\n " + Object.keys(app.dataStore.audio.audioObjects));
                             settings.snapshots = app.dataStore.snapshots
                             settings.audio = app.dataStore.audio;
                             settings.mapping = app.dataStore.mapping;
