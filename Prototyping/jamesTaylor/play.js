@@ -1,4 +1,5 @@
 (function(){
+    // probably should change this password
     var baseAddress="http://:milad@127.0.0.1:8080/requests/playlist.xml?";
     var NEXT = baseAddress + "command=pl_next";
     var PREVIOUS = baseAddress + "command=pl_previous";
@@ -7,6 +8,7 @@
     var request = Script.require('https://raw.githubusercontent.com/highfidelity/hifi-content/44a10a3fb07f3271307ef0a2c28429d51f696326/DomainContent/Hub/domainStars/modules/request.js').request;
     var type = null;
     var MESSAGE_CHANNEL = "JAMES_TAYLER";
+    // Adding this in case we need a display of what file we are currently on.  Not sure if needed juyst yet.
     var fileMap = {
         "4": {
             name: "01-TTM-ShowOPEN.mov",
@@ -122,7 +124,34 @@
         if (success) {
             console.log(JSON.stringify(success));
         }
-    };
+    }
+
+    function messageReceived(channel, data){
+        if (channel !== MESSAGE_CHANNEL) {
+            return;
+        }
+
+        switch (data) {
+            case "next":
+                request(NEXT, callback);
+                Script.setTimeout(function () {
+                    request(PAUSE, callback);
+                }, TIMEOUT_INTERVAL_MS);
+                break;
+            case "previous":
+                request(PREVIOUS, callback);
+                Script.setTimeout(function () {
+                    request(PAUSE, callback);
+                }, TIMEOUT_INTERVAL_MS);
+                break;
+            case "play":
+                request(PLAY, callback);
+                break;
+            case "pause":
+                request(PAUSE, callback);
+                break;
+        }
+    }
 
     function Control(){
 
@@ -133,32 +162,7 @@
             var userData = JSON.parse(Entities.getEntityProperties(id,'userData').userData);
             type = userData.type;
             Messages.subscribe(MESSAGE_CHANNEL);
-            Messages.messageReceived.connect(function(channel, data){
-                if (channel !== MESSAGE_CHANNEL){
-                    return;
-                }
-                
-                switch(data){
-                    case "next":
-                        request(NEXT, callback);
-                        Script.setTimeout(function(){
-                            request(PAUSE, callback);
-                        }, TIMEOUT_INTERVAL_MS);
-                    break;
-                    case "previous":
-                        request(PREVIOUS, callback);
-                        Script.setTimeout(function(){
-                            request(PAUSE, callback);
-                        }, TIMEOUT_INTERVAL_MS);
-                    break;
-                    case "play":
-                        request(PLAY, callback);
-                    break;
-                    case "pause":
-                        request(PAUSE, callback);
-                    break;
-                }
-            });
+            Messages.messageReceived.connect(messageReceived);
         },
         mousePressOnEntity: function(){
             console.log("mouse pressed")
@@ -176,6 +180,9 @@
                     Messages.sendMessage(MESSAGE_CHANNEL, 'pause');
                 break;
             }
+        },
+        unload: function(){
+            Messages.messageReceived.disconnect(messageReceived);
         }
     };
 
