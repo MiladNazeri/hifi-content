@@ -4,7 +4,7 @@
     var NEXT = baseAddress + "command=pl_next";
     var PREVIOUS = baseAddress + "command=pl_previous";
     var PLAY = baseAddress + "command=pl_play";
-    var PAUSE = baseAddress + "command=pl_pause";
+    var PAUSE = baseAddress + "command=pl_forcepause";
     var request = Script.require('https://raw.githubusercontent.com/highfidelity/hifi-content/44a10a3fb07f3271307ef0a2c28429d51f696326/DomainContent/Hub/domainStars/modules/request.js').request;
     var type = null;
     var MESSAGE_CHANNEL = "JAMES_TAYLER";
