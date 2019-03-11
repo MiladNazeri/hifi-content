@@ -1,6 +1,6 @@
-(function(){
+(function () {
     // probably should change this password
-    var baseAddress="http://:milad@127.0.0.1:8080/requests/playlist.xml?";
+    var baseAddress = "http://:milad@127.0.0.1:8080/requests/playlist.xml?";
     var NEXT = baseAddress + "command=pl_next";
     var PREVIOUS = baseAddress + "command=pl_previous";
     var PLAY = baseAddress + "command=pl_play";
@@ -120,69 +120,53 @@
         if (error) {
             console.log(JSON.stringify(error));
         }
-        
+
         if (success) {
             console.log(JSON.stringify(success));
         }
     }
 
-    function messageReceived(channel, data){
-        if (channel !== MESSAGE_CHANNEL) {
-            return;
-        }
 
-        switch (data) {
+    function onClick() {
+        switch (type) {
             case "next":
-                request(NEXT, callback);
-                Script.setTimeout(function () {
-                    request(PAUSE, callback);
-                }, TIMEOUT_INTERVAL_MS);
+                Messages.sendMessage(MESSAGE_CHANNEL, 'next');
                 break;
             case "previous":
-                request(PREVIOUS, callback);
-                Script.setTimeout(function () {
-                    request(PAUSE, callback);
-                }, TIMEOUT_INTERVAL_MS);
+                Messages.sendMessage(MESSAGE_CHANNEL, 'previous');
                 break;
             case "play":
-                request(PLAY, callback);
+                Messages.sendMessage(MESSAGE_CHANNEL, 'play');
                 break;
             case "pause":
-                request(PAUSE, callback);
+                Messages.sendMessage(MESSAGE_CHANNEL, 'pause');
                 break;
         }
     }
 
-    function Control(){
+
+    function Control() {
 
     }
 
     Control.prototype = {
-        preload: function(id){
-            var userData = JSON.parse(Entities.getEntityProperties(id,'userData').userData);
+        preload: function (id) {
+            var userData = JSON.parse(Entities.getEntityProperties(id, 'userData').userData);
             type = userData.type;
-            Messages.subscribe(MESSAGE_CHANNEL);
-            Messages.messageReceived.connect(messageReceived);
         },
-        mousePressOnEntity: function(){
-            console.log("mouse pressed")
-            switch(type){
-                case "next":
-                    Messages.sendMessage(MESSAGE_CHANNEL, 'next');
-                break;
-                case "previous":
-                    Messages.sendMessage(MESSAGE_CHANNEL, 'previous');
-                break;
-                case "play":
-                    Messages.sendMessage(MESSAGE_CHANNEL, 'play');
-                break;
-                case "pause":
-                    Messages.sendMessage(MESSAGE_CHANNEL, 'pause');
-                break;
-            }
+        clickDownOnEntity: function () {
+            console.log("mouse pressed");
+            onClick();
         },
-        unload: function(){
-            Messages.messageReceived.disconnect(messageReceived);
+        stopFarTrigger: function () {
+            console.log("stop far trigger pressed")
+            onClick();
+        },
+        stopNearTrigger: function () {
+            console.log("stop near trigger pressed")
+            onClick();
+        },
+        unload: function () {
         }
     };
 
