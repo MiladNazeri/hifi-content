@@ -1,0 +1,62 @@
+newmtl sorbe:blinn3SG
+illum 4
+Kd 0.15 0.15 0.15
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 0.06
+newmtl sorbe:blinn7SG
+illum 4
+Kd 0.49 0.78 1.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 0.06
+newmtl sorbe:pasted__lambert2SG
+illum 4
+Kd 0.99 0.28 0.31
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl sorbe:pasted__pasted__phongE2SG
+illum 4
+Kd 1.00 0.00 0.42
+Ka 0.04 0.04 0.04
+Tf 0.50 0.50 0.50
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 0.06
+newmtl sorbe:pasted__pasted__phongE3SG
+illum 4
+Kd 1.00 0.93 0.51
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 0.06
+newmtl sorbe:pasted__phongE2SG
+illum 4
+Kd 0.77 0.51 0.97
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 0.06
+newmtl sorbe:pasted__phongE3SG
+illum 4
+Kd 0.99 0.28 0.31
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.73 0.73 0.73
+Ns 0.06
+newmtl sorbe:pasted__phongE4SG
+illum 4
+Kd 1.00 0.96 0.80
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 0.06

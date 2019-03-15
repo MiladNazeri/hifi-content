@@ -1,0 +1,70 @@
+{
+    "audio_env": {
+        "attenuation_coefficients": [
+            {
+                "coefficient": "0",
+                "listener": "Dancefloor",
+                "source": "DJBooth"
+            },
+            {
+                "coefficient": "0.7",
+                "listener": "DJBooth",
+                "source": "Dancefloor"
+            }
+        ],
+        "zones": {
+            "Audience": {
+                "x_max": "451",
+                "x_min": "432.7",
+                "y_max": "505",
+                "y_min": "500",
+                "z_max": "510",
+                "z_min": "478"
+            },
+            "DJBooth": {
+                "x_max": "432.76",
+                "x_min": "428.39",
+                "y_max": "504.24",
+                "y_min": "500.58",
+                "z_max": "496.16",
+                "z_min": "492.31"
+            },
+            "Dancefloor": {
+                "x_max": "449.13",
+                "x_min": "431.22",
+                "y_max": "506.33",
+                "y_min": "499.51",
+                "z_max": "501.91",
+                "z_min": "487.50"
+            },
+            "Stage": {
+                "x_max": "432.7",
+                "x_min": "423",
+                "y_max": "506",
+                "y_min": "500",
+                "z_max": "505",
+                "z_min": "484"
+            }
+        }
+    },
+    "paths": {
+        "/aboard": {
+            "viewpoint": "/436.505,502.044,498.674/0,-0.581973,0,0.813208"
+        },
+        "/anton": {
+            "viewpoint": "/436.835,542.69,563.537/0,-0.296345,0,0.955081"
+        },
+        "/cantina": {
+            "viewpoint": "/-287.7,-131,47"
+        },
+        "/good-times": {
+            "viewpoint": "/0,0,0"
+        },
+        "/hello": {
+            "viewpoint": "/439.287,500.675,489.956/0,0.395875,0,0.918304"
+        },
+        "/theLoop": {
+            "viewpoint": "/1480,-890,1748.8"
+        }
+    }
+}

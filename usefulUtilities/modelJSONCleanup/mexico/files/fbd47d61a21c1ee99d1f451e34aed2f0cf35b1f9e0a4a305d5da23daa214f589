@@ -1,0 +1,19 @@
+[07/18 12:01:24] [DEBUG] [hifi.entities] Delete web surface:  QUuid("{9d2d636a-f164-4a81-9bdb-d32c685bfe2a}") , # 1 , url =  "https://tockify.com/hifieventscalendar/agenda"
+[07/18 12:01:24] [DEBUG] [hifi.entities] Delete web surface:  QUuid("{a378f191-d6ad-4173-ac82-200f865bb395}") , # 0 , url =  "https://tockify.com/hifieventscalendar/agenda"
+[07/18 12:01:24] [DEBUG] [hifi.shared] Rolled log file: "C:/Users/Sokiex/AppData/Local/High Fidelity/Interface/Logs/hifi-log_192.168.0.2_2017-07-18_12.01.24.txt"
+[07/18 12:02:09] [DEBUG] [hifi.avatars] Removed avatar with UUID "3ba2a1b5-94ee-4443-9172-b9a61ee8bc24" from AvatarHashMap 1
+[07/18 12:02:09] [DEBUG] [qml] No callback for message fromScript {"method":"palIsStale","params":["{3ba2a1b5-94ee-4443-9172-b9a61ee8bc24}","avatarRemoved"]}
+[07/18 12:02:09] [DEBUG] [qml] No callback for message fromScript {"method":"avatarDisconnected","params":["{3ba2a1b5-94ee-4443-9172-b9a61ee8bc24}"]}
+[07/18 12:02:11] [DEBUG] [default] Refreshing asset mapping model
+[07/18 12:02:12] [DEBUG] [hifi.interface.deadlock] DEADLOCK WATCHDOG WARNING: lastHeartbeatAge: 52497 elapsedMovingAverage: 1843 maxElapsed: 6358749 PREVIOUS maxElapsedAverage: 1841 NEW maxElapsedAverage: 1843 ** NEW MAX ELAPSED AVERAGE ** samples: 885263
+[07/18 12:02:20] [DEBUG] [hifi.networking.asset_client] Attempting to upload "C:/Users/Sokiex/AppData/Local/High Fidelity/Interface/Logs/hifi-log.txt" to asset-server.
+[07/18 12:02:20] [DEBUG] [hifi.networking.asset_client] Successfully uploaded asset to asset-server - SHA256 hash is  "9d8be1f4cda817cf9c24391b5d9f931845e408a9df29cad1164e4865f6335f8a"
+[07/18 12:02:20] [DEBUG] [hifi.networking.asset_client] "atp:9d8be1f4cda817cf9c24391b5d9f931845e408a9df29cad1164e4865f6335f8a" saved to disk cache
+[07/18 12:02:20] [DEBUG] [qml]  /hifi-log.txt
+[07/18 12:02:20] [DEBUG] [qml] Asset Browser - finished uploading:  C:/Users/Sokiex/AppData/Local/High Fidelity/Interface/Logs/hifi-log.txt
+[07/18 12:02:20] [DEBUG] [default] Refreshing asset mapping model
+[07/18 12:02:25] [DEBUG] [qml] Helper FileDialogHelper(0x238f2999fe0) drives C:/,D:/,E:/
+[07/18 12:02:26] [DEBUG] [hifi.interface.deadlock] DEADLOCK WATCHDOG WARNING: lastHeartbeatAge: 4392 elapsedMovingAverage: 1844 maxElapsed: 6358749 PREVIOUS maxElapsedAverage: 1843 NEW maxElapsedAverage: 1844 ** NEW MAX ELAPSED AVERAGE ** samples: 885865
+[07/18 12:02:53] [WARNING] [default] file:///E:/Steam/steamapps/common/High Fidelity/resources//qml/AssetServer.qml:337: TypeError: Cannot call method 'urlToPath' of undefined
+[07/18 12:02:53] [DEBUG] [default] Refreshing asset mapping model
+[07/18 12:02:53] [WARNING] [default] file:///E:/Steam/steamapps/common/High Fidelity/resources//qml/AssetServer.qml:337: TypeError: Cannot call method 'urlToPath' of undefined
