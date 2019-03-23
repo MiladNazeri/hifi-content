@@ -58,6 +58,12 @@
     var MAXIUM_PER_ROW = 5;
     var DISTANCE_BETWEEN_ROWS = 2;
 
+    // *************************************
+    // START GET_WORDS
+    // *************************************
+    // #region GET_WORDS
+
+    
     function transformWords(words){
         words.forEach(function(word){
             if (!transformedWords[word.category]){
@@ -86,6 +92,83 @@
         });
 
     }
+    
+    
+    // #endregion
+    // *************************************
+    // END GET_WORDS
+    // *************************************
+
+
+    // *************************************
+    // START ROOM
+    // *************************************
+    // #region ROOM
+    
+    
+    function Room(){
+        this.floor = null;
+        this.ceiling = null;
+        this.wallLeft = null;
+        this.wallRight = null;
+        this.wallCenter = null;
+        this.doorLeft = null;
+        this.doorRight = null;
+        this.rotation = null;
+        this.position = null;
+    }
+
+    function registerSide(type, props){
+        switch(type) {
+            case "floor":
+                this.ceiling = props;
+                break;
+            case "ceiling":
+                this.ceiling = props;
+                break;
+            case "wallLeft":
+                this.ceiling = props;
+                break;
+            case "wallRight":
+                this.ceiling = props;
+                break;
+            case "wallCenter":
+                this.ceiling = props;
+                break;
+            case "doorLeft":
+                this.ceiling = props;
+                break;
+            case "doorRight":
+                this.doorRight = props;
+                break;
+        }
+        return this;
+    }
+
+    function registerRotation(rotation){
+        this.rotation = rotation;
+        return this;
+    }
+
+    function registerPosition(position){
+        this.position = position;
+        return this;
+    }
+
+    Room.prototype = {
+        registerSide: registerSide,
+        registerPosition: registerPosition,
+        registerRotation: registerRotation
+    };
+    
+
+    // Room.prototype.
+    
+    
+    // #endregion
+    // *************************************
+    // END ROOM
+    // *************************************
 
     function startUp(){
         getGoogleShetWord();
