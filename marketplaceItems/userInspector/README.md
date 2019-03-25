@@ -14,6 +14,12 @@ With User Inspector, you can click anywhere on an avatar and get a quick view of
 
 ### 2019-03-20_11-00-00 | Marketplace v1.0 | [518f5da]
 
+<<<<<<< HEAD
+=======
+### 2019-03-20_11-00-00 | Marketplace v1.1 | [e6b3a0f]
+- Fixed enable / disable bug that was silently crashing the app
+
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
 ## Project Links
 [Trello Card](https://trello.com/c/9BVI2fyL/71-combined-name-tag-app)
 

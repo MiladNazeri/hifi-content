@@ -15,7 +15,11 @@
 // Handle the enable button being clicked
 function nameTagSwitchClicked(checkbox) {
     EventBridge.emitWebEvent(JSON.stringify({
+<<<<<<< HEAD
         app: "nametag",
+=======
+        app: "userInspector",
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
         method: "nametagSwitchClicked",
         nameTagEnabled: checkbox.checked
     }));
@@ -25,7 +29,11 @@ function nameTagSwitchClicked(checkbox) {
 // Handle the slider being changed
 function userSliderChanged(slider) {
     EventBridge.emitWebEvent(JSON.stringify({
+<<<<<<< HEAD
         app: "nametag",
+=======
+        app: "userInspector",
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
         method: "updateUserScaler",
         currentUserScaler: slider.value
     }));
@@ -41,6 +49,13 @@ function onScriptEventReceived(message) {
         return;
     }
 
+<<<<<<< HEAD
+=======
+    if (message.app !== "userInspector") {
+        return; 
+    }
+
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
     switch (message.method) {
         case "updateUI":
             document.getElementById("nameTagSwitch").checked = message.nameTagEnabled;
@@ -48,7 +63,11 @@ function onScriptEventReceived(message) {
             document.getElementById("loadingContainer").style.display = "none";
             break;
         default:
+<<<<<<< HEAD
             console.log("Unknown message received from nameTag.js! " + JSON.stringify(message));
+=======
+            console.log("Unknown message received from userInspector.js! " + JSON.stringify(message));
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
             break;
     }
 }
@@ -61,7 +80,11 @@ function onLoad() {
     setTimeout(function() {
         EventBridge.scriptEventReceived.connect(onScriptEventReceived);
         EventBridge.emitWebEvent(JSON.stringify({
+<<<<<<< HEAD
             app: "nametag",
+=======
+            app: "userInspector",
+>>>>>>> 28462e2f252de503904edd8a9ff5cbf526cf6a40
             method: "eventBridgeReady"
         }));
     }, EVENTBRIDGE_SETUP_DELAY);

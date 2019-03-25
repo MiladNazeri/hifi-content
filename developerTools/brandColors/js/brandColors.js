@@ -19,7 +19,6 @@ module.exports = {
     HIFI_GRAY_LITE: "#d8e1d9",
     HIFI_GRAY_MID: "#b7c8b9",
     HIFI_GRAY_DARK: "#7e8c81",
-    HIFI_BLACK: "#000000",
     HIFI_BLUE: "#172983",
     HIFI_CYAN: "#009ee0",
     HIFI_GREEN: "#009036",

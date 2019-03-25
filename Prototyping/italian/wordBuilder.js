@@ -41,13 +41,54 @@
 // Minimum distance between doors
 
 (function(){
+    // taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+
+    if (typeof Object.assign != 'function') {
+        // Must be writable: true, enumerable: false, configurable: true
+        Object.defineProperty(Object, "assign", {
+            value: function assign(target, varArgs) { // .length of function is 2
+                'use strict';
+                if (target == null) { // TypeError if undefined or null
+                    throw new TypeError('Cannot convert undefined or null to object');
+                }
+
+                var to = Object(target);
+
+                for (var index = 1; index < arguments.length; index++) {
+                    var nextSource = arguments[index];
+
+                    if (nextSource != null) { // Skip over if undefined or null
+                        for (var nextKey in nextSource) {
+                            // Avoid bugs when hasOwnProperty is shadowed
+                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                                to[nextKey] = nextSource[nextKey];
+                            }
+                        }
+                    }
+                }
+                return to;
+            },
+            writable: true,
+            configurable: true
+        });
+    }
+
 
     // bring in text builder
     var GOOGLE_SHEET = "https://script.google.com/macros/s/AKfycbwB58EOQcL-m44oc6-lXPTwnchIl1vC7HpylBNvwQgUQ2ODTy0/exec";
     var request = Script.require("request").request;
     var log = Script.require('https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/developerTools/sharedLibraries/easyLog/easyLog.js')
-    log("v3");
     
+    var materials = Script.require('./materials.json?' + Date.now());
+    var colors = Script.require('./brandColors.js');
+    var colorKeys = Object.keys(colors);
+
+    var materialKeys = Object.keys(materials);
+
+    function getRandom(min, max){
+        return Math.floor(Math.random() * (max - min) + min)
+    }
+
     var googleShetsWords = [];
     var transformedWords = {};
 
@@ -55,8 +96,65 @@
     var CARD_HEIGHT = 1;
     var DISTANCE_FROM_GROUND = 1;
     var DISTANCE_BETWEEN_CARDS = 1;
-    var MAXIUM_PER_ROW = 5;
-    var DISTANCE_BETWEEN_ROWS = 2;
+    var MAXIMUM_PER_ROW = 5;
+    var DISTANCE_BETWEEN_ROWS = 7;
+    var DISTANCE_BETWEEN_COLUMNS = 7;
+    var DOOR_WIDTH = 0.25;
+
+    var TEST_POSITION = [0,0,0];
+    var WALL_SIZE = 1;
+
+    var FLOOR = 'FLOOR';
+    var CEILING = 'CEILING';
+    var WALL_LEFT = 'WALL_LEFT';
+    var WALL_RIGHT = 'WALL_RIGHT';
+    var WALL_CENTER = 'WALL_CENTER';
+    var DOOR_LEFT = 'DOOR_LEFT';
+    var DOOR_RIGHT = 'DOOR_RIGHT';
+
+    var roomArray = [FLOOR, CEILING, WALL_CENTER, WALL_LEFT, WALL_RIGHT, DOOR_LEFT, DOOR_RIGHT];
+
+    var X = 0;
+    var Y = 1;
+    var Z = 2; 
+
+    var roomsToDelete = [];
+    var lights = [];
+    var lightProps = {
+        "type": "Light",
+        "dimensions": {
+            "x": 20.49194880065918,
+            "y": 20.49194880065918,
+            "z": 20.043134880065918
+        },
+        "grab": {
+            "grabbable": false,
+            "equippableLeftRotation": {
+                "x": -0.0000152587890625,
+                "y": -0.0000152587890625,
+                "z": -0.0000152587890625,
+                "w": 1
+            },
+            "equippableRightRotation": {
+                "x": -0.0000152587890625,
+                "y": -0.0000152587890625,
+                "z": -0.0000152587890625,
+                "w": 1
+            }
+        },
+        "damping": 0,
+        "angularDamping": 0,
+        "color": {
+            "red": 97,
+            "green": 15,
+            "blue": 97
+        },
+        "intensity": 5.6,
+        "exponent": 0,
+        "cutoff": 0,
+        "falloffRadius": 4.200000762939453,
+    };
+    
 
     // *************************************
     // START GET_WORDS
@@ -107,73 +205,417 @@
     
     
     function Room(){
-        this.floor = null;
-        this.ceiling = null;
-        this.wallLeft = null;
-        this.wallRight = null;
-        this.wallCenter = null;
-        this.doorLeft = null;
-        this.doorRight = null;
+        this.parentID = null;
+        this.FLOOR = {};
+        this.CEILING = {};
+        this.WALL_LEFT = {};
+        this.WALL_RIGHT = {};
+        this.WALL_CENTER = {};
+        this.DOOR_LEFT = {};
+        this.DOOR_RIGHT = {};
         this.rotation = null;
         this.position = null;
+        this.roomArray = roomArray;
     }
 
+
     function registerSide(type, props){
-        switch(type) {
-            case "floor":
-                this.ceiling = props;
+        var uniqueProps = JSON.parse(JSON.stringify(props));
+        switch (type) {
+            case FLOOR:
+                var floorProps = uniqueProps;
+                floorProps.localPosition = [0, -floorProps.localDimensions[Y], 0];
+                floorProps.localDimensions[Y] = floorProps.localDimensions[X];
+                floorProps.localRotation = Quat.fromPitchYawRollDegrees(90, 0, 0);
+                floorProps.name = FLOOR;
+                floorProps.color = [100, 100, 100];
+                this.FLOOR.props = floorProps;
                 break;
-            case "ceiling":
-                this.ceiling = props;
+            case CEILING:
+                var ceilingProps = uniqueProps;
+                ceilingProps.localPosition = [0, ceilingProps.localDimensions[Y], 0];
+                ceilingProps.localDimensions[Y] = ceilingProps.localDimensions[X];
+                ceilingProps.localRotation = Quat.fromPitchYawRollDegrees(90, 0, 0);
+                ceilingProps.name = CEILING;
+                ceilingProps.color = [200, 100, 200];
+                this.CEILING.props = ceilingProps;
                 break;
-            case "wallLeft":
-                this.ceiling = props;
+            case WALL_LEFT:
+                var wallLeftProps = uniqueProps;
+                wallLeftProps.localPosition = [this.CEILING.props.localDimensions[X] * 0.5, 0, 0];
+                wallLeftProps.localDimensions[Y] = this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y];
+                wallLeftProps.localRotation = Quat.fromPitchYawRollDegrees(0, 90, 0);
+                wallLeftProps.name = WALL_LEFT;
+                wallLeftProps.color = [0, 200, 100];
+                this.WALL_LEFT.props = wallLeftProps;
                 break;
-            case "wallRight":
-                this.ceiling = props;
+            case WALL_RIGHT:
+                var wallRightProps = uniqueProps;
+                wallRightProps.localPosition = [-this.CEILING.props.localDimensions[X] * 0.5, 0, 0];
+                wallRightProps.localDimensions[Y] = this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y];
+                wallRightProps.localRotation = Quat.fromPitchYawRollDegrees(0, 90, 0);
+                wallRightProps.name = WALL_RIGHT;
+                wallRightProps.color = [0, 100, 200];
+                this.WALL_RIGHT.props = wallRightProps;
                 break;
-            case "wallCenter":
-                this.ceiling = props;
+            case WALL_CENTER:
+                var wallCenterProps = uniqueProps;       
+                wallCenterProps.localPosition = [0, 0, -wallCenterProps.localDimensions[X] * 0.5];
+                wallCenterProps.localDimensions[Y] = this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y];
+                wallCenterProps.localRotation = Quat.fromPitchYawRollDegrees(0, 0, 0);
+                wallCenterProps.name = WALL_CENTER;
+                wallCenterProps.color = [100, 100, 200];
+                this.WALL_CENTER.props = wallCenterProps;
                 break;
-            case "doorLeft":
-                this.ceiling = props;
+            case DOOR_LEFT:
+                var doorLeftProps = uniqueProps;       
+                doorLeftProps.localDimensions[Y] = this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y];
+                doorLeftProps.localDimensions[X] = (this.CEILING.props.localDimensions[Y] * (1.0 - DOOR_WIDTH)) * 0.5;
+                doorLeftProps.localRotation = Quat.fromPitchYawRollDegrees(0, 0, 0);
+                doorLeftProps.localPosition = [
+                    (this.CEILING.props.localDimensions[Y] * DOOR_WIDTH) * 0.5 + (doorLeftProps.localDimensions[X] * 0.5), 
+                    0,
+                    this.CEILING.props.localDimensions[X] * 0.5
+                ];
+                doorLeftProps.name = DOOR_LEFT;
+                doorLeftProps.color = [20, 100, 75];
+                this.DOOR_LEFT.props = doorLeftProps;
                 break;
-            case "doorRight":
-                this.doorRight = props;
+            case DOOR_RIGHT:
+                var doorRightProps = uniqueProps;       
+                doorRightProps.localDimensions[Y] = this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y];
+                doorRightProps.localDimensions[X] = (this.CEILING.props.localDimensions[Y] * (1.0 - DOOR_WIDTH)) * 0.5;
+                doorRightProps.localRotation = Quat.fromPitchYawRollDegrees(0, 0, 0);
+                doorRightProps.localPosition = [
+                    -((this.CEILING.props.localDimensions[Y] * DOOR_WIDTH) * 0.5 + (doorRightProps.localDimensions[X] * 0.5)), 
+                    0,
+                    this.CEILING.props.localDimensions[X] * 0.5
+                ];
+                doorRightProps.name = DOOR_RIGHT;
+                doorRightProps.color = [200, 100, 75];
+                this.DOOR_RIGHT.props = doorRightProps;
                 break;
         }
         return this;
     }
 
-    function registerRotation(rotation){
-        this.rotation = rotation;
+
+    function createParent(parentProps){
+        this.parentID = Entities.addEntity(parentProps);
+        
+        return this;
+
+    }
+
+
+    function createWalls(){
+        var _this = this;
+        var wallMaterialEntityProps = {
+            type: "Material",
+            name: "floor material",
+            materialURL: "materialData",
+            materialMappingMode: "uv",
+            priority: 1,
+            materialMappingScale: [5, 5],
+            materialData: {}
+        };
+        wallMaterialEntityProps.materialData = JSON.stringify(materials[
+            materialKeys[getRandom(0, materialKeys.length)]
+        ]);
+
+
+        this.roomArray.forEach(function(room){
+            var newProps = this[room].props;
+            newProps.parentID = this.parentID;
+            this[room].id = Entities.addEntity(newProps);
+
+            this[room].materials = {};
+            this[room].materials.props = wallMaterialEntityProps;
+            this[room].materials.props.parentID = this[room].id;
+            this[room].materials.id = Entities.addEntity(this[room].materials.props);
+        }, _this);
+
+        this.roomDimensions = [
+            Math.abs(this.WALL_LEFT.props.localPosition[X] - this.WALL_RIGHT.props.localPosition[X]),
+            Math.abs(this.CEILING.props.localPosition[Y] - this.FLOOR.props.localPosition[Y]),
+            Math.abs(this.WALL_CENTER.props.localPosition[Z] - this.DOOR_RIGHT.props.localPosition[Z])
+        ];
+        // log("room dimensions", this.roomDimensions)
         return this;
     }
 
-    function registerPosition(position){
-        this.position = position;
+
+    function registerSides(props){
+        var _this = this;
+        this.roomArray.forEach(function (room) {
+            this.registerSide(room, props);
+            // log("register props", props)
+        }, _this);
         return this;
     }
+
+
+    function deleteRoom(){
+        Entities.deleteEntity(this.parentID);
+    }
+
 
     Room.prototype = {
         registerSide: registerSide,
-        registerPosition: registerPosition,
-        registerRotation: registerRotation
+        // registerParent: registerParent,
+        createParent: createParent,
+        createWalls: createWalls,
+        registerSides: registerSides,
+        deleteRoom: deleteRoom
     };
     
+    var props1 = {
+        localDimensions: [5.5, 4.0, 0.01],
+        type: "Box"
+    };
 
-    // Room.prototype.
+    var props2 = {
+        localDimensions: [5.5, 2.0, 0.01],
+        type: "Box"
+    };
+
+    var props3 = {
+        localDimensions: [5.5, 7.5, 0.01],
+        type: "Box"
+    };
+
+    var props4 = {
+        localDimensions: [6.5, 1.5, 0.01],
+        type: "Box"
+    };
+
+    var parentProps1 = {
+        type: "Box",
+        dimensions: [0.1, 0.1, 0.1],
+        position: [0, props1.localDimensions[Y], 0],
+        name: "BOX NAME",
+        visible: false
+    };
+
+    var parentProps2 = {
+        type: "Box",
+        dimensions: [0.1, 0.1, 0.1],
+        position: [0, props2.localDimensions[Y], 0],
+        name: "BOX NAME",
+        visible: false
+    };
+
+    var parentProps3 = {
+        type: "Box",
+        dimensions: [0.1, 0.1, 0.1],
+        position: [0, props3.localDimensions[Y], 0],
+        name: "BOX NAME",
+        visible: false
+    };
+
+    var parentProps4 = {
+        type: "Box",
+        dimensions: [0.1, 0.1, 0.1],
+        position: [0, props4.localDimensions[Y], 0],
+        name: "BOX NAME",
+        visible: false
+    };
     
+    function Rooms(){
+        this.rooms = [];
+        this.numberOfRooms = 0;
+        this.currentRoom = 0;
+        this.lastPosition = null;
+        this.originPosition = null;
+
+        this.floorMin = [0, 0, 0];
+        this.floorMax = [0, 0, 0];
+        this.floorDimensions = [0, 0.25, 0];
+        this.floor = {};
+    }
     
+
+    function setNumberOfRooms(rooms){
+        this.numberOfRooms = rooms;
+
+        return this;
+    }
+
+
+    function addRoom(parentProps, roomProps){
+        if (this.lastPosition){
+            this.lastPosition[X] = 
+                this.lastPosition[X] + 
+                this.rooms[this.rooms.length - 1].roomDimensions[X] * 0.5 + 
+                DISTANCE_BETWEEN_ROWS + roomProps.localDimensions[X] * 0.5;
+            
+            this.lastPosition[Y] =
+                roomProps.localDimensions[Y];
+
+        } else {
+            this.originPosition = JSON.parse(JSON.stringify(parentProps.position));
+            this.lastPosition = JSON.parse(JSON.stringify(parentProps.position));
+            // log("this.originPosition", this.originPosition)
+        }
+        var count = this.rooms.length || 0;
+        
+        // go to the next row after the set amount is reached
+        if (count !== 0 && count % MAXIMUM_PER_ROW === 0) {
+            this.lastPosition[Z] = 
+                -(Math.abs(this.lastPosition[Z]) + 
+                DISTANCE_BETWEEN_COLUMNS + 
+                this.rooms[this.rooms.length - 1].roomDimensions[Z] * 0.5);
+            this.lastPosition[X] = this.originPosition[X];
+        }
+        // log("this.lastPosition", this.lastPosition)
+        parentProps.position = this.lastPosition;
+        // log("parentprops.position", parentProps.position)
+        
+
+        var newRoom = new Room();
+        newRoom
+            .registerSides(roomProps)
+            .createParent(parentProps)
+            .createWalls();
+
+        var light = Object.assign({}, lightProps);
+        light.color = colors[
+            colorKeys[getRandom(0, colorKeys.length)]
+        ];
+        light.position = Vec3.sum(
+            [ -((newRoom.roomDimensions[X] * 0.5) + (DISTANCE_BETWEEN_ROWS * 0.5)),
+            1, 0], 
+            parentProps.position)
+        lights.push(Entities.addEntity(light))
+
+        this.rooms.push(newRoom);
+
+        var roomCheck = this.rooms[this.rooms.length - 1];
+
+        var minX = this.lastPosition[X] - (roomCheck.roomDimensions[X] * 0.5);
+        this.floorMin[X] = Math.min(minX, this.floorMin[X]);
+        var maxX = this.lastPosition[X] + (roomCheck.roomDimensions[X] * 0.5);
+        this.floorMax[X] = Math.max(maxX, this.floorMax[X]);
+
+        var minZ = this.lastPosition[Z] - (roomCheck.roomDimensions[Z] * 0.5);
+        // log("minZ", minZ)
+        this.floorMin[Z] = Math.min(minZ, this.floorMin[Z]);
+        var maxZ = this.lastPosition[Z] + (roomCheck.roomDimensions[Z] * 0.5);
+        // log("maxZ", maxZ)
+        this.floorMax[Z] = Math.max(maxZ, this.floorMax[Z]);
+
+        // this.lastPosition = this.lastPosition;
+
+        // log("this.floorMin", this.floorMin);
+        // log("this.floorMax", this.floorMax);
+        this.floorDimensions = Vec3.subtract(this.floorMax, this.floorMin);
+        this.floorDimensions[Y] = 0.25;
+        this.floorPosition = Vec3.sum(this.floorMin, Vec3.multiply(this.floorDimensions, 0.5));
+
+        var props = {
+            type: "Box",
+            name: "ALL-FLOOR",
+            dimensions: this.floorDimensions,
+            position: this.floorPosition,
+            color: [20, 40, 150]
+        };
+        
+        
+        var floorMaterialEntityProps = {
+            type: "Material",
+            name: "floor material",
+            materialURL: "materialData",
+            materialMappingMode: "uv",
+            priority: 1,
+            materialMappingScale: [6, 6],
+            materialData: {}
+        };
+
+
+        if (!this.floor.id) {
+            this.floor.id = Entities.addEntity(props);
+            this.floor.materials = {};
+            floorMaterialEntityProps.materialData = JSON.stringify(materials[
+                materialKeys[getRandom(0, materialKeys.length)]
+            ]);
+            this.floor.materials.props = floorMaterialEntityProps;
+            log("this.floor.material.props", this.floor.materials.props)
+            this.floor.materials.props.parentID = this.floor.id;
+            this.floor.materials.id = Entities.addEntity(this.floor.materials.props);
+        } else {
+            Entities.editEntity(this.floor.id, props);
+        }
+        return this;
+    }
+
+
+    function deleteRooms(){
+        this.rooms.forEach(function(room){
+            // log("room", room)
+            room.deleteRoom();
+        });
+        Entities.deleteEntity(this.floor.id);
+    }
+
+    Rooms.prototype = {
+        setNumberOfRooms: setNumberOfRooms,
+        addRoom: addRoom,
+        deleteRooms: deleteRooms
+    };
+
+
     // #endregion
     // *************************************
     // END ROOM
     // *************************************
 
+    var testRooms = new Rooms();
     function startUp(){
-        getGoogleShetWord();
+        // getGoogleShetWord();
+
+
+        testRooms
+            .addRoom(parentProps1, props1)
+            .addRoom(parentProps2, props2)
+            .addRoom(parentProps3, props3)
+            .addRoom(parentProps4, props4)
+            .addRoom(parentProps1, props1)
+            .addRoom(parentProps2, props2)
+            .addRoom(parentProps3, props3)
+            .addRoom(parentProps4, props4)
+            .addRoom(parentProps1, props1)
+            .addRoom(parentProps2, props2)
+            .addRoom(parentProps3, props3)
+            .addRoom(parentProps4, props4)
+            .addRoom(parentProps1, props1)
+            .addRoom(parentProps2, props2)
+            .addRoom(parentProps3, props3)
+            .addRoom(parentProps4, props4)
+            .addRoom(parentProps1, props1)
+            .addRoom(parentProps2, props2)
+            .addRoom(parentProps3, props3)
+            // .addRoom(parentProps, props)
+            // .addRoom(parentProps, props)
+            // .addRoom(parentProps, props);
     }
 
     startUp();
 
+    function onScriptEnding(){
+        testRooms.deleteRooms();
+        lights.forEach(function(light){
+            Entities.deleteEntity(light);
+        });
+    }
+    Script.scriptEnding.connect(onScriptEnding);
+
 })();
+
+
+// var testRoom = new Room();
+// testRoom
+// .registerPosition(TEST_POSITION)
+// .registerSides(props)
+// .createParent()
+// .createWalls();
+// roomsToDelete.push(testRoom);
