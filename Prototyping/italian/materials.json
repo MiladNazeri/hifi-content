@@ -1,0 +1,445 @@
+{
+    "glass": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 0.5775400996208191,
+            "roughness": 0.08235287666320801,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.48069190979003906,
+                "green": 0.5661895275115967,
+                "blue": 0.6400046944618225
+            }
+        }
+    },
+    "tile-blue": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0.07999315857887268,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Blue_tiles_01_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Blue_tiles_01_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Blue_tiles_01_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Blue_tiles_01_1K_AO.png"
+        }
+    },
+    "stone-puddle": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Seaside_rocks_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Seaside_rocks_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Seaside_rocks_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Seaside_rocks_02_1K_AO.png"
+        }
+    },
+    "wood-planks-med-rough": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_01_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_01_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_01_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_01_1K_AO.png"
+        }
+    },
+    "steel-corrugated": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Corrugated_metal_panel_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Corrugated_metal_panel_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Corrugated_metal_panel_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Corrugated_metal_panel_02_1K_AO.png"
+        }
+    },
+    "steel-painted-weathered": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Painted_metal_01_1K_Base_Color.png",
+            "metallicMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Painted_metal_01_1K_Metallic.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Painted_metal_01_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Painted_metal_01_1K_Normal.png"
+        }
+    },
+    "wood-parquet-dark": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Parquet_flooring_05_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Parquet_flooring_05_1K_Roughness.png"
+        }
+    },
+    "stone-mossy": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_rock_01_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_rock_01_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_rock_01_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_rock_01_1K_AO.png"
+        }
+    },
+    "gold-tiles-round": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Round_metal_tiles_01_1K_Base_Color.png",
+            "metallicMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Round_metal_tiles_01_1K_Metallic.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Round_metal_tiles_01_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Round_metal_tiles_01_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Round_metal_tiles_01_1K_AO.png"
+        }
+    },
+    "wood-bark-mossy": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_bark_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_bark_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_bark_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Mossy_bark_02_1K_AO.png"
+        }
+    },
+    "stone-gravel": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Gravel_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Gravel_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Gravel_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Gravel_02_1K_AO.png"
+        }
+    },
+    "stone-wall-rough": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Stone_wall_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Stone_wall_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Stone_wall_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Cobblestone_03_1K_AO.png"
+        }
+    },
+    "wood-planks-rough": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_03_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_03_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_03_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Wooden_planks_03_1K_AO.png"
+        }
+    },
+    "bronze-weathered": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0.8970265984535217,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Antique-brass_768_D.jpg",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Antique-brass_512_H.jpg",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Antique-brass_512_N.jpg"
+        }
+    },
+    "stone-solid-old": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Rock_03_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Rock_03_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Rock_03_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Rock_03_1K_AO.png"
+        }
+    },
+    "brick-mixed-course": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Brick_wall_02_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Brick_wall_02_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Brick_wall_02_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Brick_wall_02_1K_AO.png"
+        }
+    },
+    "steel-diamondplate": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.08235287666320801,
+            "metallic": 1,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Metal_weave_03_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Metal_weave_03_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Metal_weave_03_1K_AO.png"
+        }
+    },
+    "stone-cobblestone": {
+        "materialVersion": 1,
+        "materials": {
+            "model": "hifi_pbr",
+            "opacity": 1,
+            "roughness": 0.9039215445518494,
+            "metallic": 0,
+            "scattering": 0,
+            "unlit": false,
+            "emissive": {
+                "red": 0,
+                "green": 0,
+                "blue": 0
+            },
+            "albedo": {
+                "red": 0.8000028729438782,
+                "green": 0.8000028729438782,
+                "blue": 0.8000028729438782
+            },
+            "albedoMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Cobblestone_03_1K_Base_Color.png",
+            "glossMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Cobblestone_03_1K_Roughness.png",
+            "normalMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Cobblestone_03_1K_Normal.png",
+            "occlusionMap": "https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/Prototyping/italian/png/Cobblestone_03_1K_AO.png"
+        }
+    }
+}
