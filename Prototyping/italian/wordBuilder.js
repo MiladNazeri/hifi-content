@@ -83,6 +83,8 @@
     var colors = Script.require('./brandColors.js');
     var colorKeys = Object.keys(colors);
 
+    var textHelper = new (Script.require('./textHelper.js'));
+
     var materialKeys = Object.keys(materials);
 
     function getRandom(min, max){
@@ -187,6 +189,11 @@
                     log("transformedWords", transformedWords);
                 }
             }
+
+            for (var key in transformedWords){
+                testRooms
+                    .addRoom(parentProps1, props1)
+            }
         });
 
     }
@@ -224,7 +231,9 @@
         switch (type) {
             case FLOOR:
                 var floorProps = uniqueProps;
+                var FLOOR_OFFSET = [0, 0.1, 0];
                 floorProps.localPosition = [0, -floorProps.localDimensions[Y], 0];
+                floorProps.localPosition = Vec3.sum(floorProps.localPosition, FLOOR_OFFSET);
                 floorProps.localDimensions[Y] = floorProps.localDimensions[X];
                 floorProps.localRotation = Quat.fromPitchYawRollDegrees(90, 0, 0);
                 floorProps.name = FLOOR;
@@ -319,9 +328,10 @@
             materialMappingScale: [5, 5],
             materialData: {}
         };
-        wallMaterialEntityProps.materialData = JSON.stringify(materials[
-            materialKeys[getRandom(0, materialKeys.length)]
-        ]);
+        wallMaterialEntityProps.materialData = JSON.stringify(materials["glass"]);
+        // wallMaterialEntityProps.materialData = JSON.stringify(materials[
+        //     materialKeys[getRandom(0, materialKeys.length)]
+        // ]);
 
 
         this.roomArray.forEach(function(room){
@@ -569,34 +579,151 @@
     // END ROOM
     // *************************************
 
+    // *************************************
+    // START CARD_MAKER
+    // *************************************
+    // #region CARD_MAKER
+
+
+    function CardMaker(text, type, lineHeight){
+        // this.text = text;
+        // this.type = type;
+        // this.lineHeight = lineHeight;
+        // textHelper
+        //     .setText("text")
+        //     .setLineHeight(lineHeight)
+
+        // this.dimensions = [
+        //     textHelper.getTotalTextLength(),
+        //     lineHeight,
+        //     0.1
+        // ];
+
+        this.backgroundColor = [0, 0, 0];
+        this.textColor = [255, 255, 255];
+        this.id = null;
+        this.position = null;
+        this.rotation = null;
+    }
+
+    function setText(text){
+        this.text = text;
+
+        return this;
+    }
+    
+    function setType(type){
+        this.type = type;
+
+        return this;
+    }
+
+    function setLineHeight(lineHeight){
+        this.lineHeight = lineHeight;
+
+        textHelper
+            .setText(this.text)
+            .setLineHeight(this.lineHeight);
+
+        this.dimensions = [
+            textHelper.getTotalTextLength(),
+            this.lineHeight,
+            0.1
+        ];
+
+        log("this.dimensions", this.dimensions);
+
+        return this;
+    }
+    
+    function setPosition(position){
+        this.position = position
+
+        return this;
+    }
+
+    function setRotation(rotation){
+        this.rotation = rotation;
+        
+        return this;
+    }
+    
+    function makeCard(){
+        var props = {
+            type: "Text",
+            name: "TEXT CARD",
+            lineHeight: this.lineHeight,
+            text: this.text,
+            backgroundColor: this.backgroundColor,
+            textColor: this.textColor,
+            position: this.position,
+            rotation: this.rotation,
+            dimensions: this.dimensions
+        };
+
+        this.id = Entities.addEntity(props);
+
+        return this;
+    }
+
+    function deleteCard(){
+        Entities.deleteEntity(this.id);
+
+        return this;
+    }
+
+    CardMaker.prototype = {
+        setText: setText,
+        setType: setType,
+        setLineHeight: setLineHeight,
+        setPosition: setPosition,
+        setRotation: setRotation,
+        makeCard: makeCard,
+        deleteCard: deleteCard
+    }
+
+    // #endregion
+    // *************************************
+    // END CARD_MAKER
+    // *************************************
+
     var testRooms = new Rooms();
+    var testCard = new CardMaker();
     function startUp(){
-        // getGoogleShetWord();
+        getGoogleShetWord();
 
 
-        testRooms
-            .addRoom(parentProps1, props1)
-            .addRoom(parentProps2, props2)
-            .addRoom(parentProps3, props3)
-            .addRoom(parentProps4, props4)
-            .addRoom(parentProps1, props1)
-            .addRoom(parentProps2, props2)
-            .addRoom(parentProps3, props3)
-            .addRoom(parentProps4, props4)
-            .addRoom(parentProps1, props1)
-            .addRoom(parentProps2, props2)
-            .addRoom(parentProps3, props3)
-            .addRoom(parentProps4, props4)
-            .addRoom(parentProps1, props1)
-            .addRoom(parentProps2, props2)
-            .addRoom(parentProps3, props3)
-            .addRoom(parentProps4, props4)
-            .addRoom(parentProps1, props1)
+        // testRooms
+        //     .addRoom(parentProps1, props1)
+        //     .addRoom(parentProps2, props2)
+        //     .addRoom(parentProps3, props3)
+        //     .addRoom(parentProps4, props4)
+        //     .addRoom(parentProps1, props1)
+        //     .addRoom(parentProps2, props2)
+        //     .addRoom(parentProps3, props3)
+        //     .addRoom(parentProps4, props4)
+        //     .addRoom(parentProps1, props1)
+        //     .addRoom(parentProps2, props2)
+        //     .addRoom(parentProps3, props3)
+        //     .addRoom(parentProps4, props4)
+        //     .addRoom(parentProps1, props1)
+        //     .addRoom(parentProps2, props2)
+        //     .addRoom(parentProps3, props3)
+        //     .addRoom(parentProps4, props4)
+        //     .addRoom(parentProps1, props1)
             // .addRoom(parentProps2, props2)
             // .addRoom(parentProps3, props3)
             // .addRoom(parentProps, props)
             // .addRoom(parentProps, props)
             // .addRoom(parentProps, props);
+        
+        testCard
+            .setText("testing card maker")
+            .setType("CATEGORY")
+            .setLineHeight(0.5)
+            .setPosition([0,5,0])
+            .setRotation([0,0,0])
+            .makeCard();
     }
 
     startUp();
@@ -606,6 +733,8 @@
         lights.forEach(function(light){
             Entities.deleteEntity(light);
         });
+
+        testCard.deleteCard();
     }
     Script.scriptEnding.connect(onScriptEnding);
 
