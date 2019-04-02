@@ -11,7 +11,8 @@
 //
 
 (function(){
-    
+    var request = Script.require("https://raw.githubusercontent.com/highfidelity/hifi-content/44a10a3fb07f3271307ef0a2c28429d51f696326/Marketplace/groupTeleport/app/modules/request.js").request;
+    var BASE_URL = "https://script.google.com/macros/s/AKfycbxR68Ao1XtaUTbiMTu7VA0Q6oJuk_v5KLLjvH6b4hAjH73FQy3K/exec";
     var textID = "";
     var textHelper = new (Script.require('./textHelper.js'));
     var lineHeight = 0.1;
@@ -60,7 +61,18 @@
         var newDimensions = [textXDimension * textSizeBuffer, lineHeight, 0];
 
         var props = { dimensions: newDimensions, text: finalStatus };
-
+        var query = "?" +
+        "date=" + dateString +
+        "&newStatus=" + newStatus;
+        request(BASE_URL + query, function(sucess, error){
+            if (error){
+                console.log(JSON.stringify(error))
+            }
+        })
+        var req = new XMLHttpRequest();
+        req.open("GET", (BASE_URL + query));
+        req.send();
+        
         Entities.editEntity(textID, props);
     }
 
