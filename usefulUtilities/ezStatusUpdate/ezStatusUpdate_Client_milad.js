@@ -28,15 +28,19 @@
     function preload(id){
         buttonID = id;
         var buttonPosition = Entities.getEntityProperties(buttonID, "position").position;
-        textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];
         var userData = Entities.getEntityProperties(buttonID, "userData").userData;
+        textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];        
         try {
             userData = JSON.parse(userData);
             username = userData.username || "";
+            textName = userData.textName;
+            if (textName && textName.length > 0) {
+                textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];
+            }
+
         } catch (e) {
             console.log("could not get username for status update", e);
         }
-        
     }
 
 
