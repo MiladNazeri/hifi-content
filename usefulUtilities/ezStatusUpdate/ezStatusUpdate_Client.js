@@ -48,6 +48,9 @@
         }
         
         newStatus = Window.prompt("New status:", newStatus);
+        if (!newSatus){
+            return;
+        }
         Entities.callEntityServerMethod(textID, "handleNewStatus", [newStatus]);
     }
 
