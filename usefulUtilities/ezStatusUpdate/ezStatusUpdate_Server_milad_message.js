@@ -54,14 +54,8 @@
 
         var finalStatus = dateString + " :: " + newStatus;
 
-        textHelper
-            .setText(finalStatus)
-            .setLineHeight(lineHeight);
-        
-        var textXDimension = textHelper.getTotalTextLength();
-        var newDimensions = [textXDimension * textSizeBuffer, lineHeight, 0];
 
-        var props = { dimensions: newDimensions, text: finalStatus, from: from };
+        var props = {text: finalStatus};
         var query = "?" +
         "date=" + dateString +
         "&newStatus=" + newStatus +

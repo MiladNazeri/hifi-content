@@ -48,10 +48,10 @@
         }
         
         newStatus = Window.prompt("New status:", newStatus);
-        if (!newSatus){
+        if (!newStatus){
             return;
         }
-        Entities.callEntityServerMethod(textID, "handleNewStatus", [newStatus]);
+        Entities.callEntityServerMethod(textID, "handleNewStatus", [newStatus, AccountServices.username]);
     }
 
 
