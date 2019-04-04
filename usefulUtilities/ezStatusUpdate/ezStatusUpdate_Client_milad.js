@@ -16,9 +16,9 @@
     var textID = "";
     var newStatus = "";
     var textName = "STATUS_UPDATE_TEXT";
-    var SEARCH_RADIUS = 2;
+    var SEARCH_RADIUS = 10;
     var username = "";
-
+    var promptText = "";
     function StatusUpdater(){
 
     }
@@ -29,13 +29,17 @@
         buttonID = id;
         var buttonPosition = Entities.getEntityProperties(buttonID, "position").position;
         var userData = Entities.getEntityProperties(buttonID, "userData").userData;
-        textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];        
+        textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];     
+        console.log("userData", userData)   
         try {
             userData = JSON.parse(userData);
             username = userData.username || "";
             textName = userData.textName;
+            promptText = userData.promptText;
+            prefixText = userData.prefixText;
             if (textName && textName.length > 0) {
                 textID = Entities.findEntitiesByName(textName, buttonPosition, SEARCH_RADIUS)[0];
+                console.log("textID", JSON.stringify(textID));
             }
 
         } catch (e) {
@@ -51,11 +55,11 @@
             return;
         }
         
-        newStatus = Window.prompt("New status:", newStatus);
+        newStatus = Window.prompt(promptText, newStatus);
         if (!newStatus){
             return;
         }
-        Entities.callEntityServerMethod(textID, "handleNewStatus", [newStatus, AccountServices.username]);
+        Entities.callEntityServerMethod(textID, "handleNewStatus", [prefixText + newStatus, AccountServices.username]);
     }
 
 

@@ -22,6 +22,8 @@
     var MINUTES_MS = SECOND_MS * 60;
     var HOUR_MS = MINUTES_MS * 60;
     var CALI_TIME = HOUR_MS * 7;
+    var props = {};
+    var type = null;
 
     function StatusUpdater(){
 
@@ -31,11 +33,19 @@
 
     function preload(id){
         textID = id;
+        var userData = Entities.getEntityProperties(textID, "userData").userData;
+        try {
+            userData = JSON.parse(userData);
+            type = userData.type;
+        } catch (e) {
+            console.log("could not get username for status update", e);
+        }
     }
 
 
     // Handle clicking on entity
     function handleNewStatus(id, params){
+        console.log("params", JSON.stringify(params))
         var newDate = Date.now();
         var newStatus = params[0];
         var from = params[1];
@@ -61,16 +71,25 @@
         var textXDimension = textHelper.getTotalTextLength();
         var newDimensions = [textXDimension * textSizeBuffer, lineHeight, 0];
 
-        var props = { dimensions: newDimensions, text: finalStatus, from: from };
+        if (type === "Message" || type === "Note") {
+            props.text = finalStatus;
+        } else {
+            props.dimensions = newDimensions; 
+            props.text = finalStatus;
+        }
+        Entities.editEntity(textID, props);
+        if (type === "Status") {
+            return;
+        }
         var query = "?" +
         "date=" + dateString +
         "&newStatus=" + newStatus +
-        "&from=" + from;
+        "&from=" + from +
+        "&type=" + type;
         var req = new XMLHttpRequest();
         req.open("GET", (BASE_URL + query));
         req.send();
         
-        Entities.editEntity(textID, props);
     }
 
 
