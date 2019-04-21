@@ -1,0 +1,1357 @@
+Script started on Sat 20 Apr 2019 07:41:46 PM DST
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# c[Kll
+total 508
+drwxrwxrwx 1 root root   4096 Apr 20 19:41 [0m[34;42m.[0m/
+drwxrwxrwx 1 root root   4096 Apr  6 09:32 [34;42m..[0m/
+-rwxrwxrwx 1 root root   1319 Nov 12 12:14 [01;32mcontributing.md[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mdeveloperTools[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mDomainContent[0m/
+-rwxrwxrwx 1 root root   3226 Apr  4 10:37 [01;32m.eslintrc.js[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mevents[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 13:14 [34;42m.git[0m/
+-rwxrwxrwx 1 root root    581 Apr  4 10:37 [01;32m.gitignore[0m*
+-rwxrwxrwx 1 root root 491776 Mar  4 11:33 [01;32mhifiVsCode.json[0m*
+-rwxrwxrwx 1 root root  11558 Nov 12 12:14 [01;32mLICENSE[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mMarketplace[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mmarketplaceItems[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 17:10 [34;42mmodules[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mplaceSpecificContent[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 08:29 [34;42mPrototyping[0m/
+-rwxrwxrwx 1 root root   2671 Mar  4 11:33 [01;32mreadme.md[0m*
+drwxrwxrwx 1 root root   4096 Nov 12 12:14 [34;42mShared[0m/
+-rwxrwxrwx 1 root root    271 Mar  4 11:33 [01;32mtsconfig.json[0m*
+-rwxrwxrwx 1 root root      0 Apr 20 19:41 [01;32mtypescript[0m*
+drwxrwxrwx 1 root root   4096 Mar  4 11:33 [34;42mtypings[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 18:31 [34;42musefulUtilities[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mUtilities[0m/
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# contwnt
+contwnt: command not found
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# contet
+No command 'contet' found, did you mean:
+ Command 'context' from package 'context' (universe)
+contet: command not found
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# content
+total 508
+drwxrwxrwx 1 root root   4096 Apr 20 19:41 [0m[34;42m.[0m/
+drwxrwxrwx 1 root root   4096 Apr  6 09:32 [34;42m..[0m/
+-rwxrwxrwx 1 root root   1319 Nov 12 12:14 [01;32mcontributing.md[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mdeveloperTools[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mDomainContent[0m/
+-rwxrwxrwx 1 root root   3226 Apr  4 10:37 [01;32m.eslintrc.js[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mevents[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 13:14 [34;42m.git[0m/
+-rwxrwxrwx 1 root root    581 Apr  4 10:37 [01;32m.gitignore[0m*
+-rwxrwxrwx 1 root root 491776 Mar  4 11:33 [01;32mhifiVsCode.json[0m*
+-rwxrwxrwx 1 root root  11558 Nov 12 12:14 [01;32mLICENSE[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mMarketplace[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mmarketplaceItems[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 17:10 [34;42mmodules[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mplaceSpecificContent[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 08:29 [34;42mPrototyping[0m/
+-rwxrwxrwx 1 root root   2671 Mar  4 11:33 [01;32mreadme.md[0m*
+drwxrwxrwx 1 root root   4096 Nov 12 12:14 [34;42mShared[0m/
+-rwxrwxrwx 1 root root    271 Mar  4 11:33 [01;32mtsconfig.json[0m*
+-rwxrwxrwx 1 root root      0 Apr 20 19:41 [01;32mtypescript[0m*
+drwxrwxrwx 1 root root   4096 Mar  4 11:33 [34;42mtypings[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 18:31 [34;42musefulUtilities[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mUtilities[0m/
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# cd ..
+total 0
+drwxrwxrwx 1 root root 4096 Apr  6 09:32 [0m[34;42m.[0m/
+drwxrwxrwx 1 root root 4096 Feb 15 09:54 [34;42m..[0m/
+drwxrwxrwx 1 root root 4096 Mar 18 08:51 [34;42mhifi[0m/
+drwxrwxrwx 1 root root 4096 Jan 15 10:22 [34;42mhifi-animation[0m/
+-rwxrwxrwx 1 root root  133 Feb  1 09:18 [01;32mhifi.code-workspace[0m*
+drwxrwxrwx 1 root root 4096 Apr 20 19:41 [34;42mhifi-content[0m/
+drwxrwxrwx 1 root root 4096 Feb  6 09:58 [34;42mhifi-scripts[0m/
+drwxrwxrwx 1 root root 4096 Mar 30 10:26 [34;42minspirobot-bot[0m/
+drwxrwxrwx 1 root root 4096 Jan 15 16:08 [34;42msnippets[0m/
+drwxrwxrwx 1 root root 4096 Apr  6 09:32 [34;42mtwemoji[0m/
+drwxrwxrwx 1 root root 4096 Feb  6 12:06 [34;42mvcpkg[0m/
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos[00m# cd[K[Khome
+total 44
+drwx------ 1 root root  512 Apr 20 19:41 [0m[01;34m.[0m/
+drwxr-xr-x 1 root root  512 Dec 31  1969 [01;34m..[0m/
+-rw-rw-rw- 1 root root 8256 Apr 20 19:39 1
+-rw-r--r-- 1 root root 8256 Apr 20 19:39 .bashrc
+-rw-r--r-- 1 root root  148 Aug 17  2015 .profile
+-rw------- 1 root root 6399 Apr 20 19:41 .viminfo
+-rw-rw-rw- 1 root root   76 Apr 20 19:21 .vimrc
+]0;root@0495-DESKTOP-PC: ~[01;32mroot@0495-DESKTOP-PC[00m:[01;34m~[00m# curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -curl -sL https://deb.nodesource.com/setup_10. x | sudo -E bash -[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kcurl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+## Installing the NodeSource Node.js 10.x repo...
+
+
+## Populating apt-get cache...
+
++ apt-get update
+0% [Working]0% [Waiting for headers] [Waiting for headers]                                              Hit:1 http://archive.ubuntu.com/ubuntu xenial InRelease
+                                              0% [Waiting for headers]0% [1 InRelease gpgv 247 kB] [Waiting for headers] [Waiting for headers]                                                                        Get:2 http://security.ubuntu.com/ubuntu xenial-security InRelease [109 kB]
+0% [1 InRelease gpgv 247 kB] [Waiting for headers] [2 InRelease 12.0 kB/109 kB 11%]                                                                                   Get:3 http://archive.ubuntu.com/ubuntu xenial-updates InRelease [109 kB]
+0% [1 InRelease gpgv 247 kB] [3 InRelease 3,803 B/109 kB 3%] [2 InRelease 12.0 kB/109 kB 11%]                                                                                             0% [1 InRelease gpgv 247 kB] [3 InRelease 79.8 kB/109 kB 73%]                                                             0% [1 InRelease gpgv 247 kB]                            0% [Waiting for headers]0% [2 InRelease gpgv 109 kB] [Waiting for headers]                                                  Get:4 http://archive.ubuntu.com/ubuntu xenial-backports InRelease [107 kB]
+0% [2 InRelease gpgv 109 kB] [4 InRelease 3,803 B/107 kB 4%]                                                            0% [2 InRelease gpgv 109 kB]                            0% [Working]0% [3 InRelease gpgv 109 kB]0% [3 InRelease gpgv 109 kB]                            0% [Working]0% [4 InRelease gpgv 107 kB]0% [4 InRelease gpgv 107 kB]                            100% [Working]              Fetched 325 kB in 2s (114 kB/s)
+Reading package lists... 0%Reading package lists... 0%Reading package lists... 1%Reading package lists... 6%Reading package lists... 6%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 47%Reading package lists... 47%Reading package lists... 68%Reading package lists... 68%Reading package lists... 69%Reading package lists... 69%Reading package lists... 69%Reading package lists... 69%Reading package lists... 75%Reading package lists... 75%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 81%Reading package lists... 84%Reading package lists... 84%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 91%Reading package lists... 91%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 98%Reading package lists... 98%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+
+## Confirming "xenial" is supported...
+
++ curl -sLf -o /dev/null 'https://deb.nodesource.com/node_10.x/dists/xenial/Release'
+
+## Adding the NodeSource signing key to your keyring...
+
++ curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+OK
+
+## Creating apt sources list file for the NodeSource Node.js 10.x repo...
+
++ echo 'deb https://deb.nodesource.com/node_10.x xenial main' > /etc/apt/sources.list.d/nodesource.list
++ echo 'deb-src https://deb.nodesource.com/node_10.x xenial main' >> /etc/apt/sources.list.d/nodesource.list
+
+## Running `apt-get update` for you...
+
++ apt-get update
+0% [Working]            Get:1 https://deb.nodesource.com/node_10.x xenial InRelease [4,584 B]
+0% [Waiting for headers] [Waiting for headers] [1 InRelease 0 B/4,584 B 0%]                                                                           0% [Waiting for headers] [Waiting for headers]0% [1 InRelease gpgv 4,584 B] [Waiting for headers] [Waiting for headers]                                                                         0% [Waiting for headers] [Waiting for headers]                                              Get:2 https://deb.nodesource.com/node_10.x xenial/main amd64 Packages [767 B]
+0% [Waiting for headers] [Waiting for headers] [2 Packages 0 B/767 B 0%]                                                                        Get:3 http://security.ubuntu.com/ubuntu xenial-security InRelease [109 kB]
+0% [Waiting for headers] [3 InRelease 12.0 kB/109 kB 11%] [2 Packages 0 B/767 B 0%]                                                                                   Hit:4 http://archive.ubuntu.com/ubuntu xenial InRelease
+                                                                                   0% [3 InRelease 12.0 kB/109 kB 11%] [2 Packages 0 B/767 B 0%]0% [4 InRelease gpgv 247 kB] [Waiting for headers] [3 InRelease 12.0 kB/109 kB 11%] [2 Packages 0 B/767 B 0%]                                                                                                             0% [4 InRelease gpgv 247 kB] [Waiting for headers] [3 InRelease 36.6 kB/109 kB 33%]                                                                                   Get:5 http://archive.ubuntu.com/ubuntu xenial-updates InRelease [109 kB]
+0% [4 InRelease gpgv 247 kB] [5 InRelease 7,899 B/109 kB 7%] [3 InRelease 36.6 kB/109 kB 33%]0% [2 Packages store 0 B] [4 InRelease gpgv 247 kB] [5 InRelease 7,899 B/109 kB 7%] [3 InRelease 36.6 kB/109 kB 33%]                                                                                                                    0% [4 InRelease gpgv 247 kB] [5 InRelease 12.0 kB/109 kB 11%] [3 InRelease 36.6 kB/109 kB 33%]                                                                                              0% [4 InRelease gpgv 247 kB] [5 InRelease 51.1 kB/109 kB 47%]                                                             0% [5 InRelease 83.9 kB/109 kB 77%]0% [3 InRelease gpgv 109 kB] [5 InRelease 83.9 kB/109 kB 77%]                                                             0% [3 InRelease gpgv 109 kB]                            Get:6 http://archive.ubuntu.com/ubuntu xenial-backports InRelease [107 kB]
+0% [3 InRelease gpgv 109 kB] [6 InRelease 3,803 B/107 kB 4%]                                                            0% [3 InRelease gpgv 109 kB]                            0% [Working]0% [5 InRelease gpgv 109 kB]0% [5 InRelease gpgv 109 kB]                            0% [Working]0% [6 InRelease gpgv 107 kB]0% [6 InRelease gpgv 107 kB]                            100% [Working]              Fetched 331 kB in 3s (106 kB/s)
+Reading package lists... 0%Reading package lists... 0%Reading package lists... 1%Reading package lists... 6%Reading package lists... 6%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 9%Reading package lists... 47%Reading package lists... 47%Reading package lists... 68%Reading package lists... 68%Reading package lists... 69%Reading package lists... 69%Reading package lists... 69%Reading package lists... 69%Reading package lists... 71%Reading package lists... 75%Reading package lists... 75%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 80%Reading package lists... 84%Reading package lists... 84%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 87%Reading package lists... 91%Reading package lists... 91%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 98%Reading package lists... 98%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+
+## Run `[1msudo apt-get install -y nodejs(B[m` to install Node.js 10.x and npm
+## You may also need development tools to build native addons:
+     sudo apt-get install gcc g++ make
+## To install the Yarn package manager, run:
+     curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+     sudo apt-get update && sudo apt-get install yarn
+
+
+]0;root@0495-DESKTOP-PC: ~[01;32mroot@0495-DESKTOP-PC[00m:[01;34m~[00m# sudo apt-get install -y nodejs
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree       
+Reading state information... 0%Reading state information... 98%Reading state information... Done
+The following additional packages will be installed:
+  libpython-stdlib libpython2.7-minimal libpython2.7-stdlib python python-minimal python2.7 python2.7-minimal
+Suggested packages:
+  python-doc python-tk python2.7-doc binutils binfmt-support
+The following NEW packages will be installed:
+  libpython-stdlib libpython2.7-minimal libpython2.7-stdlib nodejs python python-minimal python2.7 python2.7-minimal
+0 upgraded, 8 newly installed, 0 to remove and 3 not upgraded.
+Need to get 18.9 MB of archives.
+After this operation, 88.5 MB of additional disk space will be used.
+0% [Working]            Get:1 https://deb.nodesource.com/node_10.x xenial/main amd64 nodejs amd64 10.15.3-1nodesource1 [15.0 MB]
+0% [Connecting to archive.ubuntu.com (91.189.88.162)] [1 nodejs 0 B/15.0 MB 0%]                                                                               66% [Connecting to archive.ubuntu.com (91.189.88.162)]66% [Connecting to archive.ubuntu.com (91.189.88.162)]66% [Connecting to archive.ubuntu.com (91.189.88.162)]66% [Connecting to archive.ubuntu.com (91.189.88.162)]66% [Connecting to archive.ubuntu.com (91.189.88.162)]66% [Connecting to archive.ubuntu.com (91.189.88.162)]                                                      66% [Waiting for headers]                         Get:2 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libpython2.7-minimal amd64 2.7.12-1ubuntu0~16.04.4 [339 kB]
+66% [2 libpython2.7-minimal 3,813 B/339 kB 1%]67% [2 libpython2.7-minimal 160 kB/339 kB 47%]                                              70% [Working]             Get:3 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 python2.7-minimal amd64 2.7.12-1ubuntu0~16.04.4 [1,261 kB]
+70% [3 python2.7-minimal 3,811 B/1,261 kB 0%]74% [3 python2.7-minimal 1,041 kB/1,261 kB 83%]                                               78% [Working]             Get:4 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 python-minimal amd64 2.7.12-1~16.04 [28.1 kB]
+78% [4 python-minimal 3,815 B/28.1 kB 14%]                                          80% [Working]             Get:5 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libpython2.7-stdlib amd64 2.7.12-1ubuntu0~16.04.4 [1,880 kB]
+80% [5 libpython2.7-stdlib 3,811 B/1,880 kB 0%]85% [5 libpython2.7-stdlib 955 kB/1,880 kB 51%]                                                                       2,807 kB/s 0s91% [Working]                                                                                                         2,807 kB/s 0s                                                                                                                                   Get:6 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 python2.7 amd64 2.7.12-1ubuntu0~16.04.4 [224 kB]
+91% [6 python2.7 3,813 B/224 kB 2%]                                                                                   2,807 kB/s 0s94% [Working]                                                                                                         2,807 kB/s 0s                                                                                                                                   Get:7 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 libpython-stdlib amd64 2.7.12-1~16.04 [7,768 B]
+94% [7 libpython-stdlib 1,297 B/7,768 B 17%]                                                                          2,807 kB/s 0s97% [Working]                                                                                                         2,807 kB/s 0s                                                                                                                                   Get:8 http://archive.ubuntu.com/ubuntu xenial-updates/main amd64 python amd64 2.7.12-1~16.04 [137 kB]
+97% [8 python 3,813 B/137 kB 3%]                                                                                      2,807 kB/s 0s100% [Working]                                                                                                        2,807 kB/s 0s                                                                                                                                   Fetched 18.9 MB in 7s (2,550 kB/s)
+Selecting previously unselected package libpython2.7-minimal:amd64.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25627 files and directories currently installed.)
+Preparing to unpack .../libpython2.7-minimal_2.7.12-1ubuntu0~16.04.4_amd64.deb ...
+Unpacking libpython2.7-minimal:amd64 (2.7.12-1ubuntu0~16.04.4) ...
+Selecting previously unselected package python2.7-minimal.
+Preparing to unpack .../python2.7-minimal_2.7.12-1ubuntu0~16.04.4_amd64.deb ...
+Unpacking python2.7-minimal (2.7.12-1ubuntu0~16.04.4) ...
+Selecting previously unselected package python-minimal.
+Preparing to unpack .../python-minimal_2.7.12-1~16.04_amd64.deb ...
+Unpacking python-minimal (2.7.12-1~16.04) ...
+Selecting previously unselected package libpython2.7-stdlib:amd64.
+Preparing to unpack .../libpython2.7-stdlib_2.7.12-1ubuntu0~16.04.4_amd64.deb ...
+Unpacking libpython2.7-stdlib:amd64 (2.7.12-1ubuntu0~16.04.4) ...
+Selecting previously unselected package python2.7.
+Preparing to unpack .../python2.7_2.7.12-1ubuntu0~16.04.4_amd64.deb ...
+Unpacking python2.7 (2.7.12-1ubuntu0~16.04.4) ...
+Selecting previously unselected package libpython-stdlib:amd64.
+Preparing to unpack .../libpython-stdlib_2.7.12-1~16.04_amd64.deb ...
+Unpacking libpython-stdlib:amd64 (2.7.12-1~16.04) ...
+Processing triggers for man-db (2.7.5-1) ...
+Processing triggers for mime-support (3.59ubuntu1) ...
+Setting up libpython2.7-minimal:amd64 (2.7.12-1ubuntu0~16.04.4) ...
+Setting up python2.7-minimal (2.7.12-1ubuntu0~16.04.4) ...
+Linking and byte-compiling packages for runtime python2.7...
+Setting up python-minimal (2.7.12-1~16.04) ...
+Selecting previously unselected package python.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 26373 files and directories currently installed.)
+Preparing to unpack .../python_2.7.12-1~16.04_amd64.deb ...
+Unpacking python (2.7.12-1~16.04) ...
+Selecting previously unselected package nodejs.
+Preparing to unpack .../nodejs_10.15.3-1nodesource1_amd64.deb ...
+Unpacking nodejs (10.15.3-1nodesource1) ...
+Processing triggers for man-db (2.7.5-1) ...
+Setting up libpython2.7-stdlib:amd64 (2.7.12-1ubuntu0~16.04.4) ...
+Setting up python2.7 (2.7.12-1ubuntu0~16.04.4) ...
+Setting up libpython-stdlib:amd64 (2.7.12-1~16.04) ...
+Setting up python (2.7.12-1~16.04) ...
+Setting up nodejs (10.15.3-1nodesource1) ...
+]0;root@0495-DESKTOP-PC: ~[01;32mroot@0495-DESKTOP-PC[00m:[01;34m~[00m# node
+[1G[0J> [3G
+(To exit, press ^C again or type .exit)
+[1G[0J> [3G.ex8[1G[0J> .ex[6Git
+]0;root@0495-DESKTOP-PC: ~[01;32mroot@0495-DESKTOP-PC[00m:[01;34m~[00m# hc
+total 0
+drwxrwxrwx 1 root root 4096 Apr  6 09:32 [0m[34;42m.[0m/
+drwxrwxrwx 1 root root 4096 Feb 15 09:54 [34;42m..[0m/
+drwxrwxrwx 1 root root 4096 Mar 18 08:51 [34;42mhifi[0m/
+drwxrwxrwx 1 root root 4096 Jan 15 10:22 [34;42mhifi-animation[0m/
+-rwxrwxrwx 1 root root  133 Feb  1 09:18 [01;32mhifi.code-workspace[0m*
+drwxrwxrwx 1 root root 4096 Apr 20 19:41 [34;42mhifi-content[0m/
+drwxrwxrwx 1 root root 4096 Feb  6 09:58 [34;42mhifi-scripts[0m/
+drwxrwxrwx 1 root root 4096 Mar 30 10:26 [34;42minspirobot-bot[0m/
+drwxrwxrwx 1 root root 4096 Jan 15 16:08 [34;42msnippets[0m/
+drwxrwxrwx 1 root root 4096 Apr  6 09:32 [34;42mtwemoji[0m/
+drwxrwxrwx 1 root root 4096 Feb  6 12:06 [34;42mvcpkg[0m/
+content
+l ^C
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos[00m# content
+total 540
+drwxrwxrwx 1 root root   4096 Apr 20 19:41 [0m[34;42m.[0m/
+drwxrwxrwx 1 root root   4096 Apr  6 09:32 [34;42m..[0m/
+-rwxrwxrwx 1 root root   1319 Nov 12 12:14 [01;32mcontributing.md[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mdeveloperTools[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mDomainContent[0m/
+-rwxrwxrwx 1 root root   3226 Apr  4 10:37 [01;32m.eslintrc.js[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mevents[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 13:14 [34;42m.git[0m/
+-rwxrwxrwx 1 root root    581 Apr  4 10:37 [01;32m.gitignore[0m*
+-rwxrwxrwx 1 root root 491776 Mar  4 11:33 [01;32mhifiVsCode.json[0m*
+-rwxrwxrwx 1 root root  11558 Nov 12 12:14 [01;32mLICENSE[0m*
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mMarketplace[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mmarketplaceItems[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 17:10 [34;42mmodules[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mplaceSpecificContent[0m/
+drwxrwxrwx 1 root root   4096 Apr 10 08:29 [34;42mPrototyping[0m/
+-rwxrwxrwx 1 root root   2671 Mar  4 11:33 [01;32mreadme.md[0m*
+drwxrwxrwx 1 root root   4096 Nov 12 12:14 [34;42mShared[0m/
+-rwxrwxrwx 1 root root    271 Mar  4 11:33 [01;32mtsconfig.json[0m*
+-rwxrwxrwx 1 root root  24576 Apr 20 19:48 [01;32mtypescript[0m*
+drwxrwxrwx 1 root root   4096 Mar  4 11:33 [34;42mtypings[0m/
+drwxrwxrwx 1 root root   4096 Apr 11 18:31 [34;42musefulUtilities[0m/
+drwxrwxrwx 1 root root   4096 Apr  4 10:37 [34;42mUtilities[0m/
+]0;root@0495-DESKTOP-PC: /mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[01;32mroot@0495-DESKTOP-PC[00m:[01;34m/mnt/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content[00m# gi[K[Kgs
+On branch statusUpdateMiladVersion
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	[31mmodified:   .eslintrc.js[m
+	[31mmodified:   .gitignore[m
+	[31mmodified:   DomainContent/AvatarStore/AttachmentRemovalZone/attachmentRemoval.js[m
+	[31mmodified:   DomainContent/AvatarStore/AttachmentRemovalZone/detachmentZone.json[m
+	[31mmodified:   DomainContent/AvatarStore/AttachmentRemovalZone/spawnAttachmentRemovalZone.js[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/checkoutMini.json[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/checkoutRecycle.js[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/checkoutScanner.js[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/checkoutZone.js[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/newCheckoutModel.json[m
+	[31mmodified:   DomainContent/AvatarStore/CheckoutZone/outlineTesting.json[m
+	[31mmodified:   DomainContent/AvatarStore/Laundry/laundry.js[m
+	[31mmodified:   DomainContent/AvatarStore/Laundry/laundryBox.json[m
+	[31mmodified:   DomainContent/AvatarStore/Laundry/laundryZone.js[m
+	[31mmodified:   DomainContent/AvatarStore/Mirror/mirrorClient.js[m
+	[31mmodified:   DomainContent/AvatarStore/Mirror/mirrorReflection.js[m
+	[31mmodified:   DomainContent/AvatarStore/ShopZone/shopZone.js[m
+	[31mmodified:   DomainContent/AvatarStore/attachmentItemScript.js[m
+	[31mmodified:   DomainContent/AvatarStore/attachmentZone.js[m
+	[31mmodified:   DomainContent/AvatarStore/attachmentZoneServer.js[m
+	[31mmodified:   DomainContent/AvatarStore/attachmentZoneShared.js[m
+	[31mmodified:   DomainContent/AvatarStore/desktopAttacher.js[m
+	[31mmodified:   DomainContent/AvatarStore/marketplaceShared.js[m
+	[31mmodified:   DomainContent/AvatarStore/request.js[m
+	[31mmodified:   DomainContent/AvatarStore/wearableServer.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/billboard.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/clickToRideAndLook.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/nav_button_cells.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/nav_button_hexokinase.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/nav_button_inside_the_cell.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/nav_button_ribosome.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/navigationButton.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/showButtonToPlaySound.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/showIdentification.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/utils.js[m
+	[31mmodified:   DomainContent/CellScience/Scripts/zoom.js[m
+	[31mmodified:   DomainContent/CellScience/backgroundMusicAC.js[m
+	[31mmodified:   DomainContent/CellScience/importNow.js[m
+	[31mmodified:   DomainContent/CellScience/motorProteinControllerAC.js[m
+	[31mmodified:   DomainContent/CellScience/moveCellsAC.js[m
+	[31mmodified:   DomainContent/CellScience/moveVesiclesAC.js[m
+	[31mmodified:   DomainContent/FaceToFace/Bell/JSON/bell.json[m
+	[31mmodified:   DomainContent/FaceToFace/Bell/triggerBell.js[m
+	[31mmodified:   DomainContent/FaceToFace/BouncerZone/BouncerZone.js[m
+	[31mmodified:   DomainContent/FaceToFace/Cats/meow.js[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/enterStageZone.js[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/muteTest.js[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/screenSetup.html[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/stageManager.html[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/stageManager.js[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/stageManagerTargetServer.js[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/svg/megaphone-a.svg[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/svg/megaphone-i.svg[m
+	[31mmodified:   DomainContent/FaceToFace/StageManager/webOverlaySpawner.js[m
+	[31mmodified:   DomainContent/FiresideChat/buttons/stageManagementButton.js[m
+	[31mmodified:   DomainContent/FiresideChat/buttons/stageManagementTargetServer.js[m
+	[31mmodified:   DomainContent/Halloween/ANJExplosion/aNjExplosion.js[m
+	[31mmodified:   DomainContent/Halloween/ANJExplosion/aNjExplosionServer.js[m
+	[31mmodified:   DomainContent/Halloween/FollowingEyes/catEyes.js[m
+	[31mmodified:   DomainContent/Halloween/FollowingEyes/forestEyes.js[m
+	[31mmodified:   DomainContent/Halloween/GifZone/GifZone.js[m
+	[31mmodified:   DomainContent/Halloween/Jump-Scares/scaryman.js[m
+	[31mmodified:   DomainContent/Halloween/Jump-Scares/scaryman_elevator.js[m
+	[31mmodified:   DomainContent/Halloween/Jump-Scares/zone_trigger.js[m
+	[31mmodified:   DomainContent/Halloween/SoundEmitterForLoops/emitter_3_with_loop.js[m
+	[31mmodified:   DomainContent/Halloween/SoundEmitterWithRandomInterval/speakerExample.json[m
+	[31mmodified:   DomainContent/Halloween/SoundEmitterWithRandomInterval/speakerServer.js[m
+	[31mmodified:   DomainContent/Halloween/Spider/HelpMeZone.js[m
+	[31mmodified:   DomainContent/Halloween/Spider/HelpMeZoneServer.js[m
+	[31mmodified:   DomainContent/Halloween/Spider/ScaryZone.js[m
+	[31mmodified:   DomainContent/Halloween/Spider/ScaryZoneServer.js[m
+	[31mmodified:   DomainContent/Halloween/Spider/resources/help-me-scary.wav[m
+	[31mmodified:   DomainContent/Halloween/Spider/resources/help-me.wav[m
+	[31mmodified:   DomainContent/Halloween/WhisperInEar/whisperInEar.js[m
+	[31mmodified:   DomainContent/Halloween/ZoneStatueJumpScare/zoneStatueJumpScare.js[m
+	[31mmodified:   DomainContent/Halloween/emptyServerScript.js[m
+	[31mmodified:   DomainContent/Halloween/flashlightSpawner.js[m
+	[31mmodified:   DomainContent/Halloween/readme.md[m
+	[31mmodified:   DomainContent/Home/blocky/arrangement6B.json[m
+	[31mmodified:   DomainContent/Home/blocky/blocky.js[m
+	[31mmodified:   DomainContent/Home/blocky/newblocks1.json[m
+	[31mmodified:   DomainContent/Home/blocky/newblocks2.json[m
+	[31mmodified:   DomainContent/Home/blocky/newblocks3.json[m
+	[31mmodified:   DomainContent/Home/blocky/newblocks4.json[m
+	[31mmodified:   DomainContent/Home/blocky/newblocks5.json[m
+	[31mmodified:   DomainContent/Home/blocky/singleSpawner.js[m
+	[31mmodified:   DomainContent/Home/blocky/wrapper.js[m
+	[31mmodified:   DomainContent/Home/cuckooClock/cuckooClockMinuteHandEntityScript.js[m
+	[31mmodified:   DomainContent/Home/cuckooClock/wrapper.js[m
+	[31mmodified:   DomainContent/Home/dressingRoom/transformer.js[m
+	[31mmodified:   DomainContent/Home/dressingRoom/wrapper.js[m
+	[31mmodified:   DomainContent/Home/firePit/fire.js[m
+	[31mmodified:   DomainContent/Home/firePit/flicker.js[m
+	[31mmodified:   DomainContent/Home/fishTank/entityLocalFish.js[m
+	[31mmodified:   DomainContent/Home/fishTank/singleSpawner.js[m
+	[31mmodified:   DomainContent/Home/fishTank/wrapper.js[m
+	[31mmodified:   DomainContent/Home/growingPlant/flower.fs[m
+	[31mmodified:   DomainContent/Home/growingPlant/growingPlantEntityScript.js[m
+	[31mmodified:   DomainContent/Home/growingPlant/waterCanEntityScript.js[m
+	[31mmodified:   DomainContent/Home/growingPlant/wrapper.js[m
+	[31mmodified:   DomainContent/Home/hoverGame/hoverBall.js[m
+	[31mmodified:   DomainContent/Home/hoverGame/hoverContainer.js[m
+	[31mmodified:   DomainContent/Home/hoverGame/wrapper.js[m
+	[31mmodified:   DomainContent/Home/kineticObjects/bench.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/books.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/deskChair.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/deskLamp.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/dressingRoomBricabrac.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/fruit.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/junk.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/lowerBookShelf.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/postersCell.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/postersPlaya.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/stuff_on_shelves.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/trashcan.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/umbrella.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/upperBookShelf.json[m
+	[31mmodified:   DomainContent/Home/kineticObjects/wrapper.js[m
+	[31mmodified:   DomainContent/Home/misc/avatarCatcher.js[m
+	[31mmodified:   DomainContent/Home/musicBox/baseBox.js[m
+	[31mmodified:   DomainContent/Home/musicBox/lid.js[m
+	[31mmodified:   DomainContent/Home/musicBox/singleSpawner.js[m
+	[31mmodified:   DomainContent/Home/musicBox/wrapper.js[m
+	[31mmodified:   DomainContent/Home/pingPongGun/pingPongGun.js[m
+	[31mmodified:   DomainContent/Home/pingPongGun/target.js[m
+	[31mmodified:   DomainContent/Home/pingPongGun/wrapper.js[m
+	[31mmodified:   DomainContent/Home/portal.js[m
+	[31mmodified:   DomainContent/Home/reset.js[m
+	[31mmodified:   DomainContent/Home/switches/dressingRoomLights.js[m
+	[31mmodified:   DomainContent/Home/switches/livingRoomDeskLamp.js[m
+	[31mmodified:   DomainContent/Home/switches/livingRoomFan.js[m
+	[31mmodified:   DomainContent/Home/switches/livingRoomLights.js[m
+	[31mmodified:   DomainContent/Home/switches/portkey.js[m
+	[31mmodified:   DomainContent/Home/teleport/downsparkle.json[m
+	[31mmodified:   DomainContent/Home/teleport/downsparkler.json[m
+	[31mmodified:   DomainContent/Home/teleport/upsparkle.json[m
+	[31mmodified:   DomainContent/Home/teleport/upsparkler.json[m
+	[31mmodified:   DomainContent/Home/tiltMaze/maze.js[m
+	[31mmodified:   DomainContent/Home/tiltMaze/wrapper.js[m
+	[31mmodified:   DomainContent/Home/utils.js[m
+	[31mmodified:   DomainContent/Home/virtualBaton.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/eraserEntityScript.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/markerEntityScript.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/swiper.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/utils.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/whiteboard.js[m
+	[31mmodified:   DomainContent/Home/whiteboard/whiteboardWithSwiper.json[m
+	[31mmodified:   DomainContent/Hub/Animation Shower/resetButton.js[m
+	[31mmodified:   DomainContent/Hub/Animation Shower/shower-script.js[m
+	[31mmodified:   DomainContent/Hub/Faucets/faucetClient.js[m
+	[31mmodified:   DomainContent/Hub/Faucets/faucetServer.js[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materialGunSpawnerServer.js[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materialSwapGun.js[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materialSwapGunServer.js[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Blue.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Chrome.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Green.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Indigo.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Orange.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Red.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Violet.json[m
+	[31mmodified:   DomainContent/Hub/Material Gun/materials/Yellow.json[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/models/flamethrower.mtl[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/models/flamethrower.obj[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/rainbow-gun_fix.json[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/scripts/flamethrowerClient.js[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/scripts/flamethrowerServer.js[m
+	[31mmodified:   DomainContent/Hub/RainbowThrower/scripts/rainbowThrowerGunSpawner.js[m
+	[31mmodified:   DomainContent/Hub/Space Juice/glassPrimitiveCatch.js[m
+	[31mmodified:   DomainContent/Hub/Space Juice/glassPrimitiveCatchServer.js[m
+	[31mmodified:   DomainContent/Hub/Space Juice/spaceJuiceClient.js[m
+	[31mmodified:   DomainContent/Hub/Space Juice/spaceJuiceServer.js[m
+	[31mmodified:   DomainContent/Hub/Space Juice/spaceJuiceSpawner.js[m
+	[31mmodified:   DomainContent/Hub/domainStars/.gitignore[m
+	[31mmodified:   DomainContent/Hub/domainStars/modules/controllerUtils.js[m
+	[31mmodified:   DomainContent/Hub/domainStars/modules/request.js[m
+	[31mmodified:   DomainContent/Hub/domainStars/package.json[m
+	[31mmodified:   DomainContent/Hub/domainStars/starDomains.js[m
+	[31mmodified:   DomainContent/Hub/food/scripts/createFoodClient.js[m
+	[31mmodified:   DomainContent/Hub/food/scripts/createFoodServer.js[m
+	[31mmodified:   DomainContent/Hub/food/scripts/crunch_client.js[m
+	[31mmodified:   DomainContent/Hub/food/scripts/crunch_server.js[m
+	[31mmodified:   DomainContent/Hub/pill/models/Pill.mtl[m
+	[31mmodified:   DomainContent/Hub/pill/models/Pill.obj[m
+	[31mmodified:   DomainContent/Hub/pill/scripts/spawnPills.js[m
+	[31mmodified:   DomainContent/Hub/pill/scripts/swallowFXPill.js[m
+	[31mmodified:   DomainContent/Hub/plates/ShatterPlateClient.js[m
+	[31mmodified:   DomainContent/Hub/plates/ShatterPlatePiece.js[m
+	[31mmodified:   DomainContent/Hub/plates/ShatterPlatePieceServer.js[m
+	[31mmodified:   DomainContent/Hub/plates/ShatterPlateServer.js[m
+	[31mmodified:   DomainContent/Hub/plates/ShatterPlateSpawner.js[m
+	[31mmodified:   DomainContent/Hub/plates/plate-whole-hub.obj[m
+	[31mmodified:   DomainContent/Hub/utilities/elevator.js[m
+	[31mmodified:   DomainContent/Korea/Brush/Marker_Client.js[m
+	[31mmodified:   DomainContent/Korea/Brush/Marker_Server.js[m
+	[31mmodified:   DomainContent/Korea/Brush/Marker_Spawner.js[m
+	[31mmodified:   DomainContent/Korea/Brush/ZoneDeleteEntitiesOnExit.js[m
+	[31mmodified:   DomainContent/Korea/InstrumentSwitch/instrumentSwitch.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/InstrumentClone.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/InstrumentSpawner.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/DaegeumClone.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/DaegeumSpawner.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/Sounds/chung_sung_gok_1.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/Sounds/chung_sung_gok_2.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/Sounds/chung_sung_gok_3.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/daegeum/Sounds/chung_sung_gok_4.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/gayageum/GayageumClone.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/gayageum/GayageumSpawner.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/gayageum/Sounds/gayageum1.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/gayageum/Sounds/gayageum2.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/gayageum/Sounds/gayageum3.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/janggu/JangguClone.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/janggu/JangguSpawner.js[m
+	[31mmodified:   DomainContent/Korea/Instruments/janggu/Sounds/janggu_08_16Bit.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/janggu/Sounds/janggu_10_16Bit.wav[m
+	[31mmodified:   DomainContent/Korea/Instruments/janggu/Sounds/janggu_11_16Bit.wav[m
+	[31mmodified:   DomainContent/LoadTest/AvatarCounter/avatarCounter.js[m
+	[31mmodified:   DomainContent/LoadTest/AvatarCounter/modules/request.js[m
+	[31mmodified:   DomainContent/LoadTest/DayNightCycle.js[m
+	[31mmodified:   DomainContent/LoadTest/RaffleWheel/raffleWheel.js[m
+	[31mmodified:   DomainContent/Mexico/assets/baseball_bat/bat.mtl[m
+	[31mmodified:   DomainContent/Mexico/assets/baseball_bat/bat.obj[m
+	[31mmodified:   DomainContent/Mexico/assets/candy/candy corn.mtl[m
+	[31mmodified:   DomainContent/Mexico/assets/candy/candy corn.obj[m
+	[31mmodified:   DomainContent/Mexico/assets/churro-stand/materials.mtl[m
+	[31mmodified:   DomainContent/Mexico/assets/churro-stand/model.obj[m
+	[31mmodified:   DomainContent/Mexico/assets/churro/materials.mtl[m
+	[31mmodified:   DomainContent/Mexico/assets/churro/model.obj[m
+	[31mmodified:   DomainContent/Mexico/assets/marigold/materials.mtl[m
+	[31mmodified:   DomainContent/Mexico/assets/marigold/model.obj[m
+	[31mmodified:   DomainContent/Mexico/assets/pinata/tballPole_phys.obj[m
+	[31mmodified:   DomainContent/Mexico/candle.js[m
+	[31mmodified:   DomainContent/Mexico/confettiHelper.js[m
+	[31mmodified:   DomainContent/Mexico/createChurro.js[m
+	[31mmodified:   DomainContent/Mexico/createSpirit.js[m
+	[31mmodified:   DomainContent/Mexico/crunch.js[m
+	[31mmodified:   DomainContent/Mexico/guitarMexico.js[m
+	[31mmodified:   DomainContent/Mexico/lightCandlesOnApproach.js[m
+	[31mmodified:   DomainContent/Mexico/onPinataHit.js[m
+	[31mmodified:   DomainContent/Mexico/pinataSpawner.js[m
+	[31mmodified:   DomainContent/Mexico/tequilaClient.js[m
+	[31mmodified:   DomainContent/Mexico/tequilaServer.js[m
+	[31mmodified:   DomainContent/Mexico/tequilaShotPrimitiveCatch.js[m
+	[31mmodified:   DomainContent/Mexico/tequilaSpawnerServer.js[m
+	[31mmodified:   DomainContent/NewYearBallDrop/ballDrop.js[m
+	[31mmodified:   DomainContent/NewYearBallDrop/empty.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ-Tools_Personal.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ-Tools_Spawner.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Dispatch_Zone_Client.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Dispatch_Zone_Server.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Empty_ServerScript.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_EndPoint_Light_Server.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_EndPoint_Particle_Server.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_EndPoint_Sound_Server.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_EndPoint_Template_Server.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Generator_Debug_Cube_Client.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Sensor_Box_Client.js[m
+	[31mmodified:   DomainContent/Rust/DJ-Tools/DJ_Sensor_Template_Client.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/Model-Image.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/ZoneScript.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/danceScript_no-Right-Click.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/mirrorClient.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/noFly.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/spawnPills.js[m
+	[31mmodified:   DomainContent/Rust/Scripts/swallowFXPill.js[m
+	[31mmodified:   DomainContent/Start/html/ChatPage.html[m
+	[31mmodified:   DomainContent/Start/loadSupportApp.js[m
+	[31mmodified:   DomainContent/Start/resources/support-a.svg[m
+	[31mmodified:   DomainContent/Start/resources/support-i.svg[m
+	[31mmodified:   DomainContent/Start/support.js[m
+	[31mmodified:   DomainContent/Toybox/AC_scripts/flickeringLight.js[m
+	[31mmodified:   DomainContent/Toybox/AC_scripts/toybox_sounds.js[m
+	[31mmodified:   DomainContent/Toybox/basketball/createHoop.js[m
+	[31mmodified:   DomainContent/Toybox/basketball/createRack.js[m
+	[31mmodified:   DomainContent/Toybox/basketball/createSingleBasketball.js[m
+	[31mmodified:   DomainContent/Toybox/basketballsResetter.js[m
+	[31mmodified:   DomainContent/Toybox/blockers/createTestBlocks.js[m
+	[31mmodified:   DomainContent/Toybox/bow/bow.js[m
+	[31mmodified:   DomainContent/Toybox/bow/createBow.js[m
+	[31mmodified:   DomainContent/Toybox/bubblewand/createWand.js[m
+	[31mmodified:   DomainContent/Toybox/bubblewand/wand.js[m
+	[31mmodified:   DomainContent/Toybox/cat/cat.js[m
+	[31mmodified:   DomainContent/Toybox/doll/createDoll.js[m
+	[31mmodified:   DomainContent/Toybox/doll/doll.js[m
+	[31mmodified:   DomainContent/Toybox/flappyAvatars/flappyAvatars.js[m
+	[31mmodified:   DomainContent/Toybox/flappyAvatars/flappyAvatars.json[m
+	[31mmodified:   DomainContent/Toybox/flashlight/createFlashlight.js[m
+	[31mmodified:   DomainContent/Toybox/flashlight/flashlight.js[m
+	[31mmodified:   DomainContent/Toybox/flowArts/raveStickEntityScript.js[m
+	[31mmodified:   DomainContent/Toybox/hiddenEntityReset.js[m
+	[31mmodified:   DomainContent/Toybox/immediateClientReset.js[m
+	[31mmodified:   DomainContent/Toybox/libraries/utils.js[m
+	[31mmodified:   DomainContent/Toybox/lights/lightSwitch.js[m
+	[31mmodified:   DomainContent/Toybox/masterReset.js[m
+	[31mmodified:   DomainContent/Toybox/musicPlayer/createNewMusicPlayerOnClick.js[m
+	[31mmodified:   DomainContent/Toybox/musicPlayer/imageShader.fs[m
+	[31mmodified:   DomainContent/Toybox/musicPlayer/musicPlayer.js[m
+	[31mmodified:   DomainContent/Toybox/ping_pong_gun/createPingPongGun.js[m
+	[31mmodified:   DomainContent/Toybox/ping_pong_gun/createTargets.js[m
+	[31mmodified:   DomainContent/Toybox/ping_pong_gun/pingPongGun.js[m
+	[31mmodified:   DomainContent/Toybox/ping_pong_gun/wallTarget.js[m
+	[31mmodified:   DomainContent/Toybox/pistol/createPistol.js[m
+	[31mmodified:   DomainContent/Toybox/pistol/pistol.js[m
+	[31mmodified:   DomainContent/Toybox/spray_paint/sprayPaintCan.js[m
+	[31mmodified:   DomainContent/Toybox/targetsResetter.js[m
+	[31mmodified:   DomainContent/Welcome Wagon/Cupcake/eatable.js[m
+	[31mmodified:   DomainContent/Zombies/Attributions.txt[m
+	[31mmodified:   DomainContent/Zombies/SOSButton.js[m
+	[31mmodified:   DomainContent/Zombies/ZombieManager/Zombie-Positions.json[m
+	[31mmodified:   DomainContent/Zombies/ZombieManager/zombiePositions.js[m
+	[31mmodified:   DomainContent/Zombies/ZombieManager/zombieStageManager.html[m
+	[31mmodified:   DomainContent/Zombies/ZombieManager/zombieStageManager.js[m
+	[31mmodified:   DomainContent/Zombies/boatLeavingZone.js[m
+	[31mmodified:   DomainContent/Zombies/boatServer.js[m
+	[31mmodified:   DomainContent/Zombies/busTriggersUnblockPathByCafe.js[m
+	[31mmodified:   DomainContent/Zombies/cafeExplosionZone.js[m
+	[31mmodified:   DomainContent/Zombies/flicker.js[m
+	[31mmodified:   DomainContent/Zombies/gasMainButton.js[m
+	[31mmodified:   DomainContent/Zombies/gateButton.js[m
+	[31mmodified:   DomainContent/Zombies/gateServer.js[m
+	[31mmodified:   DomainContent/Zombies/generatorButton.js[m
+	[31mmodified:   DomainContent/Zombies/generatorExplosionZone.js[m
+	[31mmodified:   DomainContent/Zombies/models/Gate.mtl[m
+	[31mmodified:   DomainContent/Zombies/models/Gate.obj[m
+	[31mmodified:   DomainContent/Zombies/models/SM_StairCase_02.mtl[m
+	[31mmodified:   DomainContent/Zombies/models/SM_StairCase_02.obj[m
+	[31mmodified:   DomainContent/Zombies/models/button.mtl[m
+	[31mmodified:   DomainContent/Zombies/models/button.obj[m
+	[31mmodified:   DomainContent/Zombies/models/edge01.mtl[m
+	[31mmodified:   DomainContent/Zombies/models/edge01.obj[m
+	[31mmodified:   DomainContent/Zombies/resetZombieDomain.js[m
+	[31mmodified:   DomainContent/readme.md[m
+	[31mmodified:   LICENSE[m
+	[31mmodified:   Marketplace/DANCE/Animations/dance.js[m
+	[31mmodified:   Marketplace/DANCE/DANCE.js[m
+	[31mmodified:   Marketplace/DANCE/Dance-URLS.js[m
+	[31mmodified:   Marketplace/DANCE/README.MD[m
+	[31mmodified:   Marketplace/DANCE/Tablet/Assets/DANCE-a.svg[m
+	[31mmodified:   Marketplace/DANCE/Tablet/Assets/DANCE-i.svg[m
+	[31mmodified:   Marketplace/DANCE/Tablet/Assets/glyphs/fonts/hifi-glyphs.svg[m
+	[31mmodified:   Marketplace/DANCE/Tablet/Assets/glyphs/icons-reference.html[m
+	[31mmodified:   Marketplace/DANCE/Tablet/Assets/glyphs/styles.css[m
+	[31mmodified:   Marketplace/DANCE/Tablet/DANCE_Tablet.html[m
+	[31mmodified:   Marketplace/DANCE/Tablet/css/app.css[m
+	[31mmodified:   Marketplace/DANCE/Tablet/js/DANCE_Tablet.js[m
+	[31mmodified:   Marketplace/DANCE/dance.app.json[m
+	[31mmodified:   Marketplace/DANCE/icons/tablet-icons/DANCE-a.svg[m
+	[31mmodified:   Marketplace/DANCE/icons/tablet-icons/DANCE-i.svg[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/Star_01.mtl[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/Star_01.obj[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/candyCane/275_Candy Cane.mtl[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/candyCane/275_Candy Cane.obj[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/gifts.mtl[m
+	[31mmodified:   Marketplace/HolidayGun/assets/models/gifts.obj[m
+	[31mmodified:   Marketplace/HolidayGun/edibleItem.js[m
+	[31mmodified:   Marketplace/HolidayGun/gun.js[m
+	[31mmodified:   Marketplace/HolidayGun/holiday.css[m
+	[31mmodified:   Marketplace/HolidayGun/holiday.html[m
+	[31mmodified:   Marketplace/HolidayGun/holidayApp.js[m
+	[31mmodified:   Marketplace/HolidayGun/holidayGun.md[m
+	[31mmodified:   Marketplace/HolidayGun/item.js[m
+	[31mmodified:   Marketplace/HolidayGun/itemGrow.js[m
+	[31mmodified:   Marketplace/HolidayGun/starSpawnLights.js[m
+	[31mmodified:   Marketplace/Laser Pointer/laser.js[m
+	[31mmodified:   Marketplace/Laser Pointer/models/laser.json[m
+	[31mmodified:   Marketplace/Piano/PianoKeys/Attributions.txt[m
+	[31mmodified:   Marketplace/Piano/pianoKey.js[m
+	[31mmodified:   Marketplace/Piano/pianoKeyboard.js[m
+	[31mmodified:   Marketplace/Script_Combiner/Wand/Script-wand-pink.json[m
+	[31mmodified:   Marketplace/Script_Combiner/setupScriptShopping.json[m
+	[31mmodified:   Marketplace/aquarium/FlockOfFish.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/applauseOmeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/bakedTextMeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/meter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/rezApplauseOmeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/rezMeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/rezPlasticMeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/rezTextEntityMeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/rezWoodMeter.js[m
+	[31mmodified:   Marketplace/audienceApplauseMeter/textEntityMeter.js[m
+	[31mmodified:   Marketplace/boppo/boppoClownEntity.js[m
+	[31mmodified:   Marketplace/boppo/boppoServer.js[m
+	[31mmodified:   Marketplace/boppo/clownGloveDispenser.js[m
+	[31mmodified:   Marketplace/boppo/createElBoppo.js[m
+	[31mmodified:   Marketplace/boppo/lookAtEntity.js[m
+	[31mmodified:   Marketplace/bow/bow.js[m
+	[31mmodified:   Marketplace/bow/bow.svo.json[m
+	[31mmodified:   Marketplace/bow/bow_collision_hull.obj[m
+	[31mmodified:   Marketplace/bow/newarrow_collision_hull.obj[m
+	[31mmodified:   Marketplace/bow/spawnBow.js[m
+	[31mmodified:   Marketplace/bow/utils.js[m
+	[31mmodified:   Marketplace/camera-move/Eye-Camera.svg[m
+	[31mmodified:   Marketplace/camera-move/_debug.js[m
+	[31mmodified:   Marketplace/camera-move/_json-persist.js[m
+	[31mmodified:   Marketplace/camera-move/_less-utils.js[m
+	[31mmodified:   Marketplace/camera-move/_tooltips.js[m
+	[31mmodified:   Marketplace/camera-move/app-camera-move.js[m
+	[31mmodified:   Marketplace/camera-move/app.html[m
+	[31mmodified:   Marketplace/camera-move/app.js[m
+	[31mmodified:   Marketplace/camera-move/avatar-updater.js[m
+	[31mmodified:   Marketplace/camera-move/hifi-jquery-ui.js[m
+	[31mmodified:   Marketplace/camera-move/modules/EnumMeta.js[m
+	[31mmodified:   Marketplace/camera-move/modules/_utils.js[m
+	[31mmodified:   Marketplace/camera-move/modules/config-utils.js[m
+	[31mmodified:   Marketplace/camera-move/modules/custom-settings-app/CustomSettingsApp.js[m
+	[31mmodified:   Marketplace/camera-move/modules/custom-settings-app/browser/BridgedSettings.js[m
+	[31mmodified:   Marketplace/camera-move/modules/custom-settings-app/browser/JQuerySettings.js[m
+	[31mmodified:   Marketplace/camera-move/modules/movement-utils.js[m
+	[31mmodified:   Marketplace/camera-move/modules/movement-utils.mapping.json[m
+	[31mmodified:   Marketplace/confettiGun/confettiGun.js[m
+	[31mmodified:   Marketplace/confettiGun/confettiGun.json[m
+	[31mmodified:   Marketplace/dart/createDart.js[m
+	[31mmodified:   Marketplace/dart/dart.js[m
+	[31mmodified:   Marketplace/dodgeball/dodgeball.js[m
+	[31mmodified:   Marketplace/dodgeball/makeDodgeball.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/app-doppleganger-attachments.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/dist/app-doppleganger-marketplace.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/doppleganger-a.svg[m
+	[31mmodified:   Marketplace/doppleganger-attachments/doppleganger-attachments.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/doppleganger-debug.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/doppleganger-i.svg[m
+	[31mmodified:   Marketplace/doppleganger-attachments/doppleganger.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/makefile[m
+	[31mmodified:   Marketplace/doppleganger-attachments/model-helper.js[m
+	[31mmodified:   Marketplace/doppleganger-attachments/package.json[m
+	[31mmodified:   Marketplace/doppleganger-attachments/readme.md[m
+	[31mmodified:   Marketplace/doppleganger-attachments/utils.js[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Cowbell.mtl[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Cowbell.obj[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Cymbal.mtl[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Cymbal.obj[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Drum.mtl[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Drum.obj[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Drum_Stick.mtl[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/Drum_Stick.obj[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/stand.mtl[m
+	[31mmodified:   Marketplace/drumKit/Assets/Models/stand.obj[m
+	[31mmodified:   Marketplace/drumKit/cowbell.js[m
+	[31mmodified:   Marketplace/drumKit/crash.js[m
+	[31mmodified:   Marketplace/drumKit/drumset.md[m
+	[31mmodified:   Marketplace/drumKit/floorTom.js[m
+	[31mmodified:   Marketplace/drumKit/hiHat.js[m
+	[31mmodified:   Marketplace/drumKit/hitom.js[m
+	[31mmodified:   Marketplace/drumKit/midTom.js[m
+	[31mmodified:   Marketplace/drumKit/ride.js[m
+	[31mmodified:   Marketplace/drumKit/snare.js[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/corn.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/fireworks.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/flower.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/heart.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/monster.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/pickle.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/pizza.json[m
+	[31mmodified:   Marketplace/emoji-tablet/JSON_files/poo.json[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/Edible.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/Fart.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/Flower.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/cornyLaugh.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/crunch.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/monster_growl.js[m
+	[31mmodified:   Marketplace/emoji-tablet/behaviors/monster_walk.js[m
+	[31mmodified:   Marketplace/emoji-tablet/emojiLib.js[m
+	[31mmodified:   Marketplace/emoji-tablet/emojiTablet.js[m
+	[31mmodified:   Marketplace/emoji-tablet/emojiTabletUI.html[m
+	[31mmodified:   Marketplace/emoji-tablet/icons/emoji-a.svg[m
+	[31mmodified:   Marketplace/emoji-tablet/icons/emoji-i.svg[m
+	[31mmodified:   Marketplace/flaregun/flaregun.js[m
+	[31mmodified:   Marketplace/flaregun/flaregun.json[m
+	[31mmodified:   Marketplace/gameTable/README.md[m
+	[31mmodified:   Marketplace/gameTable/assets/cards/deckOfCards.json[m
+	[31mmodified:   Marketplace/gameTable/assets/checkers/blackChecker.json[m
+	[31mmodified:   Marketplace/gameTable/assets/checkers/checkers_piece.fbx[m
+	[31mmodified:   Marketplace/gameTable/assets/checkers/redChecker.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/bishop_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/bishop_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/king_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/king_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/knight_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/knight_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/pawn_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/pawn_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/queen_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/queen_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/rook_black.json[m
+	[31mmodified:   Marketplace/gameTable/assets/chess/rook_white.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dice/dice.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino0.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino1.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino10.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino11.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino12.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino13.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino14.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino15.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino16.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino17.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino18.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino19.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino2.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino20.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino21.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino22.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino23.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino24.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino25.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino26.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino27.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino3.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino4.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino5.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino6.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino7.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino8.json[m
+	[31mmodified:   Marketplace/gameTable/assets/dominoes/domino9.json[m
+	[31mmodified:   Marketplace/gameTable/assets/table/table.json[m
+	[31mmodified:   Marketplace/gameTable/createGameTable.js[m
+	[31mmodified:   Marketplace/gameTable/entitySpawner.js[m
+	[31mmodified:   Marketplace/gameTable/games/checkers.json[m
+	[31mmodified:   Marketplace/gameTable/games/chess.json[m
+	[31mmodified:   Marketplace/gameTable/games/deckOfCards.json[m
+	[31mmodified:   Marketplace/gameTable/games/deckOfCards/deckOfCards.js[m
+	[31mmodified:   Marketplace/gameTable/games/deckOfCards/playingCard.js[m
+	[31mmodified:   Marketplace/gameTable/games/dice.json[m
+	[31mmodified:   Marketplace/gameTable/games/dominoes.json[m
+	[31mmodified:   Marketplace/gameTable/games/gamesDirectory.svo.json[m
+	[31mmodified:   Marketplace/gameTable/nextGameButton.js[m
+	[31mmodified:   Marketplace/gameTable/resetGameButton.js[m
+	[31mmodified:   Marketplace/gameTable/snapToGrid.js[m
+	[31mmodified:   Marketplace/gameTable/table.js[m
+	[31mmodified:   Marketplace/gestureRose/gestureRose.js[m
+	[31mmodified:   Marketplace/giphy-bubble/app/giphyMoodApp.html[m
+	[31mmodified:   Marketplace/giphy-bubble/app/giphyMoodApp.js[m
+	[31mmodified:   Marketplace/giphy-bubble/app/utils/request.js[m
+	[31mmodified:   Marketplace/giphy-bubble/readme.md[m
+	[31mmodified:   Marketplace/groupTeleport/api/index.js[m
+	[31mmodified:   Marketplace/groupTeleport/api/package.json[m
+	[31mmodified:   Marketplace/groupTeleport/api/public/client.js[m
+	[31mmodified:   Marketplace/groupTeleport/api/public/style.css[m
+	[31mmodified:   Marketplace/groupTeleport/api/serverless.yml[m
+	[31mmodified:   Marketplace/groupTeleport/api/views/index.html[m
+	[31mmodified:   Marketplace/groupTeleport/app/group-teleport-a.svg[m
+	[31mmodified:   Marketplace/groupTeleport/app/group-teleport-i.svg[m
+	[31mmodified:   Marketplace/groupTeleport/app/groupTeleportApp.html[m
+	[31mmodified:   Marketplace/groupTeleport/app/groupTeleportApp.js[m
+	[31mmodified:   Marketplace/groupTeleport/app/modules/request.js[m
+	[31mmodified:   Marketplace/guitar/attributions.txt[m
+	[31mmodified:   Marketplace/guitar/guitar.js[m
+	[31mmodified:   Marketplace/guitar/guitarNeck.js[m
+	[31mmodified:   Marketplace/guitar/guitarPlay.js[m
+	[31mmodified:   Marketplace/guitar/guitarZone.js[m
+	[31mmodified:   Marketplace/guitarGrab/guitarGrab.js[m
+	[31mmodified:   Marketplace/inspirational-sign/getInspirationalQuoteOfDay.js[m
+	[31mmodified:   Marketplace/inspirational-sign/readme.md[m
+	[31mmodified:   Marketplace/inspirational-sign/utils/request.js[m
+	[31mmodified:   Marketplace/laser/laser-a.svg[m
+	[31mmodified:   Marketplace/laser/laser.svg[m
+	[31mmodified:   Marketplace/laser/laserPointerApp.js[m
+	[31mmodified:   Marketplace/music-visualizer/adjuster_scripts/audioFileSync.js[m
+	[31mmodified:   Marketplace/music-visualizer/adjuster_scripts/effectTrailerLeft.js[m
+	[31mmodified:   Marketplace/music-visualizer/adjuster_scripts/effectTrailerRight.js[m
+	[31mmodified:   Marketplace/music-visualizer/adjuster_scripts/micSync.js[m
+	[31mmodified:   Marketplace/music-visualizer/eventBridgeLoader.js[m
+	[31mmodified:   Marketplace/music-visualizer/icons/particles-a-01.svg[m
+	[31mmodified:   Marketplace/music-visualizer/icons/particles-i-01.svg[m
+	[31mmodified:   Marketplace/music-visualizer/musVisHTMLHandler.js[m
+	[31mmodified:   Marketplace/music-visualizer/musVisLib.js[m
+	[31mmodified:   Marketplace/music-visualizer/musicVisualizer.js[m
+	[31mmodified:   Marketplace/music-visualizer/musicVisualizerTest.js[m
+	[31mmodified:   Marketplace/music-visualizer/musicVisualizerUI.html[m
+	[31mmodified:   Marketplace/music-visualizer/textures/invisible.fs[m
+	[31mmodified:   Marketplace/musicVisualizer/adjuster_scripts/audioFileSync.js[m
+	[31mmodified:   Marketplace/musicVisualizer/adjuster_scripts/effectTrailerLeft.js[m
+	[31mmodified:   Marketplace/musicVisualizer/adjuster_scripts/effectTrailerRight.js[m
+	[31mmodified:   Marketplace/musicVisualizer/adjuster_scripts/micSync.js[m
+	[31mmodified:   Marketplace/musicVisualizer/html/eventBridgeLoader.js[m
+	[31mmodified:   Marketplace/musicVisualizer/html/icons/particles-a-01.svg[m
+	[31mmodified:   Marketplace/musicVisualizer/html/icons/particles-i-01.svg[m
+	[31mmodified:   Marketplace/musicVisualizer/html/musVisHTMLHandler.js[m
+	[31mmodified:   Marketplace/musicVisualizer/html/music_visualizer.html[m
+	[31mmodified:   Marketplace/musicVisualizer/musVisLib.js[m
+	[31mmodified:   Marketplace/musicVisualizer/musicVisualizer.js[m
+	[31mmodified:   Marketplace/primitive-painting/Primitive_Painting_Set.json[m
+	[31mmodified:   Marketplace/primitive-painting/brushScript.js[m
+	[31mmodified:   Marketplace/primitive-painting/readme.md[m
+	[31mmodified:   Marketplace/record/html/css/edit-style.css[m
+	[31mmodified:   Marketplace/record/html/css/record.css[m
+	[31mmodified:   Marketplace/record/html/fonts/FiraSans.license[m
+	[31mmodified:   Marketplace/record/html/fonts/Raleway.license[m
+	[31mmodified:   Marketplace/record/html/js/record.js[m
+	[31mmodified:   Marketplace/record/html/record.html[m
+	[31mmodified:   Marketplace/record/playRecordingAC.js[m
+	[31mmodified:   Marketplace/record/record.js[m
+	[31mmodified:   Marketplace/shapes/assets/create/create-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/horizontal-rule.svg[m
+	[31mmodified:   Marketplace/shapes/assets/shapes-a.svg[m
+	[31mmodified:   Marketplace/shapes/assets/shapes-d.svg[m
+	[31mmodified:   Marketplace/shapes/assets/shapes-i.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/back-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/back-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/clone-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/clone-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/clone-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/color-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/color-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/color-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/color/pick-color-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/color/swatches-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/common/actions-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/common/down-arrow.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/common/finish-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/common/info-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/common/up-arrow.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/delete-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/delete-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/delete-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/delete/info-text.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group/clear-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group/group-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group/selection-box-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/group/ungroup-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/buttons/collisions-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/buttons/grabbable-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/buttons/gravity-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/buttons/off-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/buttons/on-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/balloon-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/cotton-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/custom-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/default-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/ice-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/lead-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/rubber-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/tumbleweed-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/wood-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/presets/zero-g-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/properties-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/sliders/bounce-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/sliders/density-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/sliders/friction-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/physics/sliders/gravity-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/redo-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/redo-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/stretch-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/stretch-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/stretch-tool-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/stretch/info-text.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/tool-label.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/tools-heading.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/undo-icon.svg[m
+	[31mmodified:   Marketplace/shapes/assets/tools/undo-label.svg[m
+	[31mmodified:   Marketplace/shapes/html/shapes.css[m
+	[31mmodified:   Marketplace/shapes/html/shapes.html[m
+	[31mmodified:   Marketplace/shapes/html/shapes.js[m
+	[31mmodified:   Marketplace/shapes/modules/createPalette.js[m
+	[31mmodified:   Marketplace/shapes/modules/feedback.js[m
+	[31mmodified:   Marketplace/shapes/modules/groups.js[m
+	[31mmodified:   Marketplace/shapes/modules/hand.js[m
+	[31mmodified:   Marketplace/shapes/modules/handles.js[m
+	[31mmodified:   Marketplace/shapes/modules/highlights.js[m
+	[31mmodified:   Marketplace/shapes/modules/history.js[m
+	[31mmodified:   Marketplace/shapes/modules/laser.js[m
+	[31mmodified:   Marketplace/shapes/modules/preload.js[m
+	[31mmodified:   Marketplace/shapes/modules/selection.js[m
+	[31mmodified:   Marketplace/shapes/modules/toolIcon.js[m
+	[31mmodified:   Marketplace/shapes/modules/toolsMenu.js[m
+	[31mmodified:   Marketplace/shapes/modules/uit.js[m
+	[31mmodified:   Marketplace/shapes/shapes.app.json[m
+	[31mmodified:   Marketplace/shapes/shapes.js[m
+	[31mmodified:   Marketplace/shapes/utilities/utilities.js[m
+	[31mmodified:   Marketplace/shortbow/README.md[m
+	[31mmodified:   Marketplace/shortbow/bow/bow.js[m
+	[31mmodified:   Marketplace/shortbow/bow/bow.json[m
+	[31mmodified:   Marketplace/shortbow/bow/bow.svo.json[m
+	[31mmodified:   Marketplace/shortbow/bow/models/bow_collision_hull.obj[m
+	[31mmodified:   Marketplace/shortbow/bow/spawnBow.js[m
+	[31mmodified:   Marketplace/shortbow/enemyClientEntity.js[m
+	[31mmodified:   Marketplace/shortbow/enemyServerEntity.js[m
+	[31mmodified:   Marketplace/shortbow/shortbow.js[m
+	[31mmodified:   Marketplace/shortbow/shortbow.json[m
+	[31mmodified:   Marketplace/shortbow/shortbowGameManager.js[m
+	[31mmodified:   Marketplace/shortbow/shortbowServerEntity.js[m
+	[31mmodified:   Marketplace/shortbow/spawnShortbow.js[m
+	[31mmodified:   Marketplace/shortbow/startGameButtonClientEntity.js[m
+	[31mmodified:   Marketplace/shortbow/utils.js[m
+	[31mmodified:   Marketplace/skyboxChanger/skyboxchanger.js[m
+	[31mmodified:   Marketplace/spectator-camera/spectatorCamera.js[m
+	[31mmodified:   Marketplace/stopwatch/spawnStopwatch.js[m
+	[31mmodified:   Marketplace/stopwatch/stopwatchReset.js[m
+	[31mmodified:   Marketplace/stopwatch/stopwatchServer.js[m
+	[31mmodified:   Marketplace/stopwatch/stopwatchStartStop.js[m
+	[31mmodified:   Marketplace/tablet-raiseHand/tablet-raiseHand.js[m
+	[31mmodified:   Marketplace/wear/geoLockedwearAppLoaderEntity.js[m
+	[31mmodified:   Marketplace/wear/html/css/tutorial-style.css[m
+	[31mmodified:   Marketplace/wear/html/fonts/AnonymousPro.license[m
+	[31mmodified:   Marketplace/wear/html/fonts/FiraSans.license[m
+	[31mmodified:   Marketplace/wear/html/fonts/Raleway.license[m
+	[31mmodified:   Marketplace/wear/html/img/WearAppIconBlack.svg[m
+	[31mmodified:   Marketplace/wear/html/img/WearAppIconWhite.svg[m
+	[31mmodified:   Marketplace/wear/html/js/jquery-3.2.1.min.js[m
+	[31mmodified:   Marketplace/wear/html/js/tutorial.js[m
+	[31mmodified:   Marketplace/wear/html/wearApp.html[m
+	[31mmodified:   Marketplace/wear/html/wearTutorialAdjust.html[m
+	[31mmodified:   Marketplace/wear/html/wearTutorialAdjustVR.html[m
+	[31mmodified:   Marketplace/wear/html/wearTutorialAttach.html[m
+	[31mmodified:   Marketplace/wear/html/wearTutorialBuy.html[m
+	[31mmodified:   Marketplace/wear/wearApp.js[m
+	[31mmodified:   Marketplace/wear/wearAppStandalone.js[m
+	[31mmodified:   Marketplace/webBrowser/webBrowser.js[m
+	[31mmodified:   Marketplace/xylophone/Mallet3-2bpc_phys.obj[m
+	[31mmodified:   Marketplace/xylophone/xylophoneFrameWithWave.fbx[m
+	[31mmodified:   Marketplace/xylophone/xylophoneKey.js[m
+	[31mmodified:   Marketplace/xylophone/xylophoneMallet.js[m
+	[31mmodified:   Marketplace/xylophone/xylophoneRezzer.js[m
+	[31mmodified:   Prototyping/.gitattributes[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/acServer.js[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/alien.js[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/gun.js[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/invasionUtils.js[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/powerDevice.js[m
+	[31mmodified:   Prototyping/Domains/ThemePark/Invasion/wrench.js[m
+	[31mmodified:   Prototyping/FacialExpressions/facialExpressions.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Availability_Server.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Button_Client.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Button_Server.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Empty_Server.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Spawner.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Text_Server.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Zone_Client.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Happy-Kiosk_Zone_Server.js[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/NPS-Machine-base.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/button-1.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/button-2.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/button-3.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/button-4.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/Models/footprint-standpoint.fbx[m
+	[31mmodified:   Prototyping/HappyKiosk/bell.wav[m
+	[31mmodified:   Prototyping/Kayla-Camera/.gitignore[m
+	[31mmodified:   Prototyping/Kayla-Camera/Kayla-Camera.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/Polyfills.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/Tablet/Kayla-Camera-Tablet.html[m
+	[31mmodified:   Prototyping/Kayla-Camera/Tablet/css/app.css[m
+	[31mmodified:   Prototyping/Kayla-Camera/Tablet/js/Kayla-Camera-Tablet.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/.gitignore[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/dbClass.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/dbMaker.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/kaylaCamRouter.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/kaylaCamServer.js[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/package-lock.json[m
+	[31mmodified:   Prototyping/Kayla-Camera/webApp/package.json[m
+	[31mmodified:   Prototyping/ThemePark/Carnival-Games/AlienAlertWearableScript.js[m
+	[31mmodified:   Prototyping/ThemePark/Carnival-Games/PhoneBooth/PhoneButton.js[m
+	[31mmodified:   Prototyping/ThemePark/Carnival-Games/PhoneBooth/PhoneTeleporter.js[m
+	[31mmodified:   Prototyping/ThemePark/Carnival-Games/PhoneBooth/TelephoneTeleporterClient.js[m
+	[31mmodified:   Prototyping/ThemePark/Carnival-Games/PopcornDefender.js[m
+	[31mmodified:   Shared/attachmentsShelve/attachmentItemScript.js[m
+	[31mmodified:   Utilities/Editor/VSCode_TS-Definitions_Snippets/hifi-vscode.js[m
+	[31mmodified:   Utilities/Editor/VSCode_TS-Definitions_Snippets/hifiJSDoc.json[m
+	[31mmodified:   Utilities/Editor/VSCode_TS-Definitions_Snippets/hifiTSStubGenerator.js[m
+	[31mmodified:   Utilities/Editor/VSCode_TS-Definitions_Snippets/out/hifiVsCode.json[m
+	[31mmodified:   Utilities/Editor/VSCode_TS-Definitions_Snippets/readme.md[m
+	[31mmodified:   Utilities/Entities/GrabbableLifetime.js[m
+	[31mmodified:   Utilities/HairFlow/VectorMath.js[m
+	[31mmodified:   Utilities/HairFlow/flow-a.svg[m
+	[31mmodified:   Utilities/HairFlow/flow-i.svg[m
+	[31mmodified:   Utilities/HairFlow/flow.js[m
+	[31mmodified:   Utilities/HairFlow/flowApp.html[m
+	[31mmodified:   Utilities/HairFlow/flowApp.js[m
+	[31mmodified:   Utilities/HairFlow/readme.md[m
+	[31mmodified:   Utilities/Helper.js[m
+	[31mmodified:   Utilities/Modules/tween.js[m
+	[31mmodified:   Utilities/Polyfills.js[m
+	[31mmodified:   Utilities/Sound.js[m
+	[31mmodified:   Utilities/Templates/Vue_App/Example.js[m
+	[31mmodified:   Utilities/Templates/Vue_App/html/Tablet.html[m
+	[31mmodified:   Utilities/Templates/Vue_App/html/css/app.css[m
+	[31mmodified:   Utilities/Templates/Vue_App/html/js/Tablet.js[m
+	[31mmodified:   Utilities/Trackers/pucks-sliding-fix.js[m
+	[31mmodified:   Utilities/Wearable Creator/create-wearable.js[m
+	[31mmodified:   Utilities/Wearable Creator/fonts/AnonymousPro.license[m
+	[31mmodified:   Utilities/Wearable Creator/fonts/FiraSans.license[m
+	[31mmodified:   Utilities/Wearable Creator/fonts/Raleway.license[m
+	[31mmodified:   Utilities/Wearable Creator/wear.css[m
+	[31mmodified:   Utilities/Wearable Creator/wearableCreator.html[m
+	[31mmodified:   Utilities/WearableJSONExporter/fonts/AnonymousPro.license[m
+	[31mmodified:   Utilities/WearableJSONExporter/fonts/FiraSans.license[m
+	[31mmodified:   Utilities/WearableJSONExporter/fonts/Raleway.license[m
+	[31mmodified:   Utilities/WearableJSONExporter/marketplace-packager.js[m
+	[31mmodified:   Utilities/WearableJSONExporter/wear.css[m
+	[31mmodified:   Utilities/WearableJSONExporter/wearableJSON.html[m
+	[31mmodified:   Utilities/Zones/AddAppZone.js[m
+	[31mmodified:   Utilities/readme.md[m
+	[31mmodified:   contributing.md[m
+	[31mmodified:   developerTools/brandColors/css/README.md[m
+	[31mmodified:   developerTools/brandColors/css/brandColors.css[m
+	[31mmodified:   developerTools/brandColors/js/brandColors.js[m
+	[31mmodified:   events/bingo/.gitignore[m
+	[31mmodified:   events/bingo/README.md[m
+	[31mmodified:   events/bingo/bingoBossApp/assets/icons/boss-a.svg[m
+	[31mmodified:   events/bingo/bingoBossApp/assets/icons/boss-i.svg[m
+	[31mmodified:   events/bingo/bingoBossApp/bingoBossApp_app.js[m
+	[31mmodified:   events/bingo/bingoBossApp/ui/bingoBossApp_ui.html[m
+	[31mmodified:   events/bingo/bingoBossApp/ui/css/bingoBossApp_ui.css[m
+	[31mmodified:   events/bingo/bingoCardApp/assets/icons/bingo-a.svg[m
+	[31mmodified:   events/bingo/bingoCardApp/assets/icons/bingo-i.svg[m
+	[31mmodified:   events/bingo/bingoCardApp/bingoCard_app.js[m
+	[31mmodified:   events/bingo/bingoCardApp/ui/bingoCard_ui.html[m
+	[31mmodified:   events/bingo/bingoCardApp/ui/css/bingoCard_ui.css[m
+	[31mmodified:   events/bingo/bingoWinnerApp/assets/icons/bingo-a.svg[m
+	[31mmodified:   events/bingo/bingoWinnerApp/assets/icons/bingo-i.svg[m
+	[31mmodified:   events/bingo/bingoWinnerApp/bingoWinner_app.js[m
+	[31mmodified:   events/bingo/bingoWinnerApp/ui/bingoWinner_ui.html[m
+	[31mmodified:   events/bingo/bingoWinnerApp/ui/css/bingoWinner_ui.css[m
+	[31mmodified:   events/bingo/entityScripts/bingoBouncerZone/bouncerZone.js[m
+	[31mmodified:   events/bingo/entityScripts/bingoPrizeDoorZone/bingoPrizeDoorZone.js[m
+	[31mmodified:   events/bingo/entityScripts/bingoWheel/bingoWheel.js[m
+	[31mmodified:   events/bingo/entityScripts/cardRemover/bingoCardRemover.js[m
+	[31mmodified:   events/bingo/entityScripts/cardSpawner/bingoCardSpawner.js[m
+	[31mmodified:   events/bingo/entityScripts/scannerEntryZone/bingoScannerEntryZone.js[m
+	[31mmodified:   events/bingo/entityScripts/scannerZone/bingoScannerZone.js[m
+	[31mmodified:   events/bingo/modules/request.js[m
+	[31mmodified:   events/bingo/serverScripts/bingoPlayerCounter/bingoPlayerCounterServer.js[m
+	[31mmodified:   events/bingo/serverScripts/bingoScannerZone/bingoScannerParticleServer.js[m
+	[31mmodified:   events/bingo/serverScripts/bingoScannerZone/bingoScannerZoneServer.js[m
+	[31mmodified:   events/bingo/serverScripts/bingoWheel/bingoWheelServer.js[m
+	[31mmodified:   events/bingo/serverScripts/empty.js[m
+	[31mmodified:   events/bingo/serverScripts/gates/gateServer.js[m
+	[31mmodified:   events/bingo/serverScripts/scannerEntryZone/bingoScannerEntryZoneServer.js[m
+	[31mmodified:   events/bingo/testApp/assets/icons/bingotest-a.svg[m
+	[31mmodified:   events/bingo/testApp/assets/icons/bingotest-i.svg[m
+	[31mmodified:   events/bingo/testApp/bingoTestApp_app.js[m
+	[31mmodified:   events/bingo/testApp/ui/bingoTestApp_ui.html[m
+	[31mmodified:   events/bingo/testApp/ui/css/style.css[m
+	[31mmodified:   events/bingo/webApps/package-lock.json[m
+	[31mmodified:   events/lastAvatarStandingTrivia/.gitignore[m
+	[31mmodified:   events/lastAvatarStandingTrivia/README.md[m
+	[31mmodified:   events/lastAvatarStandingTrivia/clientScripts/trivia.css[m
+	[31mmodified:   events/lastAvatarStandingTrivia/clientScripts/trivia.html[m
+	[31mmodified:   events/lastAvatarStandingTrivia/clientScripts/triviaMasterClientStandard.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entities/modules/request.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/gameZoneClient.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/triviaColorCheckBlue.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/triviaColorCheckGreen.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/triviaColorCheckRed.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/triviaColorCheckYellow.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityScripts/triviaZoneClient.js[m
+	[31mmodified:   events/lastAvatarStandingTrivia/entityServerScripts/triviaMasterServer.js[m
+	[31mmodified:   events/multiCon/.gitignore[m
+	[31mmodified:   events/multiCon/README.md[m
+	[31mmodified:   events/multiCon/jamesArnoldTaylor/JATScript.js[m
+	[31mmodified:   events/multiCon/multiConApp/assets/icons/vote-a.svg[m
+	[31mmodified:   events/multiCon/multiConApp/assets/icons/vote-i.svg[m
+	[31mmodified:   events/multiCon/multiConApp/multiConApp_app.js[m
+	[31mmodified:   events/multiCon/multiConApp/ui/css/multiConApp_ui.css[m
+	[31mmodified:   events/multiCon/multiConApp/ui/multiConApp_ui.html[m
+	[31mmodified:   events/multiCon/webApps/multiConVote/package-lock.json[m
+	[31mmodified:   hifiVsCode.json[m
+	[31mmodified:   marketplaceItems/appreciate/README.md[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/appreciate_app.js[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/resources/appreciate_ui.html[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/resources/css/style.css[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/resources/images/icons/appreciate-a.svg[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/resources/images/icons/appreciate-i.svg[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appData/resources/js/appreciate_ui.js[m
+	[31mmodified:   marketplaceItems/appreciate/appResources/appreciate.app.json[m
+	[31mmodified:   marketplaceItems/audioFocus/README.md[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/audioFocus_app.js[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/resources/audioFocus_ui.html[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/resources/css/style.css[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/resources/images/icons/focus-a.svg[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/resources/images/icons/focus-i.svg[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/appData/resources/js/audioFocus_ui.js[m
+	[31mmodified:   marketplaceItems/audioFocus/appResources/audioFocus.app.json[m
+	[31mmodified:   marketplaceItems/audioFocus/marketplaceResources/Description.md[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/README.md[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/avatarCustomization101_app.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/avatar/avatar.fst[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/avatarCustomization101_ui.html[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/config.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/css/app.css[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/css/modal/modal.css[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/icons/avatar-101-a.svg[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/icons/avatar-101-i.svg[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/js/avatarCustomization101_ui.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/blendshapes.json[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/flow.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/jscolor.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/materials.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/mirrorClient.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/appData/resources/modules/vectorMath.js[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/appResources/avatarCustomization101.app.json[m
+	[31mmodified:   marketplaceItems/avatarCustomization101/marketplaceResources/description.md[m
+	[31mmodified:   marketplaceItems/digitalPictureFrame/README.md[m
+	[31mmodified:   marketplaceItems/digitalPictureFrame/entities/digitalPictureFrame.json[m
+	[31mmodified:   marketplaceItems/digitalPictureFrame/entityServerScripts/digitalFrame.js[m
+	[31mmodified:   marketplaceItems/digitalPictureFrame/marketplaceResources/description.md[m
+	[31mmodified:   marketplaceItems/draw/README.md[m
+	[31mmodified:   marketplaceItems/draw/appResources/appData/draw_app.js[m
+	[31mmodified:   marketplaceItems/draw/appResources/appData/resources/css/draw_ui.css[m
+	[31mmodified:   marketplaceItems/draw/appResources/appData/resources/draw_ui.html[m
+	[31mmodified:   marketplaceItems/draw/appResources/draw.app.json[m
+	[31mmodified:   marketplaceItems/draw/marketplaceResources/description.md[m
+	[31mmodified:   marketplaceItems/keyboardBlueprint/README.md[m
+	[31mmodified:   marketplaceItems/keyboardBlueprint/entity/keyboard.json[m
+	[31mmodified:   marketplaceItems/keyboardBlueprint/entityClientScripts/keyboardKey.js[m
+	[31mmodified:   marketplaceItems/keyboardBlueprint/entityClientScripts/keyboardZone.js[m
+	[31mmodified:   marketplaceItems/keyboardBlueprint/marketplaceResources/description.md[m
+	[31mmodified:   marketplaceItems/partyBall/README.md[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/entity/partyBall.json[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/entityClientScripts/partyBall_client.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/entityServerScripts/partyBall_server.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/collection_animations.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/collection_music.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/collection_sfx.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/collection_textures.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/commonUtilities.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/generator_dance.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/generator_lights.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/generator_particles.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/generator_sound.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/polyfill.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/properties_material.js[m
+	[31mmodified:   marketplaceItems/partyBall/entityResources/modules/properties_particles.js[m
+	[31mmodified:   marketplaceItems/partyBall/marketplaceResources/Description.md[m
+	[31mmodified:   marketplaceItems/questionApp/README.md[m
+	[31mmodified:   marketplaceItems/questionApp/appResources/appData/question_app.js[m
+	[31mmodified:   marketplaceItems/questionApp/appResources/appData/resources/css/question_ui.css[m
+	[31mmodified:   marketplaceItems/questionApp/appResources/appData/resources/modules/pickRayController.js[m
+	[31mmodified:   marketplaceItems/questionApp/appResources/appData/resources/question_ui.html[m
+	[31mmodified:   marketplaceItems/questionApp/appResources/question.app.json[m
+	[31mmodified:   marketplaceItems/questionApp/marketplaceResources/description.md[m
+	[31mmodified:   marketplaceItems/sitPoint/README.md[m
+	[31mmodified:   marketplaceItems/sitPoint/appResources/appData/sitClient.js[m
+	[31mmodified:   marketplaceItems/sitPoint/appResources/appData/sitServer.js[m
+	[31mmodified:   marketplaceItems/sitPoint/appResources/json/invisibleSitCube.json[m
+	[31mmodified:   marketplaceItems/sitPoint/appResources/json/opaqueSitCube.json[m
+	[31mmodified:   marketplaceItems/tipJar/README.md[m
+	[31mmodified:   marketplaceItems/tipJar/entityResources/entity/tipJar.json[m
+	[31mmodified:   marketplaceItems/tipJar/entityResources/entity/tipJarSpawner.js[m
+	[31mmodified:   marketplaceItems/tipJar/entityResources/entityClientScripts/tipJar_client.js[m
+	[31mmodified:   marketplaceItems/tipJar/marketplaceResources/Description.md[m
+	[31mmodified:   marketplaceItems/userInspector/README.md[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/css/style.css[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/images/icons/inspector-a.svg[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/images/icons/inspector-i.svg[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/js/userInspector_ui.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/defaultLocalEntityProps.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/entityMaker.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/nameTagListManager.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/objectAssign.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/pickRayController.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/modules/textHelper.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/resources/userInspector_ui.html[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/appData/userInspector.js[m
+	[31mmodified:   marketplaceItems/userInspector/appResources/userInspector.app.json[m
+	[31mmodified:   marketplaceItems/userInspector/marketplaceResources/Description.md[m
+	[31mmodified:   marketplaceItems/vendingMachine/README.md[m
+	[31mmodified:   marketplaceItems/vendingMachine/entityResources/entity/vendingMachine.json[m
+	[31mmodified:   marketplaceItems/vendingMachine/entityResources/entityClientScripts/vendingMachineButton.js[m
+	[31mmodified:   marketplaceItems/vendingMachine/marketplaceResources/Description.md[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/README.md[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/resources/css/styles.css[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/resources/images/v-scope-a.svg[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/resources/images/v-scope-i.svg[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/resources/js/voiceScope_ui.js[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/resources/voiceScope_ui.html[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/appData/voiceScope_app.js[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/appResources/voiceScope.app.json[m
+	[31mmodified:   marketplaceItems/voiceScopeApp/marketplaceResources/Description.md[m
+	[31mmodified:   placeSpecificContent/mexico/README.md[m
+	[31mmodified:   placeSpecificContent/mexico/altarCandles/03-21-19_12-51-00/candle.js[m
+	[31mmodified:   placeSpecificContent/mexico/cemetary/03-21-19_12-51-00/lightCandlesOnApproach.js[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/models/orange/Orange.mtl[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/models/orange/Orange.obj[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/scripts/createFoodClient.js[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/scripts/createFoodServer.js[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/scripts/crunch_client.js[m
+	[31mmodified:   placeSpecificContent/mexico/food/03-21-19_12-51-00/scripts/crunch_server.js[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/assets/baseball_bat/bat.mtl[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/assets/baseball_bat/bat.obj[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/assets/candy/candy corn.mtl[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/assets/candy/candy corn.obj[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/assets/pinata/tballPole_phys.obj[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/confettiHelper.js[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/crunch.js[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/onPinataHit.js[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/pinataDeleteFilter.js[m
+	[31mmodified:   placeSpecificContent/mexico/pinata/03-21-19_12-51-00/pinataSpawner.js[m
+	[31mmodified:   placeSpecificContent/mexico/resources/03-21-19_12-51-00/models/stool/Stool_01.mtl[m
+	[31mmodified:   placeSpecificContent/mexico/resources/03-21-19_12-51-00/models/stool/Stool_01.obj[m
+	[31mmodified:   placeSpecificContent/mexico/tequila/03-21-19_12-51-00/glassPrimitiveCatch.js[m
+	[31mmodified:   placeSpecificContent/mexico/tequila/03-21-19_12-51-00/glassPrimitiveCatchServer.js[m
+	[31mmodified:   placeSpecificContent/mexico/tequila/03-21-19_12-51-00/tequilaClient.js[m
+	[31mmodified:   placeSpecificContent/mexico/tequila/03-21-19_12-51-00/tequilaServer.js[m
+	[31mmodified:   placeSpecificContent/mexico/tequila/03-21-19_12-51-00/tequilaSpawner.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Availability_Server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Button_Client.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Button_Server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Empty_Server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Spawner.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Text_Server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Zone_Client.js[m
+	[31mmodified:   placeSpecificContent/theSpot/HappyKiosk/Happy-Kiosk_Zone_Server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/README.md[m
+	[31mmodified:   placeSpecificContent/theSpot/food/scripts/createFoodClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/food/scripts/createFoodServer.js[m
+	[31mmodified:   placeSpecificContent/theSpot/food/scripts/crunch_client.js[m
+	[31mmodified:   placeSpecificContent/theSpot/food/scripts/crunch_server.js[m
+	[31mmodified:   placeSpecificContent/theSpot/juice/glassPrimitiveCatch.js[m
+	[31mmodified:   placeSpecificContent/theSpot/juice/glassPrimitiveCatchServer.js[m
+	[31mmodified:   placeSpecificContent/theSpot/juice/spaceJuiceClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/juice/spaceJuiceServer.js[m
+	[31mmodified:   placeSpecificContent/theSpot/juice/spaceJuiceSpawner.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/.gitignore[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/ACScripts/ACmoneyTree.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/README.md[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/entityScripts/moneyTreeBankerClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/entityScripts/moneyTreeGiverClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/entityScripts/moneyTreeProximityClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/entityScripts/moneyTreeReceiverClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/moneyTree/resources/modules/request.js[m
+	[31mmodified:   placeSpecificContent/theSpot/pill/models/Pill.mtl[m
+	[31mmodified:   placeSpecificContent/theSpot/pill/models/Pill.obj[m
+	[31mmodified:   placeSpecificContent/theSpot/pill/scripts/spawnPills.js[m
+	[31mmodified:   placeSpecificContent/theSpot/pill/scripts/swallowFXPill.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/ShatterPlateClient.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/ShatterPlatePiece.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/ShatterPlatePieceServer.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/ShatterPlateServer.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/ShatterPlateSpawner.js[m
+	[31mmodified:   placeSpecificContent/theSpot/plates/plate-whole-hub.obj[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine1/README.md[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine1/entityResources/entity/vendMo1.json[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine1/entityResources/entityClientScripts/vendingMachineButton.js[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine1/entityResources/entityClientScripts/vendingMachineItems.json[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine2/README.md[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine2/entityResources/entity/vendMo2.json[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine2/entityResources/entityClientScripts/vendingMachineButton.js[m
+	[31mmodified:   placeSpecificContent/theSpot/vendingMachine2/entityResources/entityClientScripts/vendingMachineItems.json[m
+	[31mmodified:   readme.md[m
+	[31mmodified:   tsconfig.json[m
+	[31mmodified:   usefulUtilities/appLoader/appLoader.js[m
+	[31mmodified:   usefulUtilities/avatarEntityRemover/avatarEntityRemover.js[m
+	[31mmodified:   usefulUtilities/becomeAvatar/becomeAvatar.js[m
+	[31mmodified:   usefulUtilities/botinator/README.md[m
+	[31mmodified:   usefulUtilities/botinator/assignmentClientManager.js[m
+	[31mmodified:   usefulUtilities/botinator/assignmentClientPlayer.js[m
+	[31mmodified:   usefulUtilities/botinator/botinator.js[m
+	[31mmodified:   usefulUtilities/botinator/botsToLoad.js[m
+	[31mmodified:   usefulUtilities/botinator/tabletApp/botinator_ui.html[m
+	[31mmodified:   usefulUtilities/botinator/tabletApp/css/style.css[m
+	[31mmodified:   usefulUtilities/botinator/tabletApp/images/icons/botinator-a.svg[m
+	[31mmodified:   usefulUtilities/botinator/tabletApp/images/icons/botinator-i.svg[m
+	[31mmodified:   usefulUtilities/botinator/tabletApp/js/botinator_ui.js[m
+	[31mmodified:   usefulUtilities/botinator/wavs.js[m
+	[31mmodified:   usefulUtilities/bouncerZone/bouncerZone.js[m
+	[31mmodified:   usefulUtilities/deployNewScripts/deployNewScripts_app.js[m
+	[31mmodified:   usefulUtilities/deployNewScripts/ui/css/deployNewScripts_ui.css[m
+	[31mmodified:   usefulUtilities/deployNewScripts/ui/deployNewScripts_ui.html[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/EZ_Status-Update_server_version.json[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/README.md[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/ezStatusUpdate_Client_milad.js[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/ezStatusUpdate_Server_milad.js[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/ezStatusUpdate_Server_milad_message.js[m
+	[31mmodified:   usefulUtilities/ezStatusUpdate/textHelper.js[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/README.md[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/clientScripts/hiFiCalendar_app.js[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/entityScripts/hiFiMeetingZone.js[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/entityServerScripts/hiFiCalendarServer.js[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/resources/hiFiCalendar.html[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/resources/images/GCAL-a.svg[m
+	[31mmodified:   usefulUtilities/hiFiCalendar/resources/images/GCAL-i.svg[m
+	[31mmodified:   usefulUtilities/hifiPing/hifiApp/ping_app.js[m
+	[31mmodified:   usefulUtilities/hifiPing/hifiApp/ui/css/ping_ui.css[m
+	[31mmodified:   usefulUtilities/hifiPing/hifiApp/ui/ping_ui.html[m
+	[31mmodified:   usefulUtilities/hifiPing/webApp/app/package-lock.json[m
+	[31mmodified:   usefulUtilities/hifiPing/webApp/app/package.json[m
+	[31mmodified:   usefulUtilities/hifiPing/webApp/www/hifiPing/css/index.css[m
+	[31mmodified:   usefulUtilities/lockedAvatarEntityRemover/lockedAvatarEntityRemover.js[m
+	[31mmodified:   usefulUtilities/loudApp/README.md[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/loudApp_app.js[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/resources/css/app.css[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/resources/icons/seek loud-a.svg[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/resources/icons/seek loud-i.svg[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/resources/js/loudApp_ui.js[m
+	[31mmodified:   usefulUtilities/loudApp/appResources/resources/loudApp_ui.html[m
+	[31mmodified:   usefulUtilities/marketplaceItemAdvertiser/marketplaceItemAdvertiser.js[m
+	[31mmodified:   usefulUtilities/mirror/mirrorClient.js[m
+	[31mmodified:   usefulUtilities/mirror/mirrorReflection.js[m
+	[31mmodified:   usefulUtilities/modelJSONCleanup/README.md[m
+	[31mmodified:   usefulUtilities/modelJSONCleanup/config.json[m
+	[31mmodified:   usefulUtilities/modelJSONCleanup/modelJSONCleanup.js[m
+	[31mmodified:   usefulUtilities/modelJSONCleanup/theSpot/config.json[m
+	[31mmodified:   usefulUtilities/officeMat/officeMat.json[m
+	[31mmodified:   usefulUtilities/pushPreventer/pushPreventer.js[m
+	[31mmodified:   usefulUtilities/scaleAvatar/README.md[m
+	[31mmodified:   usefulUtilities/scaleAvatar/scaleAvatar.js[m
+	[31mmodified:   usefulUtilities/scriptPauser/scriptPauser.js[m
+	[31mmodified:   usefulUtilities/statusIndicator/.gitignore[m
+	[31mmodified:   usefulUtilities/statusIndicator/README.md[m
+	[31mmodified:   usefulUtilities/statusIndicator/hifiScript/statusIndicator.js[m
+	[31mmodified:   usefulUtilities/statusIndicator/hifiScript/zoneEntityScripts/locationZoneClient.js[m
+	[31mmodified:   usefulUtilities/statusIndicator/webApp/app/package-lock.json[m
+	[31mmodified:   usefulUtilities/statusIndicator/webApp/app/package.json[m
+	[31mmodified:   usefulUtilities/statusIndicator/webApp/app/statusIndicator_webApp.js[m
+	[31mmodified:   usefulUtilities/statusIndicator/webApp/www/allEmployees.html[m
+	[31mmodified:   usefulUtilities/statusIndicator/webApp/www/teamPage.html[m
+	[31mmodified:   usefulUtilities/toggleFlyButton/README.md[m
+	[31mmodified:   usefulUtilities/userLocation/userLocation.js[m
+	[31mmodified:   usefulUtilities/us
