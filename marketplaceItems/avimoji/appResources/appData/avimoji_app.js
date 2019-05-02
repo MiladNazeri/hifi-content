@@ -577,7 +577,9 @@
     function deleteEZFavoritesOverlays(){
         if (ezFavoritesOverlays && ezFavoritesOverlays.length > 0){
             ezFavoritesOverlays.forEach(function(overlay){
-                Overlays.deleteOverlay(overlay.ezFavoriteOverlay);
+                if (overlay && overlay.ezFavoriteOverlay) {
+                    Overlays.deleteOverlay(overlay.ezFavoriteOverlay);
+                }
             });
         }
         
@@ -610,7 +612,7 @@
             } 
 
             for (var i = 0; i < ezFavoritesOverlays.length; i++){
-                if (overlayID === ezFavoritesOverlays[i].ezFavoriteOverlay){
+                if (ezFavoritesOverlays.length > 0 && ezFavoritesOverlays[i] && ezFavoritesOverlays[i].ezFavoriteOverlay && overlayID === ezFavoritesOverlays[i].ezFavoriteOverlay){
                     var emoji = emojiList[emojiCodeMap[ezFavoritesOverlays[i].code]];
                     var data = {emoji: emoji};
                     handleSelectedEmoji(data);
@@ -622,6 +624,7 @@
 
 
     function onDomainChanged() {
+        pruneOldAvimojis();
         deleteEmojiPreviewOverlay();
         maybeClearPreviewOverlayTimer();
         maybeClearEZFavoritesTimer();
@@ -632,7 +635,9 @@
             selectedEmoji = null;
         }
         maybeClearPop();
-        ui.close();
+        if (ui.isOpen) {
+            ui.close();
+        }
     }
 
 
@@ -694,10 +699,12 @@
     var ezFavoritesOverlays = null;
     var ezFavoritesTimer = null;
     var topTenEmojis = [];
+
     function renderEZFavoritesOverlays() {
         topTenEmojis = makeFavoritesArray(favorites);
         ezFavoritesOverlays = topTenEmojis.map(function(emoji, index){
-            if (emoji && emojiCodeMap && emojiCodeMap[emoji.code]){
+            if (emoji && emojiCodeMap && typeof emojiCodeMap[emoji.code] === "number"){
+
                 var favoriteEmoji = emojiList[emojiCodeMap[emoji.code]];
                 var imageURL = imageURLBase + favoriteEmoji.code[0] + ".png";
                 
@@ -711,7 +718,7 @@
                     favoriteEmoji.massive.frame.h * OVERLAY_SIZE_SCALER, 
                     imageURL, favoriteEmoji,x, y * OVERLAY_SIZE_SCALER);
                 return overlay;
-            } 
+            }
         });
         ezFavoritesTimer = Script.setInterval(ezFavoritesOverlayTimerHandler, EZFAVORITES_OVERLAY_TIMER_INTERVAL_MS);
 
@@ -767,6 +774,7 @@
     var EMOJI_CONST_SCALER = 0.27;
     var MASK_DISTANCE_IN_FRONT_OF_AVATAR = 0.24;
     var currentEmoji = new EntityMaker(entityType);
+    var EMOJI_X_OFFSET = -0.01;
     function createEmoji(emoji) {
         var neckPosition, avatarScale, aboveNeck, emojiPosition;
         avatarScale = MyAvatar.scale;
@@ -780,7 +788,7 @@
             billboardMode = "full";
             aboveNeck = ABOVE_HEAD;
             neckPosition = Vec3.subtract(MyAvatar.getNeckPosition(), MyAvatar.position);
-            emojiPosition = Vec3.sum(neckPosition, [0, avatarScale * aboveNeck * (1 + emojiSize * EMOJI_CONST_SCALER), 0]);
+            emojiPosition = Vec3.sum(neckPosition, [EMOJI_X_OFFSET, avatarScale * aboveNeck * (1 + emojiSize * EMOJI_CONST_SCALER), 0]);
         }
         var IMAGE_SIZE = avatarScale * emojiSize;
         var dimensions = { x: IMAGE_SIZE, y: IMAGE_SIZE, z: IMAGE_SIZE };
@@ -832,7 +840,8 @@
             favorites: newFavoritesArray
         });
         if (resetFavorites && newFavoritesArray.length === 1 && ezFavorites) {
-            handleEZFavorites(true);
+            var data = {ezFavorites: ezFavorites};
+            handleEZFavorites(data);
             resetFavorites = false;
             renderEZFavoritesOverlays();
         }
@@ -1425,10 +1434,17 @@
     // startup the app
     var BUTTON_NAME = "AVIMOJI";
     var APP_UI_URL = Script.resolvePath('./resources/avimoji_ui.html');
-    var AppUI = Script.require('appUi');
+    var AppUI = Script.require('./resources/modules/appUi.js?' + Date.now());
     var ui;
     var emojiCodeMap;
     function startup() {
+        // make a map of just the utf codes to help with accesing
+        emojiCodeMap = emojiList.reduce(function(previous, current, index){
+            if (current && current.code && current.code.length > 0 && current.code[0]) {
+                previous[current.code[0]] = index;
+                return previous;
+            }
+        }, {});
         ui = new AppUI({
             buttonName: BUTTON_NAME,
             home: APP_UI_URL,
@@ -1443,14 +1459,6 @@
         if (ezFavorites) {
             renderEZFavoritesOverlays();
         }
-
-        // make a map of just the utf codes to help with accesing
-        emojiCodeMap = emojiList.reduce(function(previous, current, index){
-            if (current && current.code && current.code.length > 0 && current.code[0]) {
-                previous[current.code[0]] = index;
-                return previous;
-            }
-        }, {});
 
         Controller.keyPressEvent.connect(keyPress);
         Script.scriptEnding.connect(scriptEnding);
@@ -1477,6 +1485,10 @@
 
 
     function scriptEnding() {
+        if (ui.isOpen) {
+            ui.onClosed();
+        }
+        pruneOldAvimojis();
         deleteEmojiPreviewOverlay();
         deleteEZFavoritesOverlays();
         Controller.mousePressEvent.disconnect(onMousePressEvent);
@@ -1497,7 +1509,6 @@
         maybeClearEZFavoritesTimer();
         maybeClearPlayEmojiSequenceInterval();
         maybeClearPop();
-        pruneOldAvimojis();
     }
 
 

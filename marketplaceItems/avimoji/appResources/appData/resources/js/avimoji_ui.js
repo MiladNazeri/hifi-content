@@ -752,14 +752,14 @@ function changeEmojiState(state){
             log("UI STATE: SHOW_BASIC_MODE", null, UI_LOG_STATE);
 
             document.getElementById("advancedOptionsContainer").style.display = "none";
-            document.getElementById("emojisContainer").style.height = "calc(100% - 375px)";
+            document.getElementById("emojisContainer").style.height = "calc(100% - 383px)";
             break;
         
         case SHOW_ADVANCED_MODE:
             log("UI STATE: SHOW_ADVANCED_MODE", null, UI_LOG_STATE);
 
             document.getElementById("advancedOptionsContainer").style.display = "block";
-            document.getElementById("emojisContainer").style.height = "calc(100% - 540px)";
+            document.getElementById("emojisContainer").style.height = "calc(100% - 529px)";
 
             if (emojiSequence.length >= 1) {
                 changeEmojiState(SHOW_EMOJI_SEQUENCE);

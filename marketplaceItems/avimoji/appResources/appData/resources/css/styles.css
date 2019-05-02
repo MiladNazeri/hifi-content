@@ -402,7 +402,7 @@
             #emojiSequenceDisable {
                 position: absolute;
                 width: 100vw;
-                height: 89px;
+                height: 70px;
                 padding: 0px 0px;
                 left: 0;
                 right: 0;
@@ -463,6 +463,8 @@
             #selectedContainer {
                 height: calc(100% - 480px);
                 width: 100%;
+                position: relative;
+                top: -8px;
             }
 
             #selectedContentContainer {
@@ -510,30 +512,30 @@
 
             #selectedKeywords {
                 color: var(--color5);
-                width: 100%;
+                width: calc(100% - 40px);
                 text-align: center;
                 font-size: 2.35vw;
                 font-weight: bold;
-                letter-spacing: 0.25px;
-                margin: 5px 0px 0px 0px;
+                letter-spacing: 0.15px;
+                margin: 5px 15px 0px 0px;
                 height: 2vw;
                 align-self: flex-end;
             }
 
             #selectedRemoveButton {
+                /* background-color: pink; */
                 position: absolute;
-                left: 0%;
-                top: 8%;
+                left: 30%;
+                top: 3%;
                 width: 100%;
-                height: 100%;
+                height: 150px;
                 padding: 0px;
-                font-size: 175px;
+                font-size: 100px;
                 line-height: 150px;
                 text-align:  center;
-                color: var(--color4);
+                color: var(--color5);
                 font-weight:  900;
-                opacity: 0.9;
-                mix-blend-mode: color-burn;
+                opacity: 0.5;
             }
 
             #selectedRemoveButton:hover{
