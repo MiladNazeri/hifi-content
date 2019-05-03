@@ -202,7 +202,7 @@ var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
 var BOTTOM_MARGIN_SCALER = 0.03;
-var ABOVE_HEAD = 1;
+var ABOVE_HEAD = 0.85;
 function makeNameTag(uuid, type) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -238,7 +238,7 @@ function makeNameTag(uuid, type) {
     name = avatarInfo.displayName;
     parentID = uuid;
 
-    var nameTagPosition = ABOVE_HEAD * userScaler * avatarInfo.scale;
+    var nameTagPosition = ABOVE_HEAD * userScaler;
     position = [0, nameTagPosition, 0];
 
     nametag.add("text", name);
