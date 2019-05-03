@@ -44,24 +44,9 @@ function NewAvatarProps() {
 }
 
 
-// Convert a point from local to world location
-function localToWorld(localOffset, framePosition, frameOrientation) {
-    var worldOffset = Vec3.multiplyQbyV(frameOrientation, localOffset);
-    return Vec3.sum(framePosition, worldOffset);
-}
-
-
-// Convert from world to local space
-function worldToLocal(worldPosition, framePosition, frameOrientation) {
-    var inverseFrameOrientation = Quat.inverse(frameOrientation);
-    var worldOffset = Vec3.subtract(worldPosition, framePosition);
-    return Vec3.multiplyQbyV(inverseFrameOrientation, worldOffset);
-}
-
-
 // Add a user to the list.
 var DEFAULT_LIFETIME = entityProps.lifetime;
-function add(uuid, level){
+function add(uuid){
     // User Doesn't exist so give them new props and save in the cache, get their current avatar info, 
     // and handle the different ways to get the username(friend or admin)
     if (!_this.avatars[uuid]) {
@@ -81,7 +66,7 @@ function add(uuid, level){
     avatar.nametag = new EntityMaker('local').add(entityProps);
 
     // When the user clicks someone, we create their nametag
-    makeNameTag(uuid, level);
+    makeNameTag(uuid);
 
     var deleteEnttyInMiliseconds = entityProps.lifetime * MILISECONDS_IN_SECOND;
     // Remove from list after lifetime is over
@@ -205,8 +190,7 @@ var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
 var BOTTOM_MARGIN_SCALER = 0.03;
 var ABOVE_HEAD_OFFSET = 0.3;
-function makeNameTag(uuid, level) {
-    log('log', level);
+function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
     var nametag = avatar.nametag;
@@ -246,19 +230,8 @@ function makeNameTag(uuid, level) {
     var headJointIndex = AvatarData.getJointIndex("Head");
     var jointInObjectFrame = AvatarData.getAbsoluteJointTranslationInObjectFrame(headJointIndex);
     var nameTagPosition = jointInObjectFrame.y + scaledDimenionsYHalf + ABOVE_HEAD_OFFSET;
-
     var localPosition = [0, nameTagPosition, 0];
-    log("localPosition1", localPosition)
-    localPosition = worldToLocal(avatarInfo.position, localPosition, MyAvatar.orientation);
-    log("localPosition2", localPosition)
 
-    var lookAt = Quat.lookAt(Camera.position, avatarInfo.orientation, Vec3.UNIT_Y);
-    var inverse = Quat.inverse(lookAt);
-    var localInFront = localToWorld([0,0,-1 - level], avatarInfo.position, avatar.orientation);
-    var pointTowardsMe = Vec3.multiplyQbyV(inverse, localInFront);
-    var localPos = worldToLocal(pointTowardsMe, avatarInfo.position, avatarInfo.orientation);
-    log("pointTwardsMe", pointTowardsMe);
-    log("localPos", localPos);
 
     var visible = true;
     if (mode === "persistent") {
@@ -274,7 +247,7 @@ function makeNameTag(uuid, level) {
         .add("lineHeight", lineHeight)
         .add("dimensions", scaledDimensions)
         .add("parentID", parentID)
-        .add("localPosition", pointTowardsMe)
+        .add("localPosition", localPosition)
         .add("visible", visible)
         .add("alpha", 0)
         .create(CLEAR_ENTITY_EDIT_PROPS);
@@ -519,8 +492,25 @@ function destroy() {
 }
 
 
+// Check to see if we need to delete any close by nametags
+var MAX_DELETE_RANGE = 4;
+function checkIfAnyAreClose(target){
+    // log("in check if any are close")
+    var targetPosition = AvatarManager.getAvatar(target).position;
+    // log ("targetPosition", targetPosition);
+    for (var uuid in _this.selectedAvatars) {
+        var position = AvatarManager.getAvatar(uuid).position;
+        // log ("position", position);
+        var distance = Vec3.distance(position, targetPosition);
+        // log("distance", distance)
+        if (distance <= MAX_DELETE_RANGE) {
+            // log('need to delete')
+            removeNametag(uuid);
+        }
+    }
+}
+
 // Handles what happens when an avatar gets triggered on.
-var currentLevel = 0;
 function handleSelect(uuid) {
     if (mode === "off" || mode === "persistent") {
         return;
@@ -538,16 +528,10 @@ function handleSelect(uuid) {
         }
 
         removeNametag(uuid);
-        return;
 
     } else {
-        var numberInSelected = Object.keys(_this.selectedAvatars).length;
-        if (numberInSelected > 0) {
-            currentLevel += 1;
-        } else {
-            currentLevel = 0;
-        }
-        add(uuid, currentLevel);
+        checkIfAnyAreClose(uuid);
+        add(uuid);
     }
 }
 
