@@ -42,6 +42,10 @@
         nameTagListManager.maybeRemove(uuid);
     }
 
+    function onAvatarAdded(uuid) {
+        nameTagListManager.maybeAdd(uuid);
+    }
+
 
     // Called when the script is closing
     function scriptEnding() {
@@ -152,6 +156,7 @@
 
         Window.domainChanged.connect(onDomainChange);
         AvatarManager.avatarRemovedEvent.connect(onAvatarRemoved);
+        AvatarManager.avatarAddedEvent.connect(onAvatarAdded);
 
         enableOrDisableNameTag();
     }

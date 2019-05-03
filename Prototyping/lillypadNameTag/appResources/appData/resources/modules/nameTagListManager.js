@@ -36,27 +36,10 @@ function NewAvatarProps() {
         currentDistance: null,
         initialDistance: null,
         mainInitialDimensions: null,
-        // subInitialDimensions: null,
         previousName: null,
-        // subInitialLocalPositionOffset: null,
-        timeoutStarted: true,
+        timeoutStarted: false,
         friend: false
     };
-}
-
-
-// Convert a point from local to world location
-function localToWorld(localOffset, framePosition, frameOrientation) {
-    var worldOffset = Vec3.multiplyQbyV(frameOrientation, localOffset);
-    return Vec3.sum(framePosition, worldOffset);
-}
-
-
-// Convert from world to local space
-function worldToLocal(worldPosition, framePosition, frameOrientation) {
-    var inverseFrameOrientation = Quat.inverse(frameOrientation);
-    var worldOffset = Vec3.subtract(worldPosition, framePosition);
-    return Vec3.multiplyQbyV(inverseFrameOrientation, worldOffset);
 }
 
 
@@ -76,31 +59,28 @@ function requestJSON(url, callback) {
 
 // Add a user to the list.
 var DISTANCE_AMOUNT = 0.5;
+var DEFAULT_LIFETIME = entityProps.lifetime;
 function add(uuid){
     // User Doesn't exist so give them new props and save in the cache, get their current avatar info, 
     // and handle the different ways to get the username(friend or admin)
     if (!_this.avatars[uuid]) {
         _this.avatars[uuid] = new NewAvatarProps(); 
         getAvatarData(uuid);
-        getUN(uuid);
-    } else {
-        getAvatarData(uuid);
     }
 
     var avatar = _this.avatars[uuid];
-    var avatarInfo = avatar.avatarInfo;
 
     _this.selectedAvatars[uuid] = true;
-
+    if (mode === "persistent") {
+        entityProps.lifetime = -1;
+    } else {
+        entityProps.lifetime = DEFAULT_LIFETIME;
+    }
+    
     avatar.localEntityMain = new LocalEntity('local').add(entityProps);
-    avatar.localEntitySub = new LocalEntity('local').add(entityProps);
 
     // When the user clicks someone, we create their nametag
     makeNameTag(uuid, "main");
-    // Create the sub if they have it
-    // if (avatarInfo.username){
-    //     makeNameTag(uuid, "sub");
-    // }
 
     var deleteEnttyInMiliseconds = entityProps.lifetime * MILISECONDS_IN_SECOND;
     // Remove from list after lifetime is over
@@ -153,68 +133,6 @@ function removeLocalEntity(uuid){
 }
 
 
-// Handler for the username call.
-function handleUserName(uuid, username) {
-    if (username) {
-        try {
-            var avatar = _this.avatars[uuid];
-            var avatarInfo = avatar.avatarInfo;
-        } catch (e) {
-            return;
-        }
-
-
-        avatarInfo.username = username.trim();
-        // makeNameTag(uuid, "sub");
-        // Check to see if they are also a friend
-        getInfoAboutUser(uuid);
-    }
-}
-
-
-// Update the look of the nametags if the user is your friend.
-var FRIEND_TEXT = "#000000";
-// var FRIEND_SUB_TEXT = "#efefef";
-var FRIEND_MAIN_BACKGROUND = "#d1d1d1";
-// var FRIEND_SUB_BACKGROUND = "#2d2d2d";
-function handleFriend(uuid, username) {
-    var avatar = _this.avatars[uuid];
-    var avatarInfo = avatar.avatarInfo;
-
-    avatar.friend = true;
-
-    var localEntityMain = avatar.localEntityMain;
-    // var localEntitySub = avatar.localEntitySub;
-
-    avatarInfo.username = username.trim();
-
-    localEntityMain
-        .edit("textColor", FRIEND_TEXT)
-        .edit("backgroundColor", FRIEND_MAIN_BACKGROUND);
-
-    // if (localEntitySub.id) {
-    //     localEntitySub
-    //         .edit("textColor", FRIEND_SUB_TEXT)
-    //         .edit("backgroundColor", FRIEND_SUB_BACKGROUND);
-    // } else {
-    //     // You aren't an admin so this is the first time we are making a sub nametag
-    //     makeNameTag(uuid, "sub");
-
-    //     localEntitySub
-    //         .edit("backgroundColor", FRIEND_SUB_BACKGROUND);
-    // }
-}
-
-
-// Calculate where the suboffset should be placed.
-function getLocalPositionOffset(main, sub){
-    var halfLocalEntityMainY = main[Y] * HALF;
-    var halfScaledD = sub[Y] * HALF;
-    var totalHalfs = halfLocalEntityMainY + halfScaledD;
-    return -totalHalfs;
-}
-
-
 // Makes sure clear interval exists before changing.
 function maybeClearInterval(){
     if (_this.redrawTimeout) {
@@ -227,7 +145,6 @@ function maybeClearInterval(){
 // Calculate our initial properties for either the main or the sub entity.
 var Z_SIZE = 0.01;
 var MAIN_SCALER = 0.75;
-var SUB_SCALER = 0.55;
 var LINE_HEIGHT_SCALER = 0.99;
 var DISTANCE_SCALER = 0.35; // Empirical value
 var userScaler = 1.0;
@@ -246,13 +163,8 @@ function calculateInitialProperties(uuid, type) {
     var name = null;
 
     // Handle if we are asking for the main or sub properties
-    if (type === "main") {
-        localEntity = avatar.localEntityMain;
-        name = avatarInfo.displayName;
-    } else {
-        localEntity = avatar.localEntitySub;
-        name = avatarInfo.username;
-    }
+    localEntity = avatar.localEntityMain;
+    name = avatarInfo.displayName;
 
     // Use the text helper to calculate what our dimensions for the text box should be
     textHelper
@@ -273,7 +185,7 @@ function calculateInitialProperties(uuid, type) {
     // Adjust those scaled dimensions by the main scaler or the sub scaler to control the general size
     scaledDimensions = Vec3.multiply(
         scaledDimensions,
-        type === "main" ? MAIN_SCALER : SUB_SCALER
+        MAIN_SCALER
     );
     
     // Adjust the lineheight to be the new scaled dimensions Y 
@@ -288,8 +200,6 @@ function calculateInitialProperties(uuid, type) {
 
 
 // Create or make visible either the sub or the main tag.
-var SUB_BACKGROUND = "#515151";
-var SUB_TEXTCOLOR = "#c6c6c6";
 var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
@@ -299,7 +209,6 @@ function makeNameTag(uuid, type) {
     var avatarInfo = avatar.avatarInfo;
 
     var localEntityMain = avatar.localEntityMain;
-    var localEntitySub = avatar.localEntitySub;
 
     var name = null;
     var localEntity = null;
@@ -308,17 +217,12 @@ function makeNameTag(uuid, type) {
     var distance = null;
     var scaledDimensions = null;
     var lineHeight = null;
-    var localPositionOffset = null;
     var parentID = null;
 
     // Make sure an anonymous name is covered before sending to calculate
-    if (type === "main") {
-        avatarInfo.displayName = avatarInfo.displayName === "" ? "anonymous" : avatarInfo.displayName.trim();
-        avatar.previousName = avatarInfo.displayName;
-        // #TODO: change
-        // position = avatar.intersection;
 
-    }
+    avatarInfo.displayName = avatarInfo.displayName === "" ? "anonymous" : avatarInfo.displayName.trim();
+    avatar.previousName = avatarInfo.displayName;
 
     // Common values needed by both
 
@@ -337,7 +241,8 @@ function makeNameTag(uuid, type) {
     name = avatarInfo.displayName;
     parentID = uuid;
 
-    // Common values
+    var position = [0, 1, 0];
+   // Common values
     localEntity.add("text", name);
 
     // Multiply the new dimensions and line height with the user selected scaler
@@ -354,44 +259,8 @@ function makeNameTag(uuid, type) {
         .add("bottomMargin", lineHeight * BOTTOM_MARGIN_SCALER)
         .add("lineHeight", lineHeight)
         .add("dimensions", scaledDimensions)
-        .add("parentID", parentID);
-
-
-    // Final values specific to each type
-
-    if (type === "main") {
-        localEntity
-            .add("position", position);
-        if (avatar.friend) {
-            localEntity
-                .add("textColor", FRIEND_TEXT)
-                .add("backgroundColor", FRIEND_MAIN_BACKGROUND);
-        }
-    } else {
-        // Get the localPosition offset
-        var localEntityMainDimensions = avatar.localEntityMain.get('dimensions', SHOULD_QUERY_ENTITY);
-        localPositionOffset = [
-            0,
-            getLocalPositionOffset(localEntityMainDimensions, scaledDimensions),
-            0
-        ];
-
-        localEntity
-            .add("localPosition", localPositionOffset)
-
-        // if (avatar.friend) {
-        //     localEntity
-        //         .add("textColor", FRIEND_SUB_TEXT)
-        //         .add("backgroundColor", FRIEND_SUB_BACKGROUND);
-        // } else {
-        //     localEntity
-        //         .add("backgroundColor", SUB_BACKGROUND)
-        //         .add("textColor", SUB_TEXTCOLOR);
-        // }
-
-    }
-
-    localEntity
+        .add("parentID", parentID)
+        .add("localPosition", position)
         .create(CLEAR_ENTITY_EDIT_PROPS);
 }
 
@@ -417,10 +286,6 @@ function maybeRedraw(uuid){
     } else {
         reDraw(uuid, "main");
     }
-    
-    // if (avatarInfo.username) {
-    //     reDraw(uuid, "sub");
-    // }
 }
 
 
@@ -434,18 +299,12 @@ function reDraw(uuid, type) {
     var currentDistance = null;
     var newDimensions = null;
     var lineHeight = null;
-    var localPositionOffset = null;
 
     initialDistance = avatar.initialDistance;
     currentDistance = avatar.currentDistance;
 
-    // if (type === "main") {
-        localEntity = avatar.localEntityMain;
-        initialDimensions = avatar.mainInitialDimensions;
-    // } else {
-    //     localEntity = avatar.localEntitySub;
-    //     initialDimensions = avatar.subInitialDimensions;
-    // }
+    localEntity = avatar.localEntityMain;
+    initialDimensions = avatar.mainInitialDimensions;
 
     // Find our new dimensions from the new distance 
     newDimensions = [
@@ -470,20 +329,6 @@ function reDraw(uuid, type) {
         .add("lineHeight", lineHeight)
         .add("dimensions", newDimensions);
 
-    // if (type === "sub") {
-    //     // Get the localPosition offset
-    //     var localEntityMainDimensions = avatar.localEntityMain.get('dimensions', SHOULD_QUERY_ENTITY);
-
-    //     localPositionOffset = [
-    //         0,
-    //         getLocalPositionOffset(localEntityMainDimensions, newDimensions),
-    //         0
-    //     ];
-
-    //     localEntity
-    //         .add("localPosition", localPositionOffset);
-    // }
-
     localEntity
         .sync();
 }
@@ -500,33 +345,11 @@ function checkAllSelectedForRedraw(){
 // Remake the nametags if the display name changes.  
 function updateName(uuid) {
     var avatar = _this.avatars[uuid];
-    var avatarInfo = avatar.avatarInfo;
-
     avatar.localEntityMain.destroy();
-    // avatar.localEntitySub.destroy();
 
     avatar.localEntityMain = new LocalEntity('local').add(entityProps);
-    // avatar.localEntitySub = new LocalEntity('local').add(entityProps);
-
-    // #TODO remove intersection stuff
-    // var localOffset = avatar.localPositionOfIntersection;
-    // avatar.intersection = localToWorld(localOffset, avatarInfo.position, avatarInfo.orientation);
 
     makeNameTag(uuid, "main");
-    // makeNameTag(uuid, "sub");
-}
-
-
-// Request the username.
-function getUN(uuid){
-    if (_this.avatars[uuid].avatarInfo.username) {
-        return;
-    } else if (Users.canKick) {
-        // User has admin priv and can get the username this way
-        Users.requestUsernameFromID(uuid);
-    } else {
-        getInfoAboutUser(uuid);
-    }
 }
 
 
@@ -563,24 +386,6 @@ function getDistance(uuid) {
 }
 
 
-// Get info about a user through the metaverse to see if you are friends.
-var METAVERSE_BASE = Account.metaverseServerURL;
-var REG_EX_FOR_ID_FORMATTING = /[\{\}]/g;
-function getInfoAboutUser(uuid) {
-    var url = METAVERSE_BASE + '/api/v1/users?filter=connections&status=online';
-    requestJSON(url, function (connectionsData) {
-        var users = connectionsData.users;
-        for (var i = 0; i < users.length; i++) {
-            var user = users[i];
-            if (user.location && user.location.node_id === uuid.replace(REG_EX_FOR_ID_FORMATTING, "")) { 
-                handleFriend(uuid, user.username);
-                break;
-            }
-        }
-    });
-}
-
-
 // Check to see if we need to toggle our interval check because we went to 0 avatars 
 // or if we got our first avatar in the select list.
 function shouldToggleInterval(){
@@ -611,13 +416,19 @@ function toggleInterval(){
 
 
 // interval function to scan for new avatars
-function persistentModeIntervalCheck(){
 
+// handle turning the peristenet mode on
+function handlePersistentMode(shouldTurnOnPersistentMode){
+    removeAllLocalEntities();   
+    if (shouldTurnOnPersistentMode) {
+        AvatarManager
+            .getAvatarIdentifiers()
+            .forEach(function(avatar){
+                add(avatar);
+            });
+    }
 }
 
-function handlePersistentMode(){
-    
-}
 
 // #endregion
 // *************************************
@@ -642,16 +453,13 @@ function nameTagListManager(){
 
 // Create the manager and hook up username signal.
 function create() {
-    Users.usernameFromIDReply.connect(handleUserName);
     return _this;
 }
 
 
 // Destory the manager and disconnect from username signal.
 function destroy() {
-    Users.usernameFromIDReply.disconnect(handleUserName);
     _this.reset();
-
     return _this;
 }
 
@@ -692,6 +500,12 @@ function maybeRemove(uuid) {
     }
 }
 
+function maybeAdd(uuid) {
+    if (mode === "persistent" && !(uuid in _this.avatrs)) {
+        add(uuid);
+    }
+}
+
 
 // Register the beggining scaler in case it was saved from a previous session.
 function registerInitialScaler(initalScaler) {
@@ -703,12 +517,7 @@ function registerInitialScaler(initalScaler) {
 function updateUserScaler(newUSerScaler) {
     userScaler = newUSerScaler;
     for (var avatar in _this.selectedAvatars) {
-        var avatarInfo = _this.avatars[avatar].avatarInfo;
         reDraw(avatar, "main");
-
-        // if (avatarInfo.username) {
-        //     reDraw(avatar, "sub");
-        // }
     }
 }
 
@@ -724,8 +533,12 @@ function reset() {
 
 var mode = "on";
 function changeMode(modeType) {
+    if (mode === "persistent") {
+        handlePersistentMode(false);
+    }
+
     mode = modeType;
-    if (mode === "persistent"){
+    if (mode === "persistent") {
         handlePersistentMode(true);
     }
 }
@@ -740,6 +553,7 @@ nameTagListManager.prototype = {
     destroy: destroy,
     handleSelect: handleSelect, 
     maybeRemove: maybeRemove, 
+    maybeAdd: maybeAdd, 
     registerInitialScaler: registerInitialScaler,
     updateUserScaler: updateUserScaler,
     changeMode: changeMode,
