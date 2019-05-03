@@ -10,7 +10,7 @@
 //  Helps manage the list of avatars added to the nametag list
 //
 
-var LocalEntity = Script.require('./entityMaker.js?' + Date.now());
+var EntityMaker = Script.require('./entityMaker.js?' + Date.now());
 var entityProps = Script.require('./defaultLocalEntityProps.js?' + Date.now());
 var textHelper = new (Script.require('./textHelper.js?' + Date.now()));
 var request = Script.require('request').request;
@@ -77,7 +77,7 @@ function add(uuid){
         entityProps.lifetime = DEFAULT_LIFETIME;
     }
     
-    avatar.localEntityMain = new LocalEntity('local').add(entityProps);
+    avatar.nametag = new EntityMaker('local').add(entityProps);
 
     // When the user clicks someone, we create their nametag
     makeNameTag(uuid, "main");
@@ -86,7 +86,7 @@ function add(uuid){
     // Remove from list after lifetime is over
     if (mode === "on") {
         avatar.timeoutStarted = Script.setTimeout(function () {
-            removeLocalEntity(uuid);
+            removeNametag(uuid);
         }, deleteEnttyInMiliseconds);
     }
 
@@ -104,7 +104,7 @@ function remove(uuid){
     }
 
     delete _this.avatars[uuid];
-    removeLocalEntity(uuid);
+    removeNametag(uuid);
 
     shouldToggleInterval();
     
@@ -115,18 +115,18 @@ function remove(uuid){
 // Remove all the current LocalEntities.
 function removeAllLocalEntities(){
     for (var uuid in _this.selectedAvatars) {
-        removeLocalEntity(uuid);
+        removeNametag(uuid);
     }
 
     return _this;
 }
 
 
-// Remove a single LocalEntity.
-function removeLocalEntity(uuid){
+// Remove a single Nametag.
+function removeNametag(uuid){
     var avatar = _this.avatars[uuid];
 
-    avatar.localEntityMain.destroy();
+    avatar.nametag.destroy();
     delete _this.selectedAvatars[uuid];
 
     return _this;
@@ -153,7 +153,6 @@ function calculateInitialProperties(uuid, type) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
 
-    var localEntity = null;
     var adjustedScaler = null;
     var target = null;
     var distance = null;
@@ -163,7 +162,6 @@ function calculateInitialProperties(uuid, type) {
     var name = null;
 
     // Handle if we are asking for the main or sub properties
-    localEntity = avatar.localEntityMain;
     name = avatarInfo.displayName;
 
     // Use the text helper to calculate what our dimensions for the text box should be
@@ -204,14 +202,14 @@ var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
 var BOTTOM_MARGIN_SCALER = 0.03;
+var ABOVE_HEAD = 1;
 function makeNameTag(uuid, type) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
 
-    var localEntityMain = avatar.localEntityMain;
+    var nametag = avatar.nametag;
 
     var name = null;
-    var localEntity = null;
     var calculatedProps = null;
     var position = null;
     var distance = null;
@@ -232,8 +230,7 @@ function makeNameTag(uuid, type) {
     scaledDimensions = calculatedProps.scaledDimensions;
     lineHeight = calculatedProps.lineHeight;
 
-    // Initial values specific to which type
-    localEntity = localEntityMain;
+
     // Capture the inital dimensions, distance, and displayName in case we need to redraw
     avatar.previousDisplayName = avatarInfo.displayName;
     avatar.mainInitialDimensions = scaledDimensions;
@@ -241,9 +238,10 @@ function makeNameTag(uuid, type) {
     name = avatarInfo.displayName;
     parentID = uuid;
 
-    var position = [0, 1, 0];
-   // Common values
-    localEntity.add("text", name);
+    var nameTagPosition = ABOVE_HEAD * userScaler * avatarInfo.scale;
+    position = [0, nameTagPosition, 0];
+
+    nametag.add("text", name);
 
     // Multiply the new dimensions and line height with the user selected scaler
     scaledDimensions = Vec3.multiply(scaledDimensions, userScaler);
@@ -252,7 +250,13 @@ function makeNameTag(uuid, type) {
     scaledDimensions[X] += (lineHeight * LEFT_MARGIN_SCALER) + (lineHeight * RIGHT_MARGIN_SCALER);
     scaledDimensions[Y] += (lineHeight * TOP_MARGIN_SCALER) + (lineHeight * BOTTOM_MARGIN_SCALER);
 
-    localEntity
+    var visible = true;
+    if (mode === "persistent") {
+        var currentDistance = getDistance(uuid, CHECK_AVATAR);
+        visible = currentDistance > MAX_RADIUS_IGNORE_METERS ? false : true;
+    }
+
+    nametag
         .add("leftMargin", lineHeight * LEFT_MARGIN_SCALER)
         .add("rightMargin", lineHeight * RIGHT_MARGIN_SCALER)
         .add("topMargin", lineHeight * TOP_MARGIN_SCALER)
@@ -261,12 +265,15 @@ function makeNameTag(uuid, type) {
         .add("dimensions", scaledDimensions)
         .add("parentID", parentID)
         .add("localPosition", position)
+        .add("visible", visible)
         .create(CLEAR_ENTITY_EDIT_PROPS);
 }
 
 
 // Check to see if the display named changed or if the distance is big enough to need a redraw.
-var MAX_DISTANCE_METERS = 0.1;
+var MAX_REDRAW_DISTANCE_METERS = 0.1;
+var MAX_RADIUS_IGNORE_METERS = 7;
+var CHECK_AVATAR = true;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -274,8 +281,16 @@ function maybeRedraw(uuid){
 
     getDistance(uuid);
     var distanceDelta = Math.abs(avatar.currentDistance - avatar.previousDistance);
+    var avatarDistance = getDistance(uuid, CHECK_AVATAR);
+    if (mode === "persistent" && avatarDistance > MAX_RADIUS_IGNORE_METERS) {
+        showHide(uuid, "hide");
+    } 
 
-    if (distanceDelta < MAX_DISTANCE_METERS){
+    if (mode === "persistent" && avatarDistance < MAX_RADIUS_IGNORE_METERS) {
+        showHide(uuid, "show");
+    } 
+
+    if (distanceDelta < MAX_REDRAW_DISTANCE_METERS) {
         return;
     }
 
@@ -288,12 +303,23 @@ function maybeRedraw(uuid){
     }
 }
 
+function showHide(uuid, type) {
+    var avatar = _this.avatars[uuid];
+    var nametag = avatar.nametag;
+
+    if (type === "show") {
+        nametag.show();
+    } else {
+        nametag.hide();
+    }
+
+}
 
 // Handle redrawing if needed
 function reDraw(uuid, type) {
     var avatar = _this.avatars[uuid];
 
-    var localEntity = null;
+    var nametag = avatar.nametag;
     var initialDimensions = null;
     var initialDistance = null;
     var currentDistance = null;
@@ -303,7 +329,6 @@ function reDraw(uuid, type) {
     initialDistance = avatar.initialDistance;
     currentDistance = avatar.currentDistance;
 
-    localEntity = avatar.localEntityMain;
     initialDimensions = avatar.mainInitialDimensions;
 
     // Find our new dimensions from the new distance 
@@ -321,7 +346,7 @@ function reDraw(uuid, type) {
     newDimensions[X] += (lineHeight * LEFT_MARGIN_SCALER) + (lineHeight * RIGHT_MARGIN_SCALER);
     newDimensions[Y] += (lineHeight * TOP_MARGIN_SCALER) + (lineHeight * BOTTOM_MARGIN_SCALER);
 
-    localEntity
+    nametag
         .add("leftMargin", lineHeight * LEFT_MARGIN_SCALER)
         .add("rightMargin", lineHeight * RIGHT_MARGIN_SCALER)
         .add("topMargin", lineHeight * TOP_MARGIN_SCALER)
@@ -329,7 +354,7 @@ function reDraw(uuid, type) {
         .add("lineHeight", lineHeight)
         .add("dimensions", newDimensions);
 
-    localEntity
+    nametag
         .sync();
 }
 
@@ -345,9 +370,9 @@ function checkAllSelectedForRedraw(){
 // Remake the nametags if the display name changes.  
 function updateName(uuid) {
     var avatar = _this.avatars[uuid];
-    avatar.localEntityMain.destroy();
+    avatar.nametag.destroy();
 
-    avatar.localEntityMain = new LocalEntity('local').add(entityProps);
+    avatar.nametag = new EntityMaker('local').add(entityProps);
 
     makeNameTag(uuid, "main");
 }
@@ -372,17 +397,21 @@ function getAvatarData(uuid){
 
 
 // Calculate the distance between the camera and the target avatar.
-function getDistance(uuid) {
+function getDistance(uuid, checkAvatar) {
+    checkAvatar = checkAvatar || false;
+    var eye = checkAvatar ? MyAvatar.position : Camera.position;
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
 
-    var eye = Camera.position;
     var target = avatarInfo.position;
 
-    avatar.previousDistance = avatar.currentDistance;
-    avatar.currentDistance = Vec3.distance(target, eye);
+    var currentDistance = Vec3.distance(target, eye);
+    if (checkAvatar) {
+        return currentDistance;
+    }
 
-    return avatar.currentDistance;
+    avatar.previousDistance = avatar.currentDistance;
+    avatar.currentDistance = currentDistance;
 }
 
 
@@ -482,7 +511,7 @@ function handleSelect(uuid) {
         }
 
 
-        removeLocalEntity(uuid);
+        removeNametag(uuid);
         return;
     }
     

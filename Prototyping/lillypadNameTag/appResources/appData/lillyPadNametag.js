@@ -58,7 +58,7 @@
 
     // Updates the current user scale
     function updateCurrentUserScaler() {
-        var currentUserScaler = Settings.getValue("nametag/enabled", false);
+        var currentUserScaler = Settings.getValue("nameTag/enabled", false);
         ui.sendMessage({
             app: "userInspector",
             method: "updateCurrentUserScaler", 
@@ -82,7 +82,7 @@
 
 
     // Enables or disables the app's main functionality
-    var nameTagEnabled = Settings.getValue("nametag/enabled", false);
+    var nameTagEnabled = Settings.getValue("nameTag/enabled", false);
     function enableOrDisableNameTag() {
         if (nameTagEnabled) {
             pickRayController.enable();
@@ -94,12 +94,13 @@
 
 
     // chose which mode you want the nametags in.  On, off, or persistent.
-    var mode = Settings.getValue("nametag/mode", "on");
+    var mode = Settings.getValue("nameTag/mode", "on");
+    console.log("MODE", mode);
+    handleMode(mode);
     nameTagListManager.changeMode(mode);
     function handleMode(type){
         mode = type;
         nameTagListManager.changeMode(mode);
-        Settings.setValue("nametag/mode", "on");
     }
 
 
@@ -119,7 +120,7 @@
                 break;
             case "nametagSwitchClicked":
                 nameTagEnabled = message.nameTagEnabled;
-                Settings.setValue("nametag/enabled", nameTagEnabled);
+                Settings.setValue("nameTag/enabled", nameTagEnabled);
                 enableOrDisableNameTag();
                 break;
             case "updateUserScaler":
