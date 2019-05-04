@@ -89,17 +89,17 @@ function remove(uuid){
         delete _this.selectedAvatars[uuid];
     }
 
-    delete _this.avatars[uuid];
     removeNametag(uuid);
 
     shouldToggleInterval();
+    delete _this.avatars[uuid];
     
     return _this;
 }
 
 
 // Remove all the current LocalEntities.
-function removeAllLocalEntities(){
+function removeAllNametags(){
     for (var uuid in _this.selectedAvatars) {
         removeNametag(uuid);
     }
@@ -111,6 +111,7 @@ function removeAllLocalEntities(){
 // Remove a single Nametag.
 function removeNametag(uuid){
     var avatar = _this.avatars[uuid];
+    
     if (avatar) {
         avatar.nametag.destroy();
         delete _this.selectedAvatars[uuid];
@@ -184,7 +185,7 @@ function calculateInitialProperties(uuid) {
 
 
 // Create or make visible either the sub or the main tag.
-var REDRAW_TIMEOUT_AMOUNT_MS = 60;
+var REDRAW_TIMEOUT_AMOUNT_MS = 150;
 var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
@@ -445,7 +446,7 @@ function toggleInterval(){
 
 // handle turning the peristenet mode on
 function handlePersistentMode(shouldTurnOnPersistentMode){
-    removeAllLocalEntities();   
+    _this.reset(); 
     if (shouldTurnOnPersistentMode) {
         AvatarManager
             .getAvatarIdentifiers()
@@ -495,16 +496,16 @@ function destroy() {
 // Check to see if we need to delete any close by nametags
 var MAX_DELETE_RANGE = 4;
 function checkIfAnyAreClose(target){
-    // log("in check if any are close")
     var targetPosition = AvatarManager.getAvatar(target).position;
-    // log ("targetPosition", targetPosition);
     for (var uuid in _this.selectedAvatars) {
         var position = AvatarManager.getAvatar(uuid).position;
-        // log ("position", position);
         var distance = Vec3.distance(position, targetPosition);
-        // log("distance", distance)
         if (distance <= MAX_DELETE_RANGE) {
-            // log('need to delete')
+            var timeoutStarted = _this.avatars[uuid].timeoutStarted;
+            if (timeoutStarted) {
+                Script.clearTimeout(timeoutStarted);
+                timeoutStarted = null;
+            }
             removeNametag(uuid);
         }
     }
@@ -535,14 +536,23 @@ function handleSelect(uuid) {
     }
 }
 
+function maybeClearAllTimeouts(){
+    log("in clear all timeouts");
+    for (var uuid in _this.selectedAvatars) {
+        var timeoutStarted = _this.avatars[uuid].timeoutStarted;
+        if (timeoutStarted) {
+            log("timeout Startec");
+            Script.clearTimeout(timeoutStarted);
+            timeoutStarted = null;
+        }
+    }
+}
+
 
 // Check to see if the uuid is in the avatars list before removing.
 function maybeRemove(uuid) {
-    // log("uuid just left", uuid);
     if (uuid in _this.avatars) {
         remove(uuid);
-    } else {
-        // log("uuid not in")
     }
 }
 
@@ -570,7 +580,8 @@ function updateUserScaler(newUSerScaler) {
 
 // Reset the avatar list.
 function reset() {
-    removeAllLocalEntities();
+    maybeClearAllTimeouts();
+    removeAllNametags();
     _this.avatars = {};
     shouldToggleInterval();
 

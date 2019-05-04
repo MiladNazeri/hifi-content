@@ -54,6 +54,7 @@
         pickRayController.destroy();
         Window.domainChanged.disconnect(onDomainChange);
         AvatarManager.avatarRemovedEvent.disconnect(onAvatarRemoved);
+        AvatarManager.avatarAddedEvent.disconnect(onAvatarAdded);
     }
 
 
