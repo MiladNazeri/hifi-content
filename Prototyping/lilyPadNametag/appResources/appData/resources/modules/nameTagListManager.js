@@ -537,11 +537,9 @@ function handleSelect(uuid) {
 }
 
 function maybeClearAllTimeouts(){
-    log("in clear all timeouts");
     for (var uuid in _this.selectedAvatars) {
         var timeoutStarted = _this.avatars[uuid].timeoutStarted;
         if (timeoutStarted) {
-            log("timeout Startec");
             Script.clearTimeout(timeoutStarted);
             timeoutStarted = null;
         }
