@@ -17,7 +17,7 @@ var localEntityProps = {
     textColor: "#ffffff",
     textAlpha: 1.0,
     backgroundColor: "#2d2d2d",
-    backgroundAlpha: 1,
+    backgroundAlpha: 0.4,
     billboardMode: "full",
     lifetime: 3,
     canCastShadow: true
