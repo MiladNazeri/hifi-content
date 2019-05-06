@@ -11,6 +11,10 @@
 //
 
 
+var ON = 'ON';
+var OFF = 'OFF';
+var log = Script.require('https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/developerTools/sharedLibraries/easyLog/easyLog.js?' + Date.now())(true, 'nameTagListManager.js');
+
 var EntityMaker = Script.require('./entityMaker.js?' + Date.now());
 var entityProps = Script.require('./defaultLocalEntityProps.js?' + Date.now());
 var textHelper = new (Script.require('./textHelper.js?' + Date.now()));
@@ -155,8 +159,9 @@ function getAvatarData(uuid){
 
 
 // Calculate the distance between the camera and the target avatar
-function getDistance(uuid, checkAvatar) {
+function getDistance(uuid, checkAvatar, shouldSave) {
     checkAvatar = checkAvatar || false;
+    shouldSave = shouldSave || true;
     var eye = checkAvatar ? MyAvatar.position : Camera.position;
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -165,7 +170,7 @@ function getDistance(uuid, checkAvatar) {
 
     var currentDistance = Vec3.distance(target, eye);
     
-    if (!checkAvatar) {
+    if (!checkAvatar && shouldSave) {
         avatar.previousDistance = avatar.currentDistance;
         avatar.currentDistance = currentDistance;
     }
@@ -289,7 +294,7 @@ function makeNameTag(uuid) {
 
     var visible = true;
     if (mode === "persistent") {
-        var currentDistance = getDistance(uuid, CHECK_AVATAR);
+        var currentDistance = getDistance(uuid, CHECK_AVATAR, false);
         visible = currentDistance > MAX_RADIUS_IGNORE_METERS ? false : true;
     }
 
@@ -323,7 +328,7 @@ function maybeRedraw(uuid){
 
     getDistance(uuid);
     var distanceDelta = Math.abs(avatar.currentDistance - avatar.previousDistance);
-    var avatarDistance = getDistance(uuid, CHECK_AVATAR);
+    var avatarDistance = getDistance(uuid, CHECK_AVATAR, false);
     if (mode === "persistent" && avatarDistance > MAX_RADIUS_IGNORE_METERS) {
         showHide(uuid, "hide");
     } 
@@ -371,6 +376,14 @@ function reDraw(uuid) {
 
     // Multiply the new dimensions and line height with the user selected scaler
     newDimensions = Vec3.multiply(newDimensions, userScaler);
+    var distance = getDistance(uuid, false, false);
+    if (distance < 3) {
+        log("distance less than 3", ON);
+        var finalScaler = ((distance - MAX_RADIUS_IGNORE_METERS) /  (0.2 - MAX_RADIUS_IGNORE_METERS)) * 0.35;
+        finalScaler = 1 + finalScaler;
+        newDimensions = Vec3.multiply(newDimensions, 1 + finalScaler);
+    }
+
     lineHeight = newDimensions[Y] * LINE_HEIGHT_SCALER;
 
     // Add some room for the margin by using lineHeight as a reference
