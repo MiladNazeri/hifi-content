@@ -21,6 +21,8 @@ function userSliderChanged(slider) {
     }));
 }
 
+
+// Hnadle the nametag view mode change
 var mode = "on";
 function handleMode(radioButton) {
     mode = radioButton.value;

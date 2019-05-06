@@ -10,12 +10,10 @@
 //  Helps manage the list of avatars added to the nametag list
 //
 
-var log = Script.require('https://hifi-content.s3.amazonaws.com/milad/ROLC/d/ROLC_High-Fidelity/02_Organize/O_Projects/Repos/hifi-content/developerTools/sharedLibraries/easyLog/easyLog.js')
 
 var EntityMaker = Script.require('./entityMaker.js?' + Date.now());
 var entityProps = Script.require('./defaultLocalEntityProps.js?' + Date.now());
 var textHelper = new (Script.require('./textHelper.js?' + Date.now()));
-var request = Script.require('request').request;
 var X = 0;
 var Y = 1;
 var Z = 2;
@@ -29,7 +27,7 @@ var MILISECONDS_IN_SECOND = 1000;
 // #region UTILTY
 
 
-// properties to give new avatars added to the list
+// Properties to give new avatars added to the list
 function NewAvatarProps() {
     return {
         avatarInfo: null,
@@ -44,85 +42,7 @@ function NewAvatarProps() {
 }
 
 
-// Add a user to the list.
-var DEFAULT_LIFETIME = entityProps.lifetime;
-function add(uuid){
-    // User Doesn't exist so give them new props and save in the cache, get their current avatar info, 
-    // and handle the different ways to get the username(friend or admin)
-    if (!_this.avatars[uuid]) {
-        _this.avatars[uuid] = new NewAvatarProps(); 
-        getAvatarData(uuid);
-    }
-
-    var avatar = _this.avatars[uuid];
-
-    _this.selectedAvatars[uuid] = true;
-    if (mode === "persistent") {
-        entityProps.lifetime = -1;
-    } else {
-        entityProps.lifetime = DEFAULT_LIFETIME;
-    }
-    
-    avatar.nametag = new EntityMaker('local').add(entityProps);
-
-    // When the user clicks someone, we create their nametag
-    makeNameTag(uuid);
-
-    var deleteEnttyInMiliseconds = entityProps.lifetime * MILISECONDS_IN_SECOND;
-    // Remove from list after lifetime is over
-    if (mode === "on") {
-        avatar.timeoutStarted = Script.setTimeout(function () {
-            removeNametag(uuid);
-        }, deleteEnttyInMiliseconds);
-    }
-
-    // Check to see if anyone is in the selected list now to see if we need to start the interval checking
-    shouldToggleInterval();
-
-    return _this;
-}
-
-
-// Remove the avatar from the list.
-function remove(uuid){
-    if (_this.selectedAvatars[uuid]){
-        delete _this.selectedAvatars[uuid];
-    }
-
-    removeNametag(uuid);
-
-    shouldToggleInterval();
-    delete _this.avatars[uuid];
-    
-    return _this;
-}
-
-
-// Remove all the current LocalEntities.
-function removeAllNametags(){
-    for (var uuid in _this.selectedAvatars) {
-        removeNametag(uuid);
-    }
-
-    return _this;
-}
-
-
-// Remove a single Nametag.
-function removeNametag(uuid){
-    var avatar = _this.avatars[uuid];
-    
-    if (avatar) {
-        avatar.nametag.destroy();
-        delete _this.selectedAvatars[uuid];
-
-        return _this;
-    }
-
-}
-
-
-// Makes sure clear interval exists before changing.
+// Makes sure clear interval exists before changing
 function maybeClearInterval(){
     if (_this.redrawTimeout) {
         Script.clearInterval(_this.redrawTimeout);
@@ -131,7 +51,7 @@ function maybeClearInterval(){
 }
 
 
-// Calculate our initial properties for either the main or the sub entity.
+// Calculate our initial properties for the nametag
 var Z_SIZE = 0.01;
 var MAIN_SCALER = 0.75;
 var LINE_HEIGHT_SCALER = 0.99;
@@ -184,6 +104,141 @@ function calculateInitialProperties(uuid) {
 }
 
 
+// Used in persistent mode to show or hide if they reached the max radius
+function showHide(uuid, type) {
+    var avatar = _this.avatars[uuid];
+    var nametag = avatar.nametag;
+
+    if (type === "show") {
+        nametag.show();
+    } else {
+        nametag.hide();
+    }
+}
+
+
+// Go through the selected avatar list and see if any of the avatars need a redraw
+function checkAllSelectedForRedraw(){
+    for (var avatar in _this.selectedAvatars) {
+        maybeRedraw(avatar);
+    }
+}
+
+
+// Remake the nametags if the display name changes
+function updateName(uuid) {
+    var avatar = _this.avatars[uuid];
+    avatar.nametag.destroy();
+
+    avatar.nametag = new EntityMaker('local').add(entityProps);
+
+    makeNameTag(uuid);
+}
+
+
+// Get the current data for an avatar.
+function getAvatarData(uuid){
+    var avatar = _this.avatars[uuid];
+    var avatarInfo = avatar.avatarInfo;
+
+    var newAvatarInfo = AvatarManager.getAvatar(uuid);
+    // Save the username so it doesn't get overwritten when grabbing new avatarData
+    var combinedAvatarInfo = Object.assign({}, newAvatarInfo, {
+        username: avatarInfo === null ? null : avatarInfo.username 
+    });
+
+    // Now combine that avatar data with the main avatar object
+    _this.avatars[uuid] = Object.assign({}, avatar, { avatarInfo: combinedAvatarInfo });
+
+    return _this;
+}
+
+
+// Calculate the distance between the camera and the target avatar
+function getDistance(uuid, checkAvatar) {
+    checkAvatar = checkAvatar || false;
+    var eye = checkAvatar ? MyAvatar.position : Camera.position;
+    var avatar = _this.avatars[uuid];
+    var avatarInfo = avatar.avatarInfo;
+
+    var target = avatarInfo.position;
+
+    var currentDistance = Vec3.distance(target, eye);
+    
+    if (!checkAvatar) {
+        avatar.previousDistance = avatar.currentDistance;
+        avatar.currentDistance = currentDistance;
+    }
+
+    return currentDistance;
+}
+
+
+// Check to see if we need to toggle our interval check because we went to 0 avatars
+// or if we got our first avatar in the select list
+function shouldToggleInterval(){
+    var currentNumberOfAvatarsSelected = Object.keys(_this.selectedAvatars).length;
+
+    if (currentNumberOfAvatarsSelected === 0 && _this.redrawTimeout) {
+        toggleInterval();
+        return;
+    }
+
+    if (currentNumberOfAvatarsSelected > 0 && !_this.redrawTimeout) {
+        toggleInterval();
+        return; 
+    }
+}
+
+
+// Turn off and on the redraw check
+var INTERVAL_CHECK_MS = 80;
+function toggleInterval(){
+    if (_this.redrawTimeout){
+        maybeClearInterval();
+    } else {
+        _this.redrawTimeout = 
+            Script.setInterval(checkAllSelectedForRedraw, INTERVAL_CHECK_MS);
+    }
+}
+
+
+// handle turning the peristenet mode on
+function handlePersistentMode(shouldTurnOnPersistentMode){
+    _this.reset(); 
+    if (shouldTurnOnPersistentMode) {
+        AvatarManager
+            .getAvatarIdentifiers()
+            .forEach(function(avatar){
+                if (avatar) {
+                    add(avatar);
+                }
+            });
+    }
+}
+
+
+// #endregion
+// *************************************
+// END UTILTY
+// *************************************
+
+// *************************************
+// START Nametag
+// *************************************
+// #region Nametag
+
+
+var _this = null;
+function nameTagListManager(){
+    _this = this;
+
+    _this.avatars = {};
+    _this.selectedAvatars = {};
+    _this.redrawTimeout = null;
+}
+
+
 // Create or make visible either the sub or the main tag.
 var REDRAW_TIMEOUT_AMOUNT_MS = 150;
 var LEFT_MARGIN_SCALER = 0.15;
@@ -209,7 +264,6 @@ function makeNameTag(uuid) {
     var scaledDimensions = calculatedProps.scaledDimensions;
     var lineHeight = calculatedProps.lineHeight;
 
-
     // Capture the inital dimensions, distance, and displayName in case we need to redraw
     avatar.previousDisplayName = avatarInfo.displayName;
     avatar.mainInitialDimensions = scaledDimensions;
@@ -232,7 +286,6 @@ function makeNameTag(uuid) {
     var jointInObjectFrame = AvatarData.getAbsoluteJointTranslationInObjectFrame(headJointIndex);
     var nameTagPosition = jointInObjectFrame.y + scaledDimenionsYHalf + ABOVE_HEAD_OFFSET;
     var localPosition = [0, nameTagPosition, 0];
-
 
     var visible = true;
     if (mode === "persistent") {
@@ -292,17 +345,6 @@ function maybeRedraw(uuid){
     }
 }
 
-function showHide(uuid, type) {
-    var avatar = _this.avatars[uuid];
-    var nametag = avatar.nametag;
-
-    if (type === "show") {
-        nametag.show();
-    } else {
-        nametag.hide();
-    }
-
-}
 
 // Handle redrawing if needed
 function reDraw(uuid) {
@@ -354,125 +396,88 @@ function reDraw(uuid) {
 }
 
 
-// Go through the selected avatar list and see if any of the avatars need a redraw.
-function checkAllSelectedForRedraw(){
-    for (var avatar in _this.selectedAvatars) {
-        maybeRedraw(avatar);
+// Add a user to the list.
+var DEFAULT_LIFETIME = entityProps.lifetime;
+function add(uuid){
+    // User Doesn't exist so give them new props and save in the cache, get their current avatar info, 
+    // and handle the different ways to get the username(friend or admin)
+    if (!_this.avatars[uuid]) {
+        _this.avatars[uuid] = new NewAvatarProps(); 
+        getAvatarData(uuid);
     }
-}
 
-
-// Remake the nametags if the display name changes.  
-function updateName(uuid) {
     var avatar = _this.avatars[uuid];
-    avatar.nametag.destroy();
 
+    _this.selectedAvatars[uuid] = true;
+    if (mode === "persistent") {
+        entityProps.lifetime = -1;
+    } else {
+        entityProps.lifetime = DEFAULT_LIFETIME;
+    }
+    
     avatar.nametag = new EntityMaker('local').add(entityProps);
 
+    // When the user clicks someone, we create their nametag
     makeNameTag(uuid);
-}
 
+    var deleteEnttyInMiliseconds = entityProps.lifetime * MILISECONDS_IN_SECOND;
+    // Remove from list after lifetime is over
+    if (mode === "on") {
+        avatar.timeoutStarted = Script.setTimeout(function () {
+            removeNametag(uuid);
+        }, deleteEnttyInMiliseconds);
+    }
 
-// Get the current data for an avatar.
-function getAvatarData(uuid){
-    var avatar = _this.avatars[uuid];
-    var avatarInfo = avatar.avatarInfo;
-
-    var newAvatarInfo = AvatarManager.getAvatar(uuid);
-    // Save the username so it doesn't get overwritten when grabbing new avatarData
-    var combinedAvatarInfo = Object.assign({}, newAvatarInfo, {
-        username: avatarInfo === null ? null : avatarInfo.username 
-    });
-
-    // Now combine that avatar data with the main avatar object
-    _this.avatars[uuid] = Object.assign({}, avatar, { avatarInfo: combinedAvatarInfo });
+    // Check to see if anyone is in the selected list now to see if we need to start the interval checking
+    shouldToggleInterval();
 
     return _this;
 }
 
 
-// Calculate the distance between the camera and the target avatar.
-function getDistance(uuid, checkAvatar) {
-    checkAvatar = checkAvatar || false;
-    var eye = checkAvatar ? MyAvatar.position : Camera.position;
-    var avatar = _this.avatars[uuid];
-    var avatarInfo = avatar.avatarInfo;
+// Remove the avatar from the list.
+function remove(uuid){
+    if (_this.selectedAvatars[uuid]){
+        delete _this.selectedAvatars[uuid];
+    }
 
-    var target = avatarInfo.position;
+    removeNametag(uuid);
 
-    var currentDistance = Vec3.distance(target, eye);
+    shouldToggleInterval();
+    delete _this.avatars[uuid];
     
-    if (!checkAvatar) {
-        avatar.previousDistance = avatar.currentDistance;
-        avatar.currentDistance = currentDistance;
-    }
-
-    return currentDistance;
-
-
+    return _this;
 }
 
 
-// Check to see if we need to toggle our interval check because we went to 0 avatars 
-// or if we got our first avatar in the select list.
-function shouldToggleInterval(){
-    var currentNumberOfAvatarsSelected = Object.keys(_this.selectedAvatars).length;
-
-    if (currentNumberOfAvatarsSelected === 0 && _this.redrawTimeout) {
-        toggleInterval();
-        return;
+// Remove all the current nametags.
+function removeAllNametags(){
+    for (var uuid in _this.selectedAvatars) {
+        removeNametag(uuid);
     }
 
-    if (currentNumberOfAvatarsSelected > 0 && !_this.redrawTimeout) {
-        toggleInterval();
-        return; 
-    }
+    return _this;
 }
 
 
-// Turn off and on the redraw check.
-var INTERVAL_CHECK_MS = 80;
-function toggleInterval(){
-    if (_this.redrawTimeout){
-        maybeClearInterval();
-    } else {
-        _this.redrawTimeout = 
-            Script.setInterval(checkAllSelectedForRedraw, INTERVAL_CHECK_MS);
+// Remove a single Nametag.
+function removeNametag(uuid){
+    var avatar = _this.avatars[uuid];
+    
+    if (avatar) {
+        avatar.nametag.destroy();
+        delete _this.selectedAvatars[uuid];
+
+        return _this;
     }
+
 }
 
-
-// interval function to scan for new avatars
-
-// handle turning the peristenet mode on
-function handlePersistentMode(shouldTurnOnPersistentMode){
-    _this.reset(); 
-    if (shouldTurnOnPersistentMode) {
-        AvatarManager
-            .getAvatarIdentifiers()
-            .forEach(function(avatar){
-                if (avatar) {
-                    add(avatar);
-                }
-            });
-    }
-}
-
-
+ 
 // #endregion
 // *************************************
-// END UTILTY
+// END Nametag
 // *************************************
-
-var _this = null;
-function nameTagListManager(){
-    _this = this;
-
-    _this.avatars = {};
-    _this.selectedAvatars = {};
-    _this.redrawTimeout = null;
-}
-
 
 // *************************************
 // START API
@@ -480,13 +485,13 @@ function nameTagListManager(){
 // #region API
 
 
-// Create the manager and hook up username signal.
+// Create the manager and hook up username signal
 function create() {
     return _this;
 }
 
 
-// Destory the manager and disconnect from username signal.
+// Destory the manager and disconnect from username signal
 function destroy() {
     _this.reset();
     return _this;
@@ -511,7 +516,7 @@ function checkIfAnyAreClose(target){
     }
 }
 
-// Handles what happens when an avatar gets triggered on.
+// Handles what happens when an avatar gets triggered on
 function handleSelect(uuid) {
     if (mode === "off" || mode === "persistent") {
         return;
@@ -536,6 +541,8 @@ function handleSelect(uuid) {
     }
 }
 
+
+// Check to see if we need to clear timeouts for avatars
 function maybeClearAllTimeouts(){
     for (var uuid in _this.selectedAvatars) {
         var timeoutStarted = _this.avatars[uuid].timeoutStarted;
@@ -547,13 +554,15 @@ function maybeClearAllTimeouts(){
 }
 
 
-// Check to see if the uuid is in the avatars list before removing.
+// Check to see if the uuid is in the avatars list before removing
 function maybeRemove(uuid) {
     if (uuid in _this.avatars) {
         remove(uuid);
     }
 }
 
+
+// Check to see if we need to add this user to our list
 function maybeAdd(uuid) {
     if (uuid && mode === "persistent" && !(uuid in _this.avatars)) {
         add(uuid);
@@ -561,13 +570,13 @@ function maybeAdd(uuid) {
 }
 
 
-// Register the beggining scaler in case it was saved from a previous session.
+// Register the beggining scaler in case it was saved from a previous session
 function registerInitialScaler(initalScaler) {
     userScaler = initalScaler;
 }
 
 
-// Handle the user updating scale.
+// Handle the user updating scale
 function updateUserScaler(newUSerScaler) {
     userScaler = newUSerScaler;
     for (var avatar in _this.selectedAvatars) {
@@ -576,7 +585,7 @@ function updateUserScaler(newUSerScaler) {
 }
 
 
-// Reset the avatar list.
+// Reset the avatar list
 function reset() {
     maybeClearAllTimeouts();
     removeAllNametags();
@@ -586,6 +595,8 @@ function reset() {
     return _this;
 }
 
+
+// Update the nametag display mode
 var mode = "on";
 function changeMode(modeType) {
     if (mode === "persistent") {
@@ -602,10 +613,12 @@ function changeMode(modeType) {
     }
 }
 
+
 // #endregion
 // *************************************
 // END API
 // *************************************
+
 
 nameTagListManager.prototype = {
     create: create,

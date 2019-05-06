@@ -1,7 +1,6 @@
 //
-//    User Inspector
+//    Lily Pad User Inspector
 //    Created by Milad Nazeri on 2019-02-16
-//    Additional code by Zach Foxx
 //    Copyright 2019 High Fidelity, Inc.
 //
 //    Distributed under the Apache License, Version 2.0.
@@ -43,6 +42,8 @@
         nameTagListManager.maybeRemove(uuid);
     }
 
+    
+    // Automatically add an avatar if they come into the domain.  Mainly used for persistent mode.
     function onAvatarAdded(uuid) {
         nameTagListManager.maybeAdd(uuid);
     }
@@ -68,14 +69,8 @@
     }
 
 
-    // Run when the tablet is opened
-    function onOpened() {
-        updateCurrentUserScaler();
-    }
-
-
     // Register the initial userScaler if it was saved in your settings
-    var currentUserScaler = Settings.getValue("lilyPadUserInspector/userScaler", 1.0);
+    var currentUserScaler = Settings.getValue("lilyPadUserInspector/userScaler", 0.6);
     nameTagListManager.registerInitialScaler(currentUserScaler);
     function updateUserScaler(newSize){
         nameTagListManager.updateUserScaler(newSize);
@@ -132,7 +127,6 @@
             home: APP_UI_URL,
             // User by Craig from the Noun Project
             graphicsDirectory: Script.resolvePath("./resources/images/icons/"),
-            onOpened: onOpened,
             onMessage: onMessage
         });
 
