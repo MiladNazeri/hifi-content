@@ -38,7 +38,7 @@ function NewAvatarProps() {
         previousDistance: null,
         currentDistance: null,
         initialDistance: null,
-        mainInitialDimensions: null,
+        initialDimensions: null,
         previousName: null,
         timeoutStarted: false,
         friend: false
@@ -57,9 +57,11 @@ function maybeClearInterval(){
 
 // Calculate our initial properties for the nametag
 var Z_SIZE = 0.01;
-var MAIN_SCALER = 0.75;
 var LINE_HEIGHT_SCALER = 0.99;
-var DISTANCE_SCALER = 0.35; // Empirical value
+var DISTANCE_SCALER = 0.35;
+// var DISTANCE_SCALER = 1.0;
+// var DISTANCE_SCALER = 1.25; // 
+// var DISTANCE_SCALER = 0.85; // Empirical valueEmpirical value
 var userScaler = 1.0;
 var DEFAULT_LINE_HEIGHT = entityProps.lineHeight;
 function calculateInitialProperties(uuid) {
@@ -91,12 +93,6 @@ function calculateInitialProperties(uuid) {
     // Adjust the dimensions by the modified distance scaler
     scaledDimensions = Vec3.multiply(dimensions, adjustedScaler);
 
-    // Adjust those scaled dimensions by the main scaler or the sub scaler to control the general size
-    scaledDimensions = Vec3.multiply(
-        scaledDimensions,
-        MAIN_SCALER
-    );
-    
     // Adjust the lineheight to be the new scaled dimensions Y 
     lineHeight = scaledDimensions[Y] * LINE_HEIGHT_SCALER;
 
@@ -197,7 +193,7 @@ function shouldToggleInterval(){
 
 
 // Turn off and on the redraw check
-var INTERVAL_CHECK_MS = 80;
+var INTERVAL_CHECK_MS = 40;
 function toggleInterval(){
     if (_this.redrawTimeout){
         maybeClearInterval();
@@ -245,12 +241,13 @@ function nameTagListManager(){
 
 
 // Create or make visible either the sub or the main tag.
-var REDRAW_TIMEOUT_AMOUNT_MS = 150;
+var REDRAW_TIMEOUT_AMOUNT_MS = 2000;
 var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
 var BOTTOM_MARGIN_SCALER = 0.03;
 var ABOVE_HEAD_OFFSET = 0.3;
+var MODE_ON_SCALER_ADJUST = 1.0;
 function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -271,7 +268,7 @@ function makeNameTag(uuid) {
 
     // Capture the inital dimensions, distance, and displayName in case we need to redraw
     avatar.previousDisplayName = avatarInfo.displayName;
-    avatar.mainInitialDimensions = scaledDimensions;
+    avatar.initialDimensions = scaledDimensions;
     avatar.initialDistance = distance;
     var name = avatarInfo.displayName;
     var parentID = uuid;
@@ -280,6 +277,23 @@ function makeNameTag(uuid) {
 
     // Multiply the new dimensions and line height with the user selected scaler
     scaledDimensions = Vec3.multiply(scaledDimensions, userScaler);
+
+    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS;
+    var finalScaler = (distance - maxDistance) / (MIN_DISTANCE - maxDistance);
+    
+    var remainder = 1 - finalScaler;
+    var multipliedRemainderOn = remainder * onModeScalar;
+    var multipliedRemainderPersistent = remainder * persistentModeScalar;
+    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
+
+    
+    if (avatar.avatarInfo.displayName === "MarkB") {
+        // log('384: newDimensions', newDimensions, ON);
+        log("finalScaler", finalScaler, ON);
+    }
+    
+    scaledDimensions = Vec3.multiply(scaledDimensions, finalScaler);
+
     lineHeight = scaledDimensions[Y] * LINE_HEIGHT_SCALER;
     // Add some room for the margin by using lineHeight as a reference
     scaledDimensions[X] += (lineHeight * LEFT_MARGIN_SCALER) + (lineHeight * RIGHT_MARGIN_SCALER);
@@ -308,19 +322,23 @@ function makeNameTag(uuid) {
         .add("parentID", parentID)
         .add("localPosition", localPosition)
         .add("visible", visible)
-        .add("alpha", 0)
         .create(CLEAR_ENTITY_EDIT_PROPS);
     
     Script.setTimeout(function(){
-        nametag.edit("alpha", 1);
+        nametag.edit("visible", true);
     }, REDRAW_TIMEOUT_AMOUNT_MS);
 }
 
 
 // Check to see if the display named changed or if the distance is big enough to need a redraw.
 var MAX_REDRAW_DISTANCE_METERS = 0.1;
-var MAX_RADIUS_IGNORE_METERS = 15;
+var MAX_RADIUS_IGNORE_METERS = 22;
+var MAX_ON_MODE_DISTANCE = 30;
 var CHECK_AVATAR = true;
+var MIN_DISTANCE = 1;
+var maxDistance = MAX_RADIUS_IGNORE_METERS;
+var onModeScalar = 0.05;
+var persistentModeScalar = -0.15;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -365,7 +383,7 @@ function reDraw(uuid) {
     initialDistance = avatar.initialDistance;
     currentDistance = avatar.currentDistance;
 
-    initialDimensions = avatar.mainInitialDimensions;
+    initialDimensions = avatar.initialDimensions;
 
     // Find our new dimensions from the new distance 
     newDimensions = [
@@ -376,14 +394,28 @@ function reDraw(uuid) {
 
     // Multiply the new dimensions and line height with the user selected scaler
     newDimensions = Vec3.multiply(newDimensions, userScaler);
-    var distance = getDistance(uuid, false, false);
-    if (distance < 3) {
-        log("distance less than 3", ON);
-        var finalScaler = ((distance - MAX_RADIUS_IGNORE_METERS) /  (0.2 - MAX_RADIUS_IGNORE_METERS)) * 0.35;
-        finalScaler = 1 + finalScaler;
-        newDimensions = Vec3.multiply(newDimensions, 1 + finalScaler);
-    }
 
+    var distance = getDistance(uuid, false, false);
+    
+    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS;
+    var finalScaler = (distance - maxDistance) / (MIN_DISTANCE - maxDistance);
+    if (avatar.avatarInfo.displayName === "MarkB") {
+        // log('384: newDimensions', newDimensions, ON);
+        // log("finalScaler1", finalScaler, ON);
+    }
+    var remainder = 1 - finalScaler;
+    var multipliedRemainderOn = remainder * onModeScalar;
+    var multipliedRemainderPersistent = remainder * persistentModeScalar;
+    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
+    
+    // var multipliedRemainder = remainder * 0.5;
+    // finalScaler = mode === "on" ? finalScaler + multipliedRemainder : finalScaler;
+    newDimensions = Vec3.multiply(newDimensions, finalScaler);
+
+    if (avatar.avatarInfo.displayName === "MarkB") {
+        // log('384: newDimensions', newDimensions, ON);
+        // log("finalScaler2", finalScaler, multipliedRemainderPersistent, ON);
+    }
     lineHeight = newDimensions[Y] * LINE_HEIGHT_SCALER;
 
     // Add some room for the margin by using lineHeight as a reference
