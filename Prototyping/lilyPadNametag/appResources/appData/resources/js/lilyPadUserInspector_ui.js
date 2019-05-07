@@ -19,6 +19,8 @@ function userSliderChanged(slider) {
         method: "updateUserScaler",
         currentUserScaler: slider.value
     }));
+
+    document.getElementById("sliderValueDisplay").innerHTML = slider.value;
 }
 
 
@@ -51,6 +53,8 @@ function onScriptEventReceived(message) {
         case "updateUI":
             document.getElementById("sizeSlider").value = message.currentUserScaler; 
             mode = message.mode || "on";
+            document.getElementById("sliderValueDisplay").innerHTML = message.currentUserScaler;
+            
             switch (mode) {
                 case "on":
                     document.getElementById("radio_on").checked = true;

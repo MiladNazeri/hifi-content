@@ -58,11 +58,7 @@ function maybeClearInterval(){
 // Calculate our initial properties for the nametag
 var Z_SIZE = 0.01;
 var LINE_HEIGHT_SCALER = 0.99;
-// var DISTANCE_SCALER = 0.35;
-var DISTANCE_SCALER = 1.0;
-// var DISTANCE_SCALER = 1.0;
-// var DISTANCE_SCALER = 1.25; // 
-// var DISTANCE_SCALER = 0.85; // Empirical valueEmpirical value
+var DISTANCE_SCALER = 0.65;
 var userScaler = 1.0;
 var DEFAULT_LINE_HEIGHT = entityProps.lineHeight;
 function calculateInitialProperties(uuid) {
@@ -251,7 +247,7 @@ var ABOVE_HEAD_OFFSET = 0.30;
 var MODE_ON_SCALER_ADJUST = 1.0;
 var maxDistance = MAX_RADIUS_IGNORE_METERS;
 var onModeScalar = 0.05;
-var persistentModeScalar = -1;
+var persistentModeScalar = -0.55;
 function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -290,11 +286,6 @@ function makeNameTag(uuid) {
     var multipliedRemainderPersistent = remainder * persistentModeScalar;
     finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
 
-    
-    if (avatar.avatarInfo.displayName === "MarkB") {
-        log("finalScaler", finalScaler, ON);
-    }
-    
     scaledDimensions = Vec3.multiply(scaledDimensions, finalScaler);
 
     lineHeight = scaledDimensions[Y] * LINE_HEIGHT_SCALER;
@@ -338,7 +329,7 @@ var MAX_REDRAW_DISTANCE_METERS = 0.01;
 var MAX_RADIUS_IGNORE_METERS = 22;
 var MAX_ON_MODE_DISTANCE = 30;
 var CHECK_AVATAR = true;
-var MIN_DISTANCE = 1;
+var MIN_DISTANCE = 0.2;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -406,10 +397,6 @@ function reDraw(uuid) {
     
     newDimensions = Vec3.multiply(newDimensions, finalScaler);
 
-    if (avatar.avatarInfo.displayName === "MarkB") {
-        log('384: newDimensions', newDimensions, ON);
-        log("finalScaler2", finalScaler, multipliedRemainderPersistent, ON);
-    }
     lineHeight = newDimensions[Y] * LINE_HEIGHT_SCALER;
 
     // Add some room for the margin by using lineHeight as a reference

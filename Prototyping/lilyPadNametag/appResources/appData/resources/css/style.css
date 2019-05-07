@@ -91,6 +91,10 @@ body {
     margin-top: 25px;
 }
 
+#sliderValueDisplay {
+    margin-left: 10px;
+}
+
 /* Switch CSS */
 .switch {
     position: relative;
