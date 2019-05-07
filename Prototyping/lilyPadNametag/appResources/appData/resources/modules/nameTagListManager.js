@@ -58,7 +58,8 @@ function maybeClearInterval(){
 // Calculate our initial properties for the nametag
 var Z_SIZE = 0.01;
 var LINE_HEIGHT_SCALER = 0.99;
-var DISTANCE_SCALER = 0.35;
+// var DISTANCE_SCALER = 0.35;
+var DISTANCE_SCALER = 1.0;
 // var DISTANCE_SCALER = 1.0;
 // var DISTANCE_SCALER = 1.25; // 
 // var DISTANCE_SCALER = 0.85; // Empirical valueEmpirical value
@@ -193,7 +194,7 @@ function shouldToggleInterval(){
 
 
 // Turn off and on the redraw check
-var INTERVAL_CHECK_MS = 40;
+var INTERVAL_CHECK_MS = 60;
 function toggleInterval(){
     if (_this.redrawTimeout){
         maybeClearInterval();
@@ -241,13 +242,16 @@ function nameTagListManager(){
 
 
 // Create or make visible either the sub or the main tag.
-var REDRAW_TIMEOUT_AMOUNT_MS = 2000;
+var REDRAW_TIMEOUT_AMOUNT_MS = 500;
 var LEFT_MARGIN_SCALER = 0.15;
 var RIGHT_MARGIN_SCALER = 0.10;
 var TOP_MARGIN_SCALER = 0.07;
 var BOTTOM_MARGIN_SCALER = 0.03;
-var ABOVE_HEAD_OFFSET = 0.3;
+var ABOVE_HEAD_OFFSET = 0.30;
 var MODE_ON_SCALER_ADJUST = 1.0;
+var maxDistance = MAX_RADIUS_IGNORE_METERS;
+var onModeScalar = 0.05;
+var persistentModeScalar = -1;
 function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -288,7 +292,6 @@ function makeNameTag(uuid) {
 
     
     if (avatar.avatarInfo.displayName === "MarkB") {
-        // log('384: newDimensions', newDimensions, ON);
         log("finalScaler", finalScaler, ON);
     }
     
@@ -331,14 +334,11 @@ function makeNameTag(uuid) {
 
 
 // Check to see if the display named changed or if the distance is big enough to need a redraw.
-var MAX_REDRAW_DISTANCE_METERS = 0.1;
+var MAX_REDRAW_DISTANCE_METERS = 0.01;
 var MAX_RADIUS_IGNORE_METERS = 22;
 var MAX_ON_MODE_DISTANCE = 30;
 var CHECK_AVATAR = true;
 var MIN_DISTANCE = 1;
-var maxDistance = MAX_RADIUS_IGNORE_METERS;
-var onModeScalar = 0.05;
-var persistentModeScalar = -0.15;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -399,22 +399,16 @@ function reDraw(uuid) {
     
     maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS;
     var finalScaler = (distance - maxDistance) / (MIN_DISTANCE - maxDistance);
-    if (avatar.avatarInfo.displayName === "MarkB") {
-        // log('384: newDimensions', newDimensions, ON);
-        // log("finalScaler1", finalScaler, ON);
-    }
     var remainder = 1 - finalScaler;
     var multipliedRemainderOn = remainder * onModeScalar;
     var multipliedRemainderPersistent = remainder * persistentModeScalar;
     finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
     
-    // var multipliedRemainder = remainder * 0.5;
-    // finalScaler = mode === "on" ? finalScaler + multipliedRemainder : finalScaler;
     newDimensions = Vec3.multiply(newDimensions, finalScaler);
 
     if (avatar.avatarInfo.displayName === "MarkB") {
-        // log('384: newDimensions', newDimensions, ON);
-        // log("finalScaler2", finalScaler, multipliedRemainderPersistent, ON);
+        log('384: newDimensions', newDimensions, ON);
+        log("finalScaler2", finalScaler, multipliedRemainderPersistent, ON);
     }
     lineHeight = newDimensions[Y] * LINE_HEIGHT_SCALER;
 
