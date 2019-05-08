@@ -190,7 +190,7 @@ function shouldToggleInterval(){
 
 
 // Turn off and on the redraw check
-var INTERVAL_CHECK_MS = 60;
+var INTERVAL_CHECK_MS = 30;
 function toggleInterval(){
     if (_this.redrawTimeout){
         maybeClearInterval();
@@ -330,7 +330,7 @@ var MAX_RADIUS_IGNORE_METERS = 22;
 var MAX_ON_MODE_DISTANCE = 30;
 var CHECK_AVATAR = true;
 var MIN_DISTANCE = 0.2;
-var OFFSET = 15;
+var OFFSET = 25;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -345,10 +345,6 @@ function maybeRedraw(uuid){
 
     if (mode === "alwaysOn" && avatarDistance < MAX_RADIUS_IGNORE_METERS) {
         showHide(uuid, "show");
-    } 
-
-    if (distanceDelta < MAX_REDRAW_DISTANCE_METERS) {
-        return;
     }
 
     avatarInfo.displayName = avatarInfo.displayName === "" ? "anonymous" : avatarInfo.displayName.trim();
@@ -358,6 +354,12 @@ function maybeRedraw(uuid){
     } else {
         reDraw(uuid);
     }
+
+    // if (distanceDelta < MAX_REDRAW_DISTANCE_METERS) {
+    //     return;
+    // }
+
+
 }
 
 
@@ -422,9 +424,25 @@ function reDraw(uuid) {
         .sync();
 }
 
-
 // Add a user to the list.
 var DEFAULT_LIFETIME = entityProps.lifetime;
+// var NAMETAG_SELECTION_LIST = "contextOverlayHighlightList";
+
+var NAMETAG_SELECTION_LIST = "NAMETAG_SELECTION_LIST";
+var selectionProps = {
+    outlineUnoccludedColor: { red: 255, green: 255, blue: 255 },
+    outlineOccludedColor: { red: 235, green: 87, blue: 87 },
+    fillUnoccludedColor: { red: 235, green: 87, blue: 87 },
+    fillOccludedColor: { red: 235, green: 87, blue: 87 },
+    outlineUnoccludedAlpha: 1,
+    outlineOccludedAlpha: 0,
+    fillUnoccludedAlpha: 0,
+    fillOccludedAlpha: 0,
+    outlineWidth: 3,
+    isOutlineSmooth: true
+};
+Selection.enableListHighlight(NAMETAG_SELECTION_LIST, selectionProps)
+
 function add(uuid){
     // User Doesn't exist so give them new props and save in the cache, get their current avatar info, 
     // and handle the different ways to get the username(friend or admin)
@@ -446,10 +464,10 @@ function add(uuid){
 
     // When the user clicks someone, we create their nametag
     makeNameTag(uuid);
-
     var deleteEnttyInMiliseconds = entityProps.lifetime * MILISECONDS_IN_SECOND;
     // Remove from list after lifetime is over
     if (mode === "on") {
+        Selection.addToSelectedItemsList(NAMETAG_SELECTION_LIST, "avatar", uuid);
         avatar.timeoutStarted = Script.setTimeout(function () {
             removeNametag(uuid);
         }, deleteEnttyInMiliseconds);
@@ -494,7 +512,7 @@ function removeNametag(uuid){
     if (avatar) {
         avatar.nametag.destroy();
         delete _this.selectedAvatars[uuid];
-
+        Selection.removeFromSelectedItemsList(NAMETAG_SELECTION_LIST, "avatar", uuid);
         return _this;
     }
 
@@ -514,6 +532,7 @@ function removeNametag(uuid){
 
 // Create the manager and hook up username signal
 function create() {
+
     return _this;
 }
 
