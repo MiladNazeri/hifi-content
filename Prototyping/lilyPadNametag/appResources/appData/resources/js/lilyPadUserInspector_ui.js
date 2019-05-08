@@ -64,8 +64,8 @@ function onScriptEventReceived(message) {
                     document.getElementById("radio_off").checked = true;
                     break;
 
-                case "persistent":
-                    document.getElementById("radio_persistent").checked = true;
+                case "alwaysOn":
+                    document.getElementById("radio_alwaysOn").checked = true;
                     break;
 
                 default:

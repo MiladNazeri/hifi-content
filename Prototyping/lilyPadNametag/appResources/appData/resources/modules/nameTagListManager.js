@@ -101,7 +101,7 @@ function calculateInitialProperties(uuid) {
 }
 
 
-// Used in persistent mode to show or hide if they reached the max radius
+// Used in alwaysOn mode to show or hide if they reached the max radius
 function showHide(uuid, type) {
     var avatar = _this.avatars[uuid];
     var nametag = avatar.nametag;
@@ -202,9 +202,9 @@ function toggleInterval(){
 
 
 // handle turning the peristenet mode on
-function handlePersistentMode(shouldTurnOnPersistentMode){
+function handleAlwaysOnMode(shouldTurnOnAlwaysOnMode){
     _this.reset(); 
-    if (shouldTurnOnPersistentMode) {
+    if (shouldTurnOnAlwaysOnMode) {
         AvatarManager
             .getAvatarIdentifiers()
             .forEach(function(avatar){
@@ -247,7 +247,7 @@ var ABOVE_HEAD_OFFSET = 0.30;
 var MODE_ON_SCALER_ADJUST = 1.0;
 var maxDistance = MAX_RADIUS_IGNORE_METERS;
 var onModeScalar = 0.60;
-var persistentModeScalar = -0.55;
+var alwaysOnModeScalar = -0.55;
 function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -278,13 +278,13 @@ function makeNameTag(uuid) {
     // Multiply the new dimensions and line height with the user selected scaler
     scaledDimensions = Vec3.multiply(scaledDimensions, userScaler);
 
-    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS;
+    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS + OFFSET;
     var finalScaler = (distance - maxDistance) / (MIN_DISTANCE - maxDistance);
     
     var remainder = 1 - finalScaler;
     var multipliedRemainderOn = remainder * onModeScalar;
-    var multipliedRemainderPersistent = remainder * persistentModeScalar;
-    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
+    var multipliedRemainderAlwaysOn = remainder * alwaysOnModeScalar;
+    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderAlwaysOn;
 
     scaledDimensions = Vec3.multiply(scaledDimensions, finalScaler);
 
@@ -301,7 +301,7 @@ function makeNameTag(uuid) {
     var localPosition = [0, nameTagPosition, 0];
 
     var visible = true;
-    if (mode === "persistent") {
+    if (mode === "alwaysOn") {
         var currentDistance = getDistance(uuid, CHECK_AVATAR, false);
         visible = currentDistance > MAX_RADIUS_IGNORE_METERS ? false : true;
     }
@@ -330,6 +330,7 @@ var MAX_RADIUS_IGNORE_METERS = 22;
 var MAX_ON_MODE_DISTANCE = 30;
 var CHECK_AVATAR = true;
 var MIN_DISTANCE = 0.2;
+var OFFSET = 15;
 function maybeRedraw(uuid){
     var avatar = _this.avatars[uuid];
     var avatarInfo = avatar.avatarInfo;
@@ -338,11 +339,11 @@ function maybeRedraw(uuid){
     getDistance(uuid);
     var distanceDelta = Math.abs(avatar.currentDistance - avatar.previousDistance);
     var avatarDistance = getDistance(uuid, CHECK_AVATAR, false);
-    if (mode === "persistent" && avatarDistance > MAX_RADIUS_IGNORE_METERS) {
+    if (mode === "alwaysOn" && avatarDistance > MAX_RADIUS_IGNORE_METERS) {
         showHide(uuid, "hide");
     } 
 
-    if (mode === "persistent" && avatarDistance < MAX_RADIUS_IGNORE_METERS) {
+    if (mode === "alwaysOn" && avatarDistance < MAX_RADIUS_IGNORE_METERS) {
         showHide(uuid, "show");
     } 
 
@@ -388,12 +389,12 @@ function reDraw(uuid) {
 
     var distance = getDistance(uuid, false, false);
     
-    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS;
+    maxDistance = mode === "on" ? MAX_ON_MODE_DISTANCE : MAX_RADIUS_IGNORE_METERS + OFFSET;
     var finalScaler = (distance - maxDistance) / (MIN_DISTANCE - maxDistance);
     var remainder = 1 - finalScaler;
     var multipliedRemainderOn = remainder * onModeScalar;
-    var multipliedRemainderPersistent = remainder * persistentModeScalar;
-    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderPersistent;
+    var multipliedRemainderAlwaysOn = remainder * alwaysOnModeScalar;
+    finalScaler = mode === "on" ? finalScaler + multipliedRemainderOn : finalScaler + multipliedRemainderAlwaysOn;
     
     newDimensions = Vec3.multiply(newDimensions, finalScaler);
 
@@ -435,7 +436,7 @@ function add(uuid){
     var avatar = _this.avatars[uuid];
 
     _this.selectedAvatars[uuid] = true;
-    if (mode === "persistent") {
+    if (mode === "alwaysOn") {
         entityProps.lifetime = -1;
     } else {
         entityProps.lifetime = DEFAULT_LIFETIME;
@@ -544,7 +545,7 @@ function checkIfAnyAreClose(target){
 
 // Handles what happens when an avatar gets triggered on
 function handleSelect(uuid) {
-    if (mode === "off" || mode === "persistent") {
+    if (mode === "off" || mode === "alwaysOn") {
         return;
     }
 
@@ -590,7 +591,7 @@ function maybeRemove(uuid) {
 
 // Check to see if we need to add this user to our list
 function maybeAdd(uuid) {
-    if (uuid && mode === "persistent" && !(uuid in _this.avatars)) {
+    if (uuid && mode === "alwaysOn" && !(uuid in _this.avatars)) {
         add(uuid);
     }
 }
@@ -625,13 +626,13 @@ function reset() {
 // Update the nametag display mode
 var mode = "on";
 function changeMode(modeType) {
-    if (mode === "persistent") {
-        handlePersistentMode(false);
+    if (mode === "alwaysOn") {
+        handleAlwaysOnMode(false);
     }
 
     mode = modeType;
-    if (mode === "persistent") {
-        handlePersistentMode(true);
+    if (mode === "alwaysOn") {
+        handleAlwaysOnMode(true);
     }
 
     if (mode === "off" || mode === "on") {

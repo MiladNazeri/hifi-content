@@ -43,7 +43,7 @@
     }
 
     
-    // Automatically add an avatar if they come into the domain.  Mainly used for persistent mode.
+    // Automatically add an avatar if they come into the domain.  Mainly used for alwaysOn mode.
     function onAvatarAdded(uuid) {
         nameTagListManager.maybeAdd(uuid);
     }
@@ -77,7 +77,7 @@
     }
 
 
-    // chose which mode you want the nametags in.  On, off, or persistent.
+    // chose which mode you want the nametags in.  On, off, or alwaysOn.
     var mode = Settings.getValue("lilyPadUserInspector/mode", "on");
     handleMode(mode);
     nameTagListManager.changeMode(mode);
