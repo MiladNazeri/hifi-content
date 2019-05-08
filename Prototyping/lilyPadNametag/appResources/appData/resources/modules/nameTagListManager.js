@@ -246,7 +246,7 @@ var BOTTOM_MARGIN_SCALER = 0.03;
 var ABOVE_HEAD_OFFSET = 0.30;
 var MODE_ON_SCALER_ADJUST = 1.0;
 var maxDistance = MAX_RADIUS_IGNORE_METERS;
-var onModeScalar = -0.55;
+var onModeScalar = 0.60;
 var persistentModeScalar = -0.55;
 function makeNameTag(uuid) {
     var avatar = _this.avatars[uuid];
