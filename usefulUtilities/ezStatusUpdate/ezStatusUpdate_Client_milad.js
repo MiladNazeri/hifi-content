@@ -13,9 +13,11 @@
 
 
 (function(){
+    function m(message, size){Messages.sendMessage(messageChannel, JSON.stringify({message:message.toUpperCase(),size:size}))};
     var textHelper = new (Script.require('./textHelper.js'));
     var lineHeight = 0.290;
-    var textSizeBuffer = 1.09;
+    var textSizeBufferHeight = 1.035;
+    var textSizeBufferWidth = 1.157;
     var DEFAULT_HEIGHT = 0.275;
     var SECOND_MS = 1000;
     var MINUTES_MS = SECOND_MS * 60;
@@ -53,7 +55,7 @@
                 .setLineHeight(lineHeight);
             console.log("newStatusText", newStatusText)
             var textXDimension = textHelper.getTotalTextLength();
-            var newDimensions = [textXDimension * textSizeBuffer, lineHeight * textSizeBuffer, 0];
+            var newDimensions = [textXDimension * textSizeBufferWidth, lineHeight * textSizeBufferHeight, 0];
                 props.text = newStatusText;
                 props.lineHeight = lineHeight;
                 props.dimensions = newDimensions; 
