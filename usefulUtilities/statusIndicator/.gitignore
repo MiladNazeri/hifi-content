@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 /.vs/
 
 webApp/app/dbInfo.json
 hifiScript/secrets.json
 webApp/app/node_modules/
 deployed/
+=======
+/.vs/
+
+webApp/app/config.json
+hifiScript/secrets.json
+webApp/app/node_modules/
+deployed/
+>>>>>>> c28a81cafbe1b7f7f5c719c8903cb53461420ab7

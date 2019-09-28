@@ -19,6 +19,11 @@
     // This is a list of apps that this script explicitly added.
     // We should never unload apps that the user had loaded before loading this script.
     var addedAppList = [];
+<<<<<<< HEAD
+=======
+    // An array of usernames for whom the App Loader should not load the apps in `appList`
+    var usernameWhitelist = [];
+>>>>>>> c28a81cafbe1b7f7f5c719c8903cb53461420ab7
 
     var AppLoader = function() {};
 
@@ -39,6 +44,7 @@
             }
 
             if (userData) {
+<<<<<<< HEAD
                 if (userData.appURLs) {
                     if (Array.isArray(userData.appURLs)) {
 
@@ -53,13 +59,55 @@
                             if (currentlyRunningScripts.indexOf(url) === -1) {
                                 ScriptDiscoveryService.loadScript(url);
                                 addedAppList.push(url);
+=======
+                if (userData.usernameWhitelist) {
+                    if (Array.isArray(userData.usernameWhitelist)) {
+                        (userData.usernameWhitelist).forEach(function (newUsername) {
+                            if (usernameWhitelist.indexOf(newUsername) === -1) {
+                                usernameWhitelist.push(newUsername);
+                            }
+                        });
+                    }
+                }
+
+                // Don't bother with what's next (i.e. loading any apps) if we're whitelisted.
+                if (usernameWhitelist.indexOf(AccountServices.username) > -1) {
+                    return;
+                }
+
+                if (userData.appURLs) {
+                    if (Array.isArray(userData.appURLs)) {
+                        (userData.appURLs).forEach(function (newAppUrl) {
+                            if (appList.indexOf(newAppUrl) === -1) {
+                                appList.push(newAppUrl);
+
+                                var currentlyRunningScripts = ScriptDiscoveryService.getRunning();
+                                var loadNewAppUrl = true;
+                                for (var i = 0; i < currentlyRunningScripts.length; i++) {
+                                    if (currentlyRunningScripts[i].url === newAppUrl) {
+                                        loadNewAppUrl = false;
+                                        break;
+                                    }
+                                }
+
+                                if (loadNewAppUrl) {
+                                    ScriptDiscoveryService.loadScript(newAppUrl);
+                                    addedAppList.push(newAppUrl);
+                                }
+>>>>>>> c28a81cafbe1b7f7f5c719c8903cb53461420ab7
                             }
                         });
                     }
                 } 
             }
+<<<<<<< HEAD
 
         },
+=======
+        },
+
+        
+>>>>>>> c28a81cafbe1b7f7f5c719c8903cb53461420ab7
         unload: function() {
             addedAppList.forEach(function(url) {
                 ScriptDiscoveryService.stopScript(url);

@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 {
     "scriptURL": "http://mpassets.highfidelity.com/15dc3a17-4214-4ee3-aed1-0996ea6f7c6b-v1/userInspector/appResources/appData/userInspector.js",
     "homeURL": "http://mpassets.highfidelity.com/15dc3a17-4214-4ee3-aed1-0996ea6f7c6b-v1/userInspector/appResources/appData/resources/userInspector_ui.html"
 }
+=======
+{
+    "scriptURL": "http://mpassets.highfidelity.com/1cd38895-b1a4-4474-bf63-10eb47ff061f-v1/userInspector/appResources/appData/userInspector.js",
+    "homeURL": "http://mpassets.highfidelity.com/1cd38895-b1a4-4474-bf63-10eb47ff061f-v1/userInspector/appResources/appData/resources/userInspector_ui.html"
+}
+>>>>>>> c28a81cafbe1b7f7f5c719c8903cb53461420ab7
