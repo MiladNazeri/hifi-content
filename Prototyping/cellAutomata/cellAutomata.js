@@ -10,7 +10,7 @@ var CELL_DIMENSIONS = 0.5;
 
 var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
 var NUMBER_DEAD_AROUND_TO_DIE = 2;
-var NUMBER_ALIVE_AROUND_TO_LIVE = 1;
+var NUMBER_ALIVE_AROUND_TO_LIVE = 2;
 
 var cellGrid = [];
 var position = {x: 0, y: 0, z: 0};
@@ -72,11 +72,13 @@ CELL_MAKER.prototype = {
         })
     },
     getNextState: function(){
-        if (this.currentNeighborsDead >= NUMBER_DEAD_AROUND_TO_DIE) {
-            this.nextState = 0;
-        }
+        // if (this.currentNeighborsDead >= NUMBER_DEAD_AROUND_TO_DIE) {
+        //     this.nextState = 0;
+        // }
         if (this.currentNeighborsAlive >= NUMBER_ALIVE_AROUND_TO_LIVE) {
             this.nextState = 1;
+        } else {
+            this.nextState = 0;
         }
     },
     applyNextState: function(){
@@ -103,8 +105,11 @@ function makeCells(){
             var cellID = Entities.addEntity(CELL_PROPS);
             var newCell = new CELL_MAKER(cellID);
             var shouldBeOn = false;
-            var randomOffset = Math.floor(Math.random() * NUMBER_OF_CELLS);
-            if (currentCell === Math.floor(NUMBER_OF_CELLS / 2 - randomOffset)) {
+            // var randomOffset = Math.floor(Math.random() * NUMBER_OF_CELLS);
+            // if (currentCell === Math.floor(NUMBER_OF_CELLS / 2 - randomOffset)) {
+            //     shouldBeOn = true;
+            // };
+            if (currentCell % 8 === 0) {
                 shouldBeOn = true;
             };
             newCell.isAlive = shouldBeOn;
