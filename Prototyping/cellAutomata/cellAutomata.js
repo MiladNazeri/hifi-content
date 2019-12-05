@@ -2,9 +2,9 @@ Entities.findEntitiesByName("Cell", MyAvatar.position, 20000).forEach(function(c
     Entities.deletingEntity(cell);
 });
 
-var GRID_X = 10;
-var GRID_Y = 10;
-var GRID_Z = 10;
+var GRID_X = 2;
+var GRID_Y = 2;
+var GRID_Z = 2;
 
 var CELL_DIMENSIONS = 0.5;
 
@@ -22,7 +22,7 @@ var CELL_PROPS = {
     registrationPoint: {x: 0.5, y: 0.5, z: 0.5}
 }
 
-var PADDING = 0.1;
+var PADDING = 1.0;
 var LIFE_STAGE_0 = 0.00;
 var LIFE_STAGE_1 = 0.20;
 var LIFE_STAGE_2 = 0.40;
@@ -38,8 +38,8 @@ var LIFE_STAGE_4_COLOR = [255,255,255];
 
 function CELL_MAKER(id){
     this.id = id;
-    this.lifeMeter = Math.round(Math.random());
-    // this.lifeMeter = Math.random();
+    // this.lifeMeter = Math.round(Math.random());
+    this.lifeMeter = Math.random();
     // this.lifeMeter = 0;
     this.previousState = this.lifeMeter;
     this.nextState = this.lifeMeter;
@@ -122,33 +122,16 @@ CELL_MAKER.prototype = {
     getNextState: function(){
         this.history.push(this.lifeMeter);
         this.generation++;
-            // console.log("this.lifemeter1", this.lifeMeter);
-
         if (this.lifeMeter >= LIFE_STAGE_0 && this.currentNeighborsAlive >= NEIGHBORS_GREATER_THAN_BEFORE_DYING || this.currentNeighborsAlive <= NEIGHBORS_LESS_THAN_BEFORE_DYING) {
-            // console.log("Here")
             this.lifeMeter = this.lifeMeter - LIFE_CHANGE;
         } else if (this.lifeMeter <= LIFE_STAGE_4 && this.currentNeighborsAlive > NEIGHBORS_LESS_THAN_BEFORE_DYING && this.currentNeighborsAlive < NEIGHBORS_GREATER_THAN_BEFORE_DYING) {
-            // console.log("Here2")
             this.lifeMeter = this.lifeMeter + LIFE_CHANGE
         }
-        // console.log("this.life meter1", this.lifeMeter);
-        // console.log("\nCURRENT NEIGHBORS:", this.currentNeighborsAlive)
-        // if (this.lifeMeter === LIFE_STAGE_4 && this.currentNeighborsAlive >= NEIGHBORS_GREATER_THAN_BEFORE_DYING || this.currentNeighborsAlive <= NEIGHBORS_LESS_THAN_BEFORE_DYING) {
-            // this.lifeMeter = this.lifeMeter - LIFE_STAGE_4;
-            // this.lifeMeter = 0;
-        // } else if (this.lifeMeter === LIFE_STAGE_0 && this.currentNeighborsAlive === NEIGHBORS_TO_BE_ALIVE) {
-            // console.log("############# IN HERE \n##########")
-            // this.lifeMeter = this.lifeMeter + this.LIFE_STAGE_4
-            // this.lifeMeter = 1;
-        // }
-            // console.log("this.lifemeter1", this.lifeMeter);
         this.getAdjustedLifeMeter();
-            // console.log("lifeMeter", this.lifeMeter);
         this.nextState = this.lifeMeter;
     },
     getAdjustedLifeMeter: function(){   
         this.lifeMeter = Math.max(this.lifeMeter, LIFE_STAGE_0);
-        // console.log("lifeMeter1", this.lifeMeter)
         this.lifeMeter = Math.min(this.lifeMeter, LIFE_STAGE_4);
     },
     applyNextState: function(){
@@ -158,9 +141,14 @@ CELL_MAKER.prototype = {
     }
 };
 var LIFE_CHANGE = .21;
-var NEIGHBORS_LESS_THAN_BEFORE_DYING = 10;
+// var NEIGHBORS_LESS_THAN_BEFORE_DYING = 10;
+// var NEIGHBORS_TO_BE_ALIVE = 3;
+// var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 15;
+// var NEIGHBORS_LESS_THAN_BEFORE_DYING = NUMBER_OF_CELLS * 0.25;
+var NEIGHBORS_LESS_THAN_BEFORE_DYING = 3;
 var NEIGHBORS_TO_BE_ALIVE = 3;
-var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 15;
+// var NEIGHBORS_GREATER_THAN_BEFORE_DYING = NUMBER_OF_CELLS * 0.30;
+var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 6;
 
 
 
@@ -192,7 +180,7 @@ function makeCells(){
                 newCell.toggleVisible();
                 currentCell++;
                 cellGrid.push(newCell);
-                var shouldBeOn = 0;
+                // var shouldBeOn = 0;
                 // var randomOffset = Math.floor(Math.random() * NUMBER_OF_CELLS);
                 // if (currentCell === Math.floor(NUMBER_OF_CELLS / 2 - randomOffset)) {
                 //     shouldBeOn = 1;
@@ -225,7 +213,7 @@ function populateNeighborhoodStateArray(){
     })
 }
 
-var GENEARTION_TIMER_INTERVAL_MS = 17;
+var GENEARTION_TIMER_INTERVAL_MS = 500;
 function startAnimation(){
     nextGenerationTimer = Script.setInterval(nextGeneration, GENEARTION_TIMER_INTERVAL_MS)
 }
@@ -245,22 +233,45 @@ function getNextState(){
         var RANDOM_MODULUS = Math.floor(Math.random() * NUMBER_OF_CELLS);
         // console.log(RANDOM_MODULUS);
         // console.log(i % RANDOM_MODULUS === 0);m
-        if (i % RANDOM_MODULUS === 0) {
+        // if (i % RANDOM_MODULUS === 0) {
         // if (i % 2 === 0) {
 
             cell.applyNextState();
-        }
+        // }
         worldSum += cell.lifeMeter;
     })
     animateParticle();
     // console.log("worldSum:", Math.log(worldSum) * 4.5);
 }
 
+function lerp(inMin, inMax, outMin, outMax, value){
+    var position = (value - inMin) % (inMax - inMin);
+    var lerpedValue = (outMax - outMin) * position;
+    return lerpedValue;
+}
+
 var particle_id = "{6547c2f9-7222-4bfd-a27c-ff68d54e6e63}";
+var currentMin = Number.POSITIVE_INFINITY;
+var currentMax = Number.NEGATIVE_INFINITY;
+var MIN_PARTICLE_RADIUS = 0.1;
+var MAX_PARTICLE_RADIUS = 5;
+var MIN_COLOR = 0;
+var MAX_COLOR = 255;
 function animateParticle(){
+    var loggedWorldSum = Math.log(worldSum);
+    currentMin = Math.min(currentMin, loggedWorldSum);
+    currentMax = Math.max(currentMax, loggedWorldSum);
+    console.log("currentMin", currentMin);
+    console.log("currentMax", currentMax);
+    console.log("loggedowrldsum", loggedWorldSum);
+    var particleRadius = Math.min(lerp(currentMin, currentMax, MIN_PARTICLE_RADIUS, MAX_PARTICLE_RADIUS, worldSum), MAX_PARTICLE_RADIUS);
+    var color = Math.min(lerp(currentMin, currentMax, MIN_COLOR, MAX_COLOR, worldSum), MAX_COLOR);
+    // console.log("particleRadius", particleRadius);
+    // console.log("color", color);
+
     var props = {
-        particleRadius: Math.log(worldSum) * 1,
-        color: [0, Math.log(worldSum) * 25, 0]
+        particleRadius: particleRadius,
+        color: [0, color, 0]
     }
     Entities.editEntity(particle_id, props);
 
