@@ -2,9 +2,9 @@ Entities.findEntitiesByName("Cell", MyAvatar.position, 20000).forEach(function(c
     Entities.deletingEntity(cell);
 });
 
-var GRID_X = 2;
-var GRID_Y = 2;
-var GRID_Z = 2;
+var GRID_X = 3;
+var GRID_Y = 3;
+var GRID_Z = 3;
 
 var CELL_DIMENSIONS = 0.5;
 
@@ -22,10 +22,10 @@ var CELL_PROPS = {
     registrationPoint: {x: 0.5, y: 0.5, z: 0.5}
 }
 
-var PADDING = 1.0;
+var PADDING = 0.9;
 var LIFE_STAGE_0 = 0.00;
-var LIFE_STAGE_1 = 0.20;
-var LIFE_STAGE_2 = 0.40;
+var LIFE_STAGE_1 = 0.45;
+var LIFE_STAGE_2 = 0.65;
 var LIFE_STAGE_3 = 0.80;
 var LIFE_STAGE_4 = 1.00;
 
@@ -36,6 +36,7 @@ var LIFE_STAGE_3_COLOR = [175,200,125];
 var LIFE_STAGE_4_COLOR = [255,255,255];
 
 
+var targetCell = null;
 function CELL_MAKER(id){
     this.id = id;
     // this.lifeMeter = Math.round(Math.random());
@@ -50,9 +51,8 @@ function CELL_MAKER(id){
     this.currentNeighborsAlive;
     this.generation = 0;
     this.color = LIFE_STAGE_0_COLOR;
+    this.isTarget = false;
 }
-
-
 
 CELL_MAKER.prototype = {
     toggleVisible: function(){
@@ -140,15 +140,15 @@ CELL_MAKER.prototype = {
         this.toggleVisible();
     }
 };
-var LIFE_CHANGE = .21;
+var LIFE_CHANGE = .65;
 // var NEIGHBORS_LESS_THAN_BEFORE_DYING = 10;
 // var NEIGHBORS_TO_BE_ALIVE = 3;
 // var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 15;
 // var NEIGHBORS_LESS_THAN_BEFORE_DYING = NUMBER_OF_CELLS * 0.25;
-var NEIGHBORS_LESS_THAN_BEFORE_DYING = 3;
+var NEIGHBORS_LESS_THAN_BEFORE_DYING = 1;
 var NEIGHBORS_TO_BE_ALIVE = 3;
 // var NEIGHBORS_GREATER_THAN_BEFORE_DYING = NUMBER_OF_CELLS * 0.30;
-var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 6;
+var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 3;
 
 
 
@@ -175,6 +175,7 @@ function makeCells(){
                 var cellPosition = Vec3.sum(position, {x: (CELL_DIMENSIONS + PADDING) * i, y: (CELL_DIMENSIONS + PADDING) * k, z: (CELL_DIMENSIONS + PADDING)* j});
                 CELL_PROPS.name = "Cell: " + i + "-" + j;
                 CELL_PROPS.position = cellPosition;
+                CELL_PROPS.collisionless = true;
                 var cellID = Entities.addEntity(CELL_PROPS);
                 var newCell = new CELL_MAKER(cellID);
                 newCell.toggleVisible();
@@ -182,9 +183,10 @@ function makeCells(){
                 cellGrid.push(newCell);
                 // var shouldBeOn = 0;
                 // var randomOffset = Math.floor(Math.random() * NUMBER_OF_CELLS);
-                // if (currentCell === Math.floor(NUMBER_OF_CELLS / 2 - randomOffset)) {
-                //     shouldBeOn = 1;
-                // };
+                if (currentCell === Math.floor(NUMBER_OF_CELLS / 2)) {
+                    newCell.isTarget = true;
+                    targetCell = newCell.id;
+                };
                 // if (currentCell % 10 === 0) {
                 //     shouldBeOn = 1;
                 // };
@@ -213,7 +215,7 @@ function populateNeighborhoodStateArray(){
     })
 }
 
-var GENEARTION_TIMER_INTERVAL_MS = 500;
+var GENEARTION_TIMER_INTERVAL_MS = 150;
 function startAnimation(){
     nextGenerationTimer = Script.setInterval(nextGeneration, GENEARTION_TIMER_INTERVAL_MS)
 }
@@ -224,6 +226,7 @@ function nextGeneration(){
 }
 
 function getNextState(){
+    getAllNeighbors();
     worldSum = 0;
     populateNeighborhoodStateArray();
     cellGrid.forEach(function(cell){
@@ -232,12 +235,12 @@ function getNextState(){
     cellGrid.forEach(function(cell, i){
         var RANDOM_MODULUS = Math.floor(Math.random() * NUMBER_OF_CELLS);
         // console.log(RANDOM_MODULUS);
-        // console.log(i % RANDOM_MODULUS === 0);m
-        // if (i % RANDOM_MODULUS === 0) {
+        // console.log(i % RANDOM_MODULUS === 0);
+        if (i % RANDOM_MODULUS === 0) {
         // if (i % 2 === 0) {
 
             cell.applyNextState();
-        // }
+        }
         worldSum += cell.lifeMeter;
     })
     animateParticle();
