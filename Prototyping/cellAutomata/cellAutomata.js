@@ -42,6 +42,28 @@
 
 
 // Helper Functions
+    var DEBUG = true;
+    function log(){
+        var args = Array.prototype.slice.call(arguments);
+        // var type = args[args.length - 1];
+        // var nonArgs = args.slice(0, args.length - 1);
+        // var debug = DEBUG || true;
+        // if (!debug) {
+        //     if (type !== "ON") {
+        //         return;
+        //     }
+        // } else {
+        //     if (type === "OFF") {
+        //         return;
+        //     }
+        // }
+        var string = [];
+        args.forEach(function (data) {
+            data = typeof data === "string" ? data : "\n" + JSON.stringify(data, null, 2);
+            string.push(data);
+        });
+        console.log("***********\n" + string.join(" | "));
+    }
     function deleteCurrentCellEntities(){
         Entities.findEntities(MyAvatar.position, 20000).forEach(function(cell){
             var props = Entities.getEntityProperties(cell);
@@ -53,6 +75,8 @@
 
     function checkIfIn(currentPosition, minMaxObj, margin) {
         margin = margin || 0.05;
+        // log("currentPosition", currentPosition);
+        // log("minMaxObj", minMaxObj);
         return (
             (currentPosition.x >= minMaxObj.xMin - margin && currentPosition.x <= minMaxObj.xMax + margin) &&
             (currentPosition.y >= minMaxObj.yMin - margin && currentPosition.y <= minMaxObj.yMax + margin) &&
@@ -84,14 +108,24 @@
         limitsMin = limitsMin || {x: 0.0, y: 0.0, z: 0.0};
         vector.x = Math.min(vector.x, limitsMax.x);
         vector.x = Math.max(vector.x, limitsMin.x);
-        vector.x = Math.min(vector.x, limitsMax.x);
-        vector.x = Math.max(vector.x, limitsMin.x);
+        vector.y = Math.min(vector.y, limitsMax.y);
+        vector.y = Math.max(vector.y, limitsMin.y);
         vector.z = Math.min(vector.z, limitsMax.z);
         vector.z = Math.max(vector.z, limitsMin.z);
         return vector;
     }
 
+    function collectMinMax(position){
+        minMaxObject.x = Math.min(minMaxObject.x, position.x);
+        minMaxObject.x = Math.max(minMaxObject.x, position.x);
+        minMaxObject.x = Math.min(minMaxObject.x, position.x);
+        maxMaxObject.x = Math.max(maxMaxObject.x, position.x);
+        maxMaxObject.z = Math.max(maxMaxObject.z, position.z);
+        maxMaxObject.z = Math.max(maxMaxObject.z, position.z);
+    }
+
 // Cell
+    var CELL_DIMENSIONS = 0.05;
     var triesBeforeNewTarget = 0;
     var MAX_TRIES_BEFORE_NEW_TARGET = 20;
     var targetCell = null;
@@ -147,7 +181,7 @@
     CELL_MAKER.prototype = {
         updatePosition: function(){
             // Don't move if we are dead are at full life
-            if (this.lifeMeter <= LIFE_STAGE_0 || this.lifeMeter >= LIFE_STAGE_4) { return };
+            // if (this.lifeMeter <= LIFE_STAGE_0 || this.lifeMeter >= LIFE_STAGE_4) { return };
             this.position = Entities.getEntityProperties(this.id, "position").position;
             
             // move if we aren't the target
@@ -186,9 +220,14 @@
                     Vec3.sum(this.velocity, scaledDirection), 
                     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed}
                 );
+                // log("checking isInside");
+                if (this.isInside(liquid)) {
+                    this.drag(liquid);
+                }
                 // Add the velocity and the current position
                 this.position = Vec3.sum(this.position, this.velocity);
                 Entities.editEntity(this.id, {position: this.position});
+                this.velocity = Vec3.ZERO;
             }
         },
         toggleVisible: function(){
@@ -267,8 +306,9 @@
             } else if (this.lifeMeter <= LIFE_STAGE_4 && (this.currentNeighborsAlive > NEIGHBORS_LESS_THAN_BEFORE_DYING && this.currentNeighborsAlive < NEIGHBORS_GREATER_THAN_BEFORE_DYING)) {
                 this.lifeMeter = this.lifeMeter + LIFE_CHANGE
             }
-            this.getAdjustedLifeMeter();
-            this.nextState = this.lifeMeter;
+            // this.getAdjustedLifeMeter();
+            // this.nextState = this.lifeMeter;
+            this.nextState = LIFE_STAGE_4;
         },
         getAdjustedLifeMeter: function(){   
             this.lifeMeter = Math.max(this.lifeMeter, LIFE_STAGE_0);
@@ -284,6 +324,34 @@
             this.lifeMeter = LIFE_STAGE_4;
             this.color = [255,0,0];
             targetCell = this.id;
+        },
+        isInside: function(liquid){
+            var currentPosition = Entities.getEntityProperties(this.id, 'position').position
+            // log(liquid);
+            var dimensionsX = liquid.dimensions.x;
+            var dimensionsY = liquid.dimensions.y;
+            var dimensionsZ = liquid.dimensions.z;
+            var positionX = liquid.position.x;
+            var positionY = liquid.position.y;
+            var positionZ = liquid.position.z;
+            var minMaxObject = {
+                xMin: positionX - dimensionsX,
+                yMin: positionY - dimensionsY,
+                zMin: positionZ - dimensionsZ,
+                xMax: positionX + dimensionsX,
+                yMax: positionY + dimensionsY,
+                zMax: positionZ + dimensionsZ
+            }
+            // log(minMaxObject);
+            return checkIfIn(currentPosition, minMaxObject);
+        }, 
+        drag: function(liquid){
+            var speed = Vec3.length(this.velocity);
+            var dragMagnitude = liquid.dragCoefficient * speed * speed; 
+            var direction = Vec3.multiply(this.velocity, -1);
+            var normalizedDirection = Vec3.normalize(direction);
+            var finalDrag = Vec3.multiply(normalizedDirection, dragMagnitude);
+            this.velocity = Vec3.sum(this.velocity, finalDrag);
         }
     };
     var LIFE_CHANGE = 0.15;
@@ -291,15 +359,25 @@
     var NEIGHBORS_TO_BE_ALIVE = 3;
     var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 10;
 
+// Liquid
+    function Liquid(position, dimensions, dragCoefficient){
+        this.position = position;
+        this.dimensions = dimensions;
+        this.dragCoefficient = dragCoefficient;
+    }
+
+    var LIQUID_POSITION = {x: 0, y: 0, z: 0};
+    var LIQUID_DIMENSIONS_SCALER = 100;
+    var LIQUID_DIMENSIONS = {
+        x: CELL_DIMENSIONS * LIQUID_DIMENSIONS_SCALER, 
+        y: CELL_DIMENSIONS * LIQUID_DIMENSIONS_SCALER, 
+        z: CELL_DIMENSIONS * LIQUID_DIMENSIONS_SCALER
+    };
+
+    DRAG_COEFFICIENT = 0.5;
+    var liquid = new Liquid(LIQUID_POSITION, LIQUID_DIMENSIONS, DRAG_COEFFICIENT);
 
 // Controls
-
-
-    var GRID_X = 3;
-    var GRID_Y = 3;
-    var GRID_Z = 3;
-    var CELL_DIMENSIONS = 0.05;
-    var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
     var CELL_PROPS = {
         type: "Box",
         dimensions: {x: CELL_DIMENSIONS, y: CELL_DIMENSIONS, z: CELL_DIMENSIONS},
@@ -309,7 +387,19 @@
     var cellGrid = [];
     var currentCell = 0;
     var position = {x: 0, y: 0, z: 0};
-    var PADDING = 0.35;
+    var GRID_X = 3;
+    var GRID_Y = 3;
+    var GRID_Z = 3;
+    var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
+    var PADDING = 2.35;
+    var minMaxObject = {
+        xMin: Number.POSITIVE_INFINITY,
+        yMin: Number.POSITIVE_INFINITY,
+        zMin: Number.POSITIVE_INFINITY,
+        xMax: Number.NEGATIVE_INFINITY,
+        yMax: Number.NEGATIVE_INFINITY,
+        zMax: Number.NEGATIVE_INFINITY
+    }
     function makeCells(){
         for (var i = 1; i <= GRID_X; i++) {
             for (var j = 1; j <= GRID_Z; j++) {
