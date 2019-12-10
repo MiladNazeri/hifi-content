@@ -131,7 +131,7 @@
 
     var CELL_DIMENSIONS = 0.2;
     var triesBeforeNewTarget = 0;
-    var MAX_TRIES_BEFORE_NEW_TARGET = 10;
+    var MAX_TRIES_BEFORE_NEW_TARGET = 100;
     var targetCell = null;
     function maybeChooseNewRandomTarget(){
         if (triesBeforeNewTarget >= MAX_TRIES_BEFORE_NEW_TARGET) {
@@ -163,13 +163,14 @@
         this.generation = 0;
         this.color = LIFE_STAGE_0_COLOR;
         this.isTarget = false;
-    
+        this.targetAnimation = null;
         this.position = {x: 0, y: 0, z: 0};
         this.velocity = {x: 0, y: 0, z: 0};
         this.acceleration = {x: 0.0, y: 0.1, z: 0.0};
         this.maxSpeed = 0.1;
         this.mass = 5;
         this.gravity = Vec3.multiply({x: 0, y: -9.8, z: 0}, 0.1 * this.mass)
+        this.currentSlice = 1;
     }
 
     var WIND_FORCE = {x: 0.15, y: 0, z: 0.01}
@@ -181,7 +182,7 @@
     var LIFE_STAGE_2 = 0.65;
     var LIFE_STAGE_3 = 0.80;
     var LIFE_STAGE_4 = 1.00;
-
+    var VISIBLE_AMOUNT_CAN_SEE = CELL_DIMENSIONS * 20;
     CELL_MAKER.prototype = {
         nearHittingNeighbors: function(){
             var _this = this;
@@ -204,11 +205,16 @@
             
             // move if we aren't the target
             if (!this.isTarget) {
+                this.currentSlice = 1;
+
                 // Get the direction of the target
                 var targetPosition = Entities.getEntityProperties(targetCell, 'position').position;
                 // Find the vector from the cell to the target
                 var direction = Vec3.subtract(targetPosition, this.position);
                 var distanceFromTarget = Vec3.distance(targetPosition, this.position);
+                if (distanceFromTarget > VISIBLE_AMOUNT_CAN_SEE) {
+                    return;
+                }
                 var adjustedDistanceFromTarget = distanceFromTarget - (CELL_DIMENSIONS);
                 // log("adjustedDistanceFromTarget", adjustedDistanceFromTarget)
                 if (adjustedDistanceFromTarget <= DISTANCE_TO_STOP) {
@@ -223,7 +229,7 @@
                 var normalizedDirection = Vec3.normalize(direction);
 
                 // Make a constant speed
-                var speed = 0.01;
+                var speed = 0.1;
                 // Get a new acceleration amount
                 var scaledDirection = Vec3.multiply(normalizedDirection, speed);
 
@@ -270,6 +276,27 @@
                 Entities.editEntity(this.id, {position: this.position});
                 // this.velocity = Vec3.ZERO;
                 // log("position", this.position);
+            } else {
+                var normal = Math.sin(this.currentSlice * SLICE_TIME);
+                // log("normal", normal)
+                // log("this.currentSlice", this.currentSlice)
+
+
+                var adjustedVector = {
+                    x: normal * Math.random(),
+                    y: normal * Math.random(),
+                    z: normal * Math.random()
+                }
+                // log("adjustedVector", adjustedVector)
+                var scaledVector = Vec3.multiply(adjustedVector, CELL_DIMENSIONS * 1)                
+                var newPosition = Vec3.sum(scaledVector, this.position);
+                // log("newPosition:", newPosition);
+                Entities.editEntity(this.id, {position: newPosition});
+                this.currentSlice++;
+                if (!checkIfIn(this.position, cellGridMinMaxObject)){
+                    // log("not inside");
+                    this.velocity = Vec3.multiply(this.velocity, -1);
+                }
             }
         },
         toggleVisible: function(){
@@ -404,6 +431,31 @@
     var NEIGHBORS_TO_BE_ALIVE = 3;
     var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 10;
 
+    var SLICES = 30;
+    var SLICE_TIME = (Math.PI * 2) / SLICES;
+    var currentSlice = 0;
+    function targetAnimationHandler(){
+        var normal = Math.sin(currentSlice * SLICE_TIME);
+        var adjustedVector = {
+            x: normal * Math.random(),
+            y: normal * Math.random(),
+            z: normal * Math.random()
+        }
+        Math.pie = CELL_DIMENSIONS * 2;
+        var cell = cellMap[targetCell];
+        var newPosition = cell.position
+    }
+    var TARGET_ANIMATION_INTERVAL_MS = 100;
+
+    function targetAnimationStart(){
+        Script.setInterval(_this.targetAnimationHandler, TARGET_ANIMATION_INTERVAL_MS);
+    }
+    function maybeTurnOffTargetAnimation(){
+        if (_this.targetAnimation) {
+            Script.clearInterval(_this.targetAnimation);
+            _this.targetAnimation = null;
+        }
+    }
 // Controls
     var CELL_PROPS = {
         type: "Box",
@@ -414,9 +466,9 @@
     var cellGrid = [];
     var currentCell = 0;
     var position = {x: 0, y: 0, z: 0};
-    var GRID_X = 2;
-    var GRID_Y = 2;
-    var GRID_Z = 2;
+    var GRID_X = 5;
+    var GRID_Y = 5;
+    var GRID_Z = 5;
     var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
     var DIMENSION_MARGIN = PADDING * 1.0;
     // var DIMENSION_MARGIN = PADDING * 0.25;
@@ -460,16 +512,15 @@
         // console.log("cellGrid", JSON.stringify(cellGrid, null, 4));
         // console.log("cellGrid Length: " , cellGrid.length);
         // log("cellGridMinMAx", cellGridMinMaxObject)
-        var props = {
-            type: "Box",
-            name: "Cell_bounds",
-            alpha: 0.3,
-            color: [50,75,190],
-            position: getGridMiddle(),
-            dimensions: getGridDimensions()
-        }
-        // log("props", props);
-        gridBox = Entities.addEntity(props);
+        // var props = {
+        //     type: "Box",
+        //     name: "Cell_bounds",
+        //     alpha: 0.3,
+        //     color: [50,75,190],
+        //     position: getGridMiddle(),
+        //     dimensions: getGridDimensions()
+        // }
+        // gridBox = Entities.addEntity(props);
     }
 
     var cellMap = {};
@@ -500,7 +551,7 @@
     }
 
 
-    var GENEARTION_TIMER_INTERVAL_MS = 60;
+    var GENEARTION_TIMER_INTERVAL_MS = 100;
     function startAnimation(){
         nextGenerationTimer = Script.setInterval(nextGeneration, GENEARTION_TIMER_INTERVAL_MS)
     }
@@ -549,12 +600,12 @@
             var RANDOM_MODULUS = Math.floor(Math.random() * NUMBER_OF_CELLS);
             // console.log(RANDOM_MODULUS);
             // console.log(i % RANDOM_MODULUS === 0);
-            if (i % RANDOM_MODULUS === 0) {
+            // if (i % RANDOM_MODULUS === 0) {
             // if (i % 2 === 0) {
 
                 cell.applyNextState();
                 cell.updatePosition();
-            }
+            // }
             worldSum += cell.lifeMeter;
         })
         // console.log("worldSum:", Math.log(worldSum) * 4.5);
