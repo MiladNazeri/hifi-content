@@ -74,7 +74,7 @@
 
     // Check if a point is in a non axis aligned space
     function checkIfInNonAligned(pointToCheck, position, orientation, minMaxObj, margin) {
-        var worldOffset = VEC3.subtract(pointToCheck, position),
+        var worldOffset = vecSubtract(pointToCheck, position),
         pointToCheck = VEC3.multiplyQbyV(QUAT.inverse(orientation), worldOffset);
         margin = margin || 0.03;
 
@@ -126,18 +126,80 @@
         cellGridMinMaxObject.zMax = Math.max(cellGridMinMaxObject.zMax, position.z) + padding;
     }
 
+// Helper Vec Functions
+    var EPSILON = 0.000001;
+    var EPSILON_SQUARED = EPSILON * EPSILON;
+    var PI = 3.14159265358979;
+    var ALMOST_ONE= 1.0 - EPSILON;
+    var PI_OVER_TWO = 1.57079632679490;
+    function vecDistance(vec1, vec2){
+        return Math.sqrt(
+            ( (vec1.x - vec2.x) * (vec1.x - vec2.x) ) +
+            ( (vec1.y - vec2.y) * (vec1.y - vec2.y) ) +
+            ( (vec1.z - vec2.z) * (vec1.z - vec2.z) )
+        );
+    }
+
+    function vecMagnitude(vec) {
+        return Math.sqrt(
+            (vec.x * vec.x) +
+            (vec.y * vec.y) +
+            (vec.z * vec.z)
+        )
+    }
+    function vecNormalize(vec){
+        var magnitude = 
+            (vec.x * vec.x) +
+            (vec.y * vec.y) +
+            (vec.z * vec.z);
+        if (magnitude < EPSILON_SQUARED) {
+            return vec;
+        }
+        var invMagnitude = 1.0/Math.sqrt(magnitude);
+        return {
+            x: vec.x * invMagnitude,
+            y: vec.y * invMagnitude,
+            z: vec.z * invMagnitude
+        }
+    }
+
+    function vecSum(vec1, vec2){
+        return {
+            x: vec1.x + vec2.x,
+            y: vec1.y + vec2.y,
+            z: vec1.z + vec2.z
+        }
+    }
+
+    function vecSubtract(vec1, vec2){
+        return {
+            x: vec1.x - vec2.x,
+            y: vec1.y - vec2.y,
+            z: vec1.z - vec2.z
+        }
+    }
+
+    function vecMultiply(vec, scaler){
+        return {
+            x: vec.x * scaler,
+            y: vec.y * scaler,
+            z: vec.z * scaler
+        }
+    }
+
 // Cell
     var PADDING = 0.9;
 
     var CELL_DIMENSIONS = 0.2;
     var triesBeforeNewTarget = 0;
-    var MAX_TRIES_BEFORE_NEW_TARGET = 100;
+    var MAX_TRIES_BEFORE_NEW_TARGET = 20;
     var targetCell = null;
     function maybeChooseNewRandomTarget(){
         if (triesBeforeNewTarget >= MAX_TRIES_BEFORE_NEW_TARGET) {
             var index = Math.floor(Math.random() * NUMBER_OF_CELLS);
             cellMap[targetCell].isTarget = false;
             cellGrid[index].makeTarget();
+            log("new targetCell", targetCell);
             triesBeforeNewTarget = 0;
         }
     }
@@ -169,7 +231,7 @@
         this.acceleration = {x: 0.0, y: 0.1, z: 0.0};
         this.maxSpeed = 0.1;
         this.mass = 5;
-        this.gravity = Vec3.multiply({x: 0, y: -9.8, z: 0}, 0.1 * this.mass)
+        this.gravity = vecMultiply({x: 0, y: -9.8, z: 0}, 0.1 * this.mass)
         this.currentSlice = 1;
     }
 
@@ -182,14 +244,15 @@
     var LIFE_STAGE_2 = 0.65;
     var LIFE_STAGE_3 = 0.80;
     var LIFE_STAGE_4 = 1.00;
-    var VISIBLE_AMOUNT_CAN_SEE = CELL_DIMENSIONS * 20;
+    var VISIBLE_AMOUNT_CAN_SEE = CELL_DIMENSIONS + PADDING * 2;
+
     CELL_MAKER.prototype = {
         nearHittingNeighbors: function(){
             var _this = this;
             for (var i = 0; i < this.neighborhood.length; i++){
                 var neighbor = cellMap[this.neighborhood[i]];
                 if (neighbor) {
-                    var vec3Distance = Vec3.distance(neighbor.position, _this.position);
+                    var vec3Distance = vecDistance(neighbor.position, _this.position);
                     if (vec3Distance < CELL_DIMENSIONS * 2) {
                         return true;
                     } 
@@ -201,17 +264,19 @@
         updatePosition: function(){
             // Don't move if we are dead are at full life
             // if (this.lifeMeter <= LIFE_STAGE_0 || this.lifeMeter >= LIFE_STAGE_4) { return };
-            this.position = Entities.getEntityProperties(this.id, "position").position;
+            // this.position = Entities.getEntityProperties(this.id, "position").position;
             
             // move if we aren't the target
             if (!this.isTarget) {
                 this.currentSlice = 1;
-
+                var targetCellOBject = cellMap[targetCell];
                 // Get the direction of the target
-                var targetPosition = Entities.getEntityProperties(targetCell, 'position').position;
+                // var targetPosition = Entities.getEntityProperties(targetCell, 'position').position;
+                var targetPosition = targetCellOBject.position;
+
                 // Find the vector from the cell to the target
-                var direction = Vec3.subtract(targetPosition, this.position);
-                var distanceFromTarget = Vec3.distance(targetPosition, this.position);
+                var direction = vecSubtract(targetPosition, this.position);
+                var distanceFromTarget = vecDistance(targetPosition, this.position);
                 if (distanceFromTarget > VISIBLE_AMOUNT_CAN_SEE) {
                     return;
                 }
@@ -226,36 +291,36 @@
                     // log("near hitting neighbords");
                 }
                 // Normalize the direction we are looking at
-                var normalizedDirection = Vec3.normalize(direction);
+                var normalizedDirection = vecNormalize(direction);
 
                 // Make a constant speed
                 var speed = 0.1;
                 // Get a new acceleration amount
-                var scaledDirection = Vec3.multiply(normalizedDirection, speed);
+                var scaledDirection = vecMultiply(normalizedDirection, speed);
 
                 // Add the force with Mass
                 //  var normalizedMassToDivide = 0.1 * this.mass;
                 // Add the Mass
-                // var newForce = Vec3.multiply(WIND_FORCE,normalizedMassToDivide)
-                // scaledDirection = Vec3.sum(scaledDirection, newForce);
+                // var newForce = vecMultiply(WIND_FORCE,normalizedMassToDivide)
+                // scaledDirection = vecSum(scaledDirection, newForce);
                 // Get the magnitude of friction
                 // var frictionMag = FRICTION_CONSTANT * NORMAL_FORCE;
                 // Reverse direction of friction
-                // var frictionDirection = Vec3.multiply(scaledDirection, -1);
+                // var frictionDirection = vecMultiply(scaledDirection, -1);
                 // normalize friction
-                // frictionDirection = Vec3.normalize(frictionDirection);
+                // frictionDirection = vecNormalize(frictionDirection);
                 // Multiply the direction by the magnitude
-                // var finalFriction = Vec3.multiply(frictionDirection, frictionMag);
+                // var finalFriction = vecMultiply(frictionDirection, frictionMag);
                 // Add friction to the force
-                // scaledDirection = Vec3.sum(scaledDirection, finalFriction);
+                // scaledDirection = vecSum(scaledDirection, finalFriction);
                 // Add up the current velocity with the scaled acceleration
                 this.velocity = setVecLimits(
-                    // Vec3.sum(this.velocity, this.acceleration), 
-                    Vec3.sum(this.velocity, scaledDirection),
+                    // vecSum(this.velocity, this.acceleration), 
+                    vecSum(this.velocity, scaledDirection),
                     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
                     {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
                 );
-                this.velocity = Vec3.sum(this.velocity, scaledDirection);
+                this.velocity = vecSum(this.velocity, scaledDirection);
                 // log("velocity", this.velocity);
                 // log("checking isInside");
                 if (this.isInside(liquid)) {
@@ -263,40 +328,34 @@
                 }
                 if (!checkIfIn(this.position, cellGridMinMaxObject)){
                     // log("not inside");
-                    this.velocity = Vec3.multiply(this.velocity, -1);
+                    this.velocity = vecMultiply(this.velocity, -1);
                 }
                 this.velocity = setVecLimits(
-                    // Vec3.sum(this.velocity, this.acceleration), 
+                    // vecSum(this.velocity, this.acceleration), 
                     this.velocity,
                     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
                     {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
                 );
                 // Add the velocity and the current position
-                this.position = Vec3.sum(this.position, this.velocity);
+                this.position = vecSum(this.position, this.velocity);
                 Entities.editEntity(this.id, {position: this.position});
                 // this.velocity = Vec3.ZERO;
                 // log("position", this.position);
             } else {
-                var normal = Math.sin(this.currentSlice * SLICE_TIME);
-                // log("normal", normal)
-                // log("this.currentSlice", this.currentSlice)
+                // var normal = Math.sin(this.currentSlice * SLICE_TIME);
 
-
-                var adjustedVector = {
-                    x: normal * Math.random(),
-                    y: normal * Math.random(),
-                    z: normal * Math.random()
-                }
-                // log("adjustedVector", adjustedVector)
-                var scaledVector = Vec3.multiply(adjustedVector, CELL_DIMENSIONS * 1)                
-                var newPosition = Vec3.sum(scaledVector, this.position);
-                // log("newPosition:", newPosition);
-                Entities.editEntity(this.id, {position: newPosition});
-                this.currentSlice++;
-                if (!checkIfIn(this.position, cellGridMinMaxObject)){
-                    // log("not inside");
-                    this.velocity = Vec3.multiply(this.velocity, -1);
-                }
+                // var adjustedVector = {
+                //     x: normal * Math.random(),
+                //     y: normal * Math.random(),
+                //     z: normal * Math.random()
+                // }
+                // var scaledVector = vecMultiply(adjustedVector, CELL_DIMENSIONS * 1)                
+                // var newPosition = vecSum(scaledVector, this.position);
+                // Entities.editEntity(this.id, {position: newPosition});
+                // this.currentSlice++;
+                // if (!checkIfIn(this.position, cellGridMinMaxObject)){
+                //     this.velocity = vecMultiply(this.velocity, -1);
+                // }
             }
         },
         toggleVisible: function(){
@@ -340,11 +399,9 @@
         getNeighbors: function(){
             _this = this;
             var searchRange = CELL_DIMENSIONS + (PADDING * 2);
-            var position = Entities.getEntityProperties(this.id, "position").position;
-            this.neighborhood = Entities.findEntities(position, searchRange).filter(function(cell){
-                // console.log("cell:", cell)
-                var name = Entities.getEntityProperties(cell, "name").name;
-                return name.indexOf("Cell") > -1 && cell !== _this.id;
+            // var position = Entities.getEntityProperties(this.id, "position").position;
+            this.neighborhood = cellGrid.filter(function(cell){
+                return vecDistance(_this.position, cell.position) < searchRange;
             });
             // console.log("this.neighborhood", JSON.stringify(this.neighborhood));
         },
@@ -398,7 +455,8 @@
             targetCell = this.id;
         },
         isInside: function(liquid){
-            var currentPosition = Entities.getEntityProperties(this.id, 'position').position
+            // var currentPosition = Entities.getEntityProperties(this.id, 'position').position/
+
             // log(liquid);
             var dimensionsX = liquid.dimensions.x;
             var dimensionsY = liquid.dimensions.y;
@@ -415,15 +473,15 @@
                 zMax: positionZ + dimensionsZ
             }
             // log(minMaxObject);
-            return checkIfIn(currentPosition, minMaxObject);
+            return checkIfIn(this.position, minMaxObject);
         }, 
         drag: function(liquid){
-            var speed = Vec3.length(this.velocity);
+            var speed = vecMagnitude(this.velocity);
             var dragMagnitude = liquid.dragCoefficient * speed * speed; 
-            var direction = Vec3.multiply(this.velocity, -1);
-            var normalizedDirection = Vec3.normalize(direction);
-            var finalDrag = Vec3.multiply(normalizedDirection, dragMagnitude);
-            this.velocity = Vec3.sum(this.velocity, finalDrag);
+            var direction = vecMultiply(this.velocity, -1);
+            var normalizedDirection = vecNormalize(direction);
+            var finalDrag = vecMultiply(normalizedDirection, dragMagnitude);
+            this.velocity = vecSum(this.velocity, finalDrag);
         }
     };
     var LIFE_CHANGE = 0.15;
@@ -466,9 +524,9 @@
     var cellGrid = [];
     var currentCell = 0;
     var position = {x: 0, y: 0, z: 0};
-    var GRID_X = 5;
-    var GRID_Y = 5;
-    var GRID_Z = 5;
+    var GRID_X = 2;
+    var GRID_Y = 2;
+    var GRID_Z = 2;
     var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
     var DIMENSION_MARGIN = PADDING * 1.0;
     // var DIMENSION_MARGIN = PADDING * 0.25;
@@ -481,12 +539,13 @@
         zMax: Number.NEGATIVE_INFINITY
     }
     var gridBox;
+    var randomTarget = Math.floor(Math.random() * NUMBER_OF_CELLS);
     function makeCells(){
         for (var i = 1; i <= GRID_X; i++) {
             for (var j = 1; j <= GRID_Z; j++) {
                 for (var k = 1; k <= GRID_Y; k++) {
                     // if (currentCell > 1) break;
-                    var cellPosition = Vec3.sum(position, {x: (CELL_DIMENSIONS + PADDING) * i, y: (CELL_DIMENSIONS + PADDING) * k, z: (CELL_DIMENSIONS + PADDING)* j});
+                    var cellPosition = vecSum(position, {x: (CELL_DIMENSIONS + PADDING) * i, y: (CELL_DIMENSIONS + PADDING) * k, z: (CELL_DIMENSIONS + PADDING)* j});
                     collectMinMax(cellPosition, CELL_DIMENSIONS * 0.5);
                     CELL_PROPS.name = "Cell: " + i + "-" + j + "-" + k;
                     CELL_PROPS.position = cellPosition;
@@ -496,10 +555,11 @@
                     var newCell = new CELL_MAKER(cellID);
                     // var shouldBeOn = 0;
                     // var randomOffset = Math.floor(Math.random() * NUMBER_OF_CELLS);
-                    if (currentCell === Math.floor(NUMBER_OF_CELLS / 2)) {
+                    if (currentCell === randomTarget) {
                         newCell.makeTarget();
                     };
                     newCell.toggleVisible();
+                    newCell.position = cellPosition;
                     currentCell++;
                     cellGrid.push(newCell);
                     // if (currentCell % 10 === 0) {
@@ -551,7 +611,7 @@
     }
 
 
-    var GENEARTION_TIMER_INTERVAL_MS = 100;
+    var GENEARTION_TIMER_INTERVAL_MS = 64;
     function startAnimation(){
         nextGenerationTimer = Script.setInterval(nextGeneration, GENEARTION_TIMER_INTERVAL_MS)
     }
@@ -573,7 +633,7 @@
         saveState();
         getNextState();
         // animateParticle();
-        maybeChooseNewRandomTarget();
+        // maybeChooseNewRandomTarget();
     }
 
     function previousGeneration(){
