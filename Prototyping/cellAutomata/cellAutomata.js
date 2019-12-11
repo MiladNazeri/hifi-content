@@ -187,12 +187,37 @@
         }
     }
 
-// Cell
-    var PADDING = 0.9;
+    function vecAngleAxis(angle, axis){
+        var s = Math.sin(0.5 * angle);
+        return {w: Math.cos(0.5 * angle),x: s * axis.x, y: s * axis.y, z: s * axis.z};
+    }
 
-    var CELL_DIMENSIONS = 0.2;
+    function vecMultiplyQbyV (Q,V) {
+        var num = Q.x * 2.0;
+        var num2 = Q.y * 2.0;
+        var num3 = Q.z * 2.0;
+        var num4 = Q.x * num;
+        var num5 = Q.y * num2;
+        var num6 = Q.z * num3;
+        var num7 = Q.x * num2;
+        var num8 = Q.x * num3;
+        var num9 = Q.y * num3;
+        var num10 = Q.w * num;
+        var num11 = Q.w * num2;
+        var num12 = Q.w * num3;
+        var result = {x: 0, y: 0, z: 0};
+        result.x = (1.0 - (num5 + num6)) * V.x + (num7 - num12) * V.y + (num8 + num11) * V.z;
+        result.y = (num7 + num12) * V.x + (1.0 - (num4 + num6)) * V.y + (num9 - num10) * V.z;
+        result.z = (num8 - num11) * V.x + (num9 + num10) * V.y + (1.0 - (num4 + num5)) * V.z;
+        return result;
+    };  
+
+// Cell
+
+    var CELL_DIMENSIONS = 1;
+    var PADDING = CELL_DIMENSIONS * 5;
     var triesBeforeNewTarget = 0;
-    var MAX_TRIES_BEFORE_NEW_TARGET = 20;
+    var MAX_TRIES_BEFORE_NEW_TARGET = 50;
     var targetCell = null;
     function maybeChooseNewRandomTarget(){
         if (triesBeforeNewTarget >= MAX_TRIES_BEFORE_NEW_TARGET) {
@@ -204,7 +229,7 @@
         }
     }
 
-    var DISTANCE_TO_STOP = CELL_DIMENSIONS / 2;
+    var DISTANCE_TO_STOP = CELL_DIMENSIONS * 2;
     var LIFE_STAGE_0_COLOR = [0,0,0];
     var LIFE_STAGE_1_COLOR = [20,75,5];
     var LIFE_STAGE_2_COLOR = [100,150,75];
@@ -213,8 +238,8 @@
     function CELL_MAKER(id){
         this.id = id;
         // this.lifeMeter = Math.round(Math.random());
-        this.lifeMeter = LIFE_STAGE_4;
-        // this.lifeMeter = Math.random();
+        // this.lifeMeter = LIFE_STAGE_4;
+        this.lifeMeter = Math.random();
         this.history = [];
         this.previousState = this.lifeMeter;
         this.nextState = this.lifeMeter;
@@ -229,8 +254,9 @@
         this.position = {x: 0, y: 0, z: 0};
         this.velocity = {x: 0, y: 0, z: 0};
         this.acceleration = {x: 0.0, y: 0.1, z: 0.0};
-        this.maxSpeed = 0.1;
+        this.maxSpeed = CELL_DIMENSIONS / 4;
         this.mass = 5;
+        this.speed = CELL_DIMENSIONS / 16;
         this.gravity = vecMultiply({x: 0, y: -9.8, z: 0}, 0.1 * this.mass)
         this.currentSlice = 1;
     }
@@ -239,12 +265,12 @@
     var FRICTION_CONSTANT = 0.01;
     var NORMAL_FORCE = 1;
 
-    var LIFE_STAGE_0 = 0.30;
-    var LIFE_STAGE_1 = 0.45;
-    var LIFE_STAGE_2 = 0.65;
-    var LIFE_STAGE_3 = 0.80;
-    var LIFE_STAGE_4 = 1.00;
-    var VISIBLE_AMOUNT_CAN_SEE = CELL_DIMENSIONS + PADDING * 2;
+    var LIFE_STAGE_0 = 0.0;
+    var LIFE_STAGE_1 = 0.20;
+    var LIFE_STAGE_2 = 0.40;
+    var LIFE_STAGE_3 = 0.60;
+    var LIFE_STAGE_4 = 1.80;
+    var VISIBLE_AMOUNT_CAN_SEE = CELL_DIMENSIONS + PADDING * 4;
 
     CELL_MAKER.prototype = {
         nearHittingNeighbors: function(){
@@ -253,7 +279,7 @@
                 var neighbor = cellMap[this.neighborhood[i]];
                 if (neighbor) {
                     var vec3Distance = vecDistance(neighbor.position, _this.position);
-                    if (vec3Distance < CELL_DIMENSIONS * 2) {
+                    if (vec3Distance < DISTANCE_TO_STOP / 4 && this.neighborhood.length > 35) {
                         return true;
                     } 
                 }
@@ -263,64 +289,73 @@
         },
         updatePosition: function(){
             // Don't move if we are dead are at full life
-            // if (this.lifeMeter <= LIFE_STAGE_0 || this.lifeMeter >= LIFE_STAGE_4) { return };
             // this.position = Entities.getEntityProperties(this.id, "position").position;
             
             // move if we aren't the target
             if (!this.isTarget) {
+                // if (this.lifeMeter <= LIFE_STAGE_0 || this.lifeMeter >= LIFE_STAGE_4) { return };
+                if (this.lifeMeter <= LIFE_STAGE_0) { return };
+
+
                 this.currentSlice = 1;
                 var targetCellOBject = cellMap[targetCell];
                 // Get the direction of the target
                 // var targetPosition = Entities.getEntityProperties(targetCell, 'position').position;
                 var targetPosition = targetCellOBject.position;
-
                 // Find the vector from the cell to the target
                 var direction = vecSubtract(targetPosition, this.position);
+                // log("direction:", direction);
                 var distanceFromTarget = vecDistance(targetPosition, this.position);
+                // log("distanceFrom Target: ", distanceFromTarget)
                 if (distanceFromTarget > VISIBLE_AMOUNT_CAN_SEE) {
                     return;
                 }
-                var adjustedDistanceFromTarget = distanceFromTarget - (CELL_DIMENSIONS);
+                // var adjustedDistanceFromTarget = distanceFromTarget - CELL_DIMENSIONS;
                 // log("adjustedDistanceFromTarget", adjustedDistanceFromTarget)
-                if (adjustedDistanceFromTarget <= DISTANCE_TO_STOP) {
+                if (distanceFromTarget <= DISTANCE_TO_STOP) {
                     // log("returning too close")
                     return;
                 }
                 if (this.nearHittingNeighbors()) {
+                    this.position = vecSum(this.position, 
+                        vecMultiply(
+                            [Vec3.UNIT_X, Vec3.UNIT_Y, Vec3.UNIT_Z][Math.floor(Math.random() * 3)],
+                            Math.random() * 10    
+                        )
+                    );
+                    this.position = setVecLimits(this.position, limitsMaxGrid, limitsMinGrid);
+                    Entities.editEntity(this.id, {position: this.position});
                     return;
-                    // log("near hitting neighbords");
                 }
-                // Normalize the direction we are looking at
+                // Normalize the direction towards the target
                 var normalizedDirection = vecNormalize(direction);
 
                 // Make a constant speed
-                var speed = 0.1;
                 // Get a new acceleration amount
-                var scaledDirection = vecMultiply(normalizedDirection, speed);
+                var scaledAccelerationDirection = vecMultiply(normalizedDirection, this.speed);
 
                 // Add the force with Mass
-                //  var normalizedMassToDivide = 0.1 * this.mass;
+                 var normalizedMassToDivide = 0.1 * this.mass;
                 // Add the Mass
-                // var newForce = vecMultiply(WIND_FORCE,normalizedMassToDivide)
-                // scaledDirection = vecSum(scaledDirection, newForce);
+                var newForce = vecMultiply(WIND_FORCE,normalizedMassToDivide)
+                scaledAccelerationDirection = vecSum(scaledAccelerationDirection, newForce);
                 // Get the magnitude of friction
-                // var frictionMag = FRICTION_CONSTANT * NORMAL_FORCE;
+                var frictionMag = FRICTION_CONSTANT * NORMAL_FORCE;
                 // Reverse direction of friction
-                // var frictionDirection = vecMultiply(scaledDirection, -1);
+                var frictionDirection = vecMultiply(scaledAccelerationDirection, -1);
                 // normalize friction
-                // frictionDirection = vecNormalize(frictionDirection);
+                frictionDirection = vecNormalize(frictionDirection);
                 // Multiply the direction by the magnitude
-                // var finalFriction = vecMultiply(frictionDirection, frictionMag);
+                var finalFriction = vecMultiply(frictionDirection, frictionMag);
                 // Add friction to the force
-                // scaledDirection = vecSum(scaledDirection, finalFriction);
+                scaledAccelerationDirection = vecSum(scaledAccelerationDirection, finalFriction);
                 // Add up the current velocity with the scaled acceleration
-                this.velocity = setVecLimits(
-                    // vecSum(this.velocity, this.acceleration), 
-                    vecSum(this.velocity, scaledDirection),
-                    {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
-                    {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
-                );
-                this.velocity = vecSum(this.velocity, scaledDirection);
+                // this.velocity = setVecLimits(
+                //     vecSum(this.velocity, scaledAccelerationDirection),
+                //     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
+                //     {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
+                // );
+                this.velocity = vecSum(this.velocity, scaledAccelerationDirection);
                 // log("velocity", this.velocity);
                 // log("checking isInside");
                 if (this.isInside(liquid)) {
@@ -331,17 +366,52 @@
                     this.velocity = vecMultiply(this.velocity, -1);
                 }
                 this.velocity = setVecLimits(
-                    // vecSum(this.velocity, this.acceleration), 
                     this.velocity,
                     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
                     {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
                 );
                 // Add the velocity and the current position
                 this.position = vecSum(this.position, this.velocity);
+                this.position = setVecLimits(this.position, limitsMaxGrid, limitsMinGrid);
                 Entities.editEntity(this.id, {position: this.position});
-                // this.velocity = Vec3.ZERO;
                 // log("position", this.position);
             } else {
+                var distance = vecDistance(worldAverageVector, this.position);
+                // if (distance < CELL_DIMENSIONS * 4) {
+                    var oppositeVectorToWorldAverage = vecSum(worldAverageVector, this.position);
+
+                // } else {
+                    var oppositeVectorToWorldAverage = vecSubtract(worldAverageVector, this.position);
+
+                // }
+                var normalizedDirection = vecNormalize(oppositeVectorToWorldAverage);
+                // normalizedDirection = normalizedDirection;
+                var scaledMaxSpeed = this.maxSpeed * 3;
+                var moveScaler = scaledMaxSpeed * (scaledMaxSpeed / distance);
+                // var angleAxis = vecAngleAxis(50, Vec3.UP)
+                // log("normalizedDirection", normalizedDirection);
+
+                // var rotatedVec = vecMultiplyQbyV(angleAxis, normalizedDirection)
+                // log("rotatedVec", rotatedVec);
+                // log("distance", distance, "moveScaler", moveScaler);
+                var scaledDirection = vecMultiply(normalizedDirection, moveScaler);
+                // this.velocity = setVecLimits(
+                //     vecSum(this.velocity, scaledDirection),
+                //     {x: this.maxSpeed, y: this.maxSpeed, z: this.maxSpeed},
+                //     {x: -this.maxSpeed, y: -this.maxSpeed, z: -this.maxSpeed}
+                // );
+
+                this.velocity = vecSum(this.velocity, scaledDirection);
+                if (!checkIfIn(this.position, cellGridMinMaxObject)){
+                    // log("not inside");
+                    this.velocity = vecMultiply(this.velocity, -1);
+                }
+                // if (this.isInside(liquid)) {
+                //     this.drag(liquid);
+                // }
+                this.position = vecSum(this.position, this.velocity);
+                this.position = setVecLimits(this.position, limitsMaxGrid, limitsMinGrid);
+                Entities.editEntity(this.id, {position: this.position});
                 // var normal = Math.sin(this.currentSlice * SLICE_TIME);
 
                 // var adjustedVector = {
@@ -357,12 +427,13 @@
                 //     this.velocity = vecMultiply(this.velocity, -1);
                 // }
             }
+            // this.velocity = Vec3.ZERO;
         },
         toggleVisible: function(){
             var shouldBeDead = this.lifeMeter <= LIFE_STAGE_0;
             this.getLifeStageColor();
             var props = {
-                alpha: this.lifeMeter,
+                // alpha: this.lifeMeter,
                 color: this.color
             };
             Entities.editEntity(this.id, props);
@@ -401,7 +472,9 @@
             var searchRange = CELL_DIMENSIONS + (PADDING * 2);
             // var position = Entities.getEntityProperties(this.id, "position").position;
             this.neighborhood = cellGrid.filter(function(cell){
-                return vecDistance(_this.position, cell.position) < searchRange;
+                return cell.id !== _this.id && vecDistance(_this.position, cell.position) < searchRange;
+            }).map(function(cell){
+                return cell.id;
             });
             // console.log("this.neighborhood", JSON.stringify(this.neighborhood));
         },
@@ -410,10 +483,11 @@
             this.neighborhoodStateArray = [];
             this.currentNeighborsDead = 0;
             this.currentNeighborsAlive = 0;
+            // log("cellMap", Object.keys(cellMap).length);
+
             this.neighborhood.forEach(function(neighbor){
                 neighbor = cellMap[neighbor];
                 if (!neighbor) {
-                    // console.log("neighbor", neighbor);
                     return; 
                 }
                 // console.log("life meter", neighbor.lifeMeter);
@@ -428,16 +502,24 @@
             })
         },
         getNextState: function(){
+            if (this.isTarget){
+                return;
+            }
             this.history.push(this.lifeMeter);
             this.generation++;
+            // log("this.currentNeightbordsAlive", this.currentNeighborsAlive)
             if (this.lifeMeter >= LIFE_STAGE_0 && (this.currentNeighborsAlive >= NEIGHBORS_GREATER_THAN_BEFORE_DYING || this.currentNeighborsAlive <= NEIGHBORS_LESS_THAN_BEFORE_DYING)) {
                 this.lifeMeter = this.lifeMeter - LIFE_CHANGE;
+                // log("in hereLifeSubtracted", this.lifeMeter)
             } else if (this.lifeMeter <= LIFE_STAGE_4 && (this.currentNeighborsAlive > NEIGHBORS_LESS_THAN_BEFORE_DYING && this.currentNeighborsAlive < NEIGHBORS_GREATER_THAN_BEFORE_DYING)) {
-                this.lifeMeter = this.lifeMeter + LIFE_CHANGE
+                this.lifeMeter = this.lifeMeter + LIFE_CHANGE;
+                // log("in hereLifeAdded", this.lifeMeter)
+
             }
-            // this.getAdjustedLifeMeter();
-            // this.nextState = this.lifeMeter;
-            this.nextState = LIFE_STAGE_4;
+            this.getAdjustedLifeMeter();
+            // log("final life:", this.lifeMeter)
+            this.nextState = this.lifeMeter;
+            // this.nextState = LIFE_STAGE_4;
         },
         getAdjustedLifeMeter: function(){   
             this.lifeMeter = Math.max(this.lifeMeter, LIFE_STAGE_0);
@@ -456,7 +538,6 @@
         },
         isInside: function(liquid){
             // var currentPosition = Entities.getEntityProperties(this.id, 'position').position/
-
             // log(liquid);
             var dimensionsX = liquid.dimensions.x;
             var dimensionsY = liquid.dimensions.y;
@@ -473,7 +554,7 @@
                 zMax: positionZ + dimensionsZ
             }
             // log(minMaxObject);
-            return checkIfIn(this.position, minMaxObject);
+            return checkIfIn(this.position, minMaxObject, -CELL_DIMENSIONS);
         }, 
         drag: function(liquid){
             var speed = vecMagnitude(this.velocity);
@@ -484,10 +565,7 @@
             this.velocity = vecSum(this.velocity, finalDrag);
         }
     };
-    var LIFE_CHANGE = 0.15;
-    var NEIGHBORS_LESS_THAN_BEFORE_DYING = 1;
-    var NEIGHBORS_TO_BE_ALIVE = 3;
-    var NEIGHBORS_GREATER_THAN_BEFORE_DYING = 10;
+
 
     var SLICES = 30;
     var SLICE_TIME = (Math.PI * 2) / SLICES;
@@ -516,19 +594,25 @@
     }
 // Controls
     var CELL_PROPS = {
-        type: "Box",
+        type: "Sphere",
         dimensions: {x: CELL_DIMENSIONS, y: CELL_DIMENSIONS, z: CELL_DIMENSIONS},
         registrationPoint: {x: 0.5, y: 0.5, z: 0.5}
     }
-
+    
     var cellGrid = [];
     var currentCell = 0;
     var position = {x: 0, y: 0, z: 0};
-    var GRID_X = 2;
-    var GRID_Y = 2;
-    var GRID_Z = 2;
+    var GRID_X = 4;
+    var GRID_Y = 4;
+    var GRID_Z = 4;
     var NUMBER_OF_CELLS = GRID_X * GRID_Z; 
     var DIMENSION_MARGIN = PADDING * 1.0;
+
+    var LIFE_CHANGE = 0.001;
+    var NEIGHBORS_LESS_THAN_BEFORE_DYING = Math.floor(NUMBER_OF_CELLS * 0.10);
+    log("NEIGHBORS_LESS_THAN_BEFORE_DYING", NEIGHBORS_LESS_THAN_BEFORE_DYING)
+    var NEIGHBORS_GREATER_THAN_BEFORE_DYING = Math.floor(NUMBER_OF_CELLS * 0.90);
+    log("NEIGHBORS_GREATER_THAN_BEFORE_DYING:", NEIGHBORS_GREATER_THAN_BEFORE_DYING)
     // var DIMENSION_MARGIN = PADDING * 0.25;
     var cellGridMinMaxObject = {
         xMin: Number.POSITIVE_INFINITY,
@@ -539,7 +623,8 @@
         zMax: Number.NEGATIVE_INFINITY
     }
     var gridBox;
-    var randomTarget = Math.floor(Math.random() * NUMBER_OF_CELLS);
+    // var randomTarget = Math.floor(Math.random() * NUMBER_OF_CELLS);
+    var randomTarget = Math.floor(NUMBER_OF_CELLS / 2);
     function makeCells(){
         for (var i = 1; i <= GRID_X; i++) {
             for (var j = 1; j <= GRID_Z; j++) {
@@ -575,12 +660,13 @@
         // var props = {
         //     type: "Box",
         //     name: "Cell_bounds",
-        //     alpha: 0.3,
+        //     alpha: 0.01,
         //     color: [50,75,190],
         //     position: getGridMiddle(),
         //     dimensions: getGridDimensions()
         // }
         // gridBox = Entities.addEntity(props);
+
     }
 
     var cellMap = {};
@@ -611,7 +697,7 @@
     }
 
 
-    var GENEARTION_TIMER_INTERVAL_MS = 64;
+    var GENEARTION_TIMER_INTERVAL_MS = 30;
     function startAnimation(){
         nextGenerationTimer = Script.setInterval(nextGeneration, GENEARTION_TIMER_INTERVAL_MS)
     }
@@ -632,6 +718,7 @@
         triesBeforeNewTarget++;
         saveState();
         getNextState();
+        getVectorAverage();
         // animateParticle();
         // maybeChooseNewRandomTarget();
     }
@@ -647,22 +734,49 @@
         })
     }
 
+    var worldAverageVector = {x: 0, y:0, z: 0};
+    var vectorAverageTestBox;
+    // vectorAverageTestBox = Entities.addEntity({
+    //     type: "Box",
+    //     name: "VECTORBOX",
+    //     position: worldAverageVector,
+    //     dimensions: {x: CELL_DIMENSIONS, y: CELL_DIMENSIONS, z: CELL_DIMENSIONS},
+    //     color: [255,0,85]
+    // })
+    function getVectorAverage(){
+        worldAverageVector = {x: 0, y: 0, z: 0};
+        var vectors = cellGrid.map(function(cell){ 
+            if (cell.isTarget){
+                return {x:0, y:0, z:0};
+            }
+            return cell.position 
+        });
+        for (var i = 0; i < vectors.length; i++) {
+            worldAverageVector = vecSum(worldAverageVector, vectors[i]);
+        }
+        worldAverageVector = vecMultiply(worldAverageVector, 1.0/vectors.length);
+        // log('worldAverageVector', worldAverageVector);
+        
+        Entities.editEntity(vectorAverageTestBox, {position: worldAverageVector});
+    }
+
 
     var worldSum = 0;
     function getNextState(){
+        var RANDOM_MODULUS = Math.floor(Math.random() * NUMBER_OF_CELLS);
         getAllNeighbors();
         worldSum = 0;
         populateNeighborhoodStateArray();
-        cellGrid.forEach(function(cell){
-            cell.getNextState();
+        cellGrid.forEach(function(cell, i){
+            // if (i % RANDOM_MODULUS === 0) {
+                cell.getNextState();
+            // }
         })
         cellGrid.forEach(function(cell, i){
-            var RANDOM_MODULUS = Math.floor(Math.random() * NUMBER_OF_CELLS);
             // console.log(RANDOM_MODULUS);
             // console.log(i % RANDOM_MODULUS === 0);
             // if (i % RANDOM_MODULUS === 0) {
             // if (i % 2 === 0) {
-
                 cell.applyNextState();
                 cell.updatePosition();
             // }
@@ -710,7 +824,8 @@
         };
     }
 
-
+var limitsMinGrid;
+var limitsMaxGrid;
 // Startup
     function startup(){
         Script.scriptEnding.connect(tearDown);
@@ -721,11 +836,20 @@
         getAllNeighbors();
         saveState();
         populateNeighborhoodStateArray();
+        getVectorAverage();
         startAnimation();
+        limitsMinGrid = {
+            x: cellGridMinMaxObject.xMin, y: cellGridMinMaxObject.yMin, z: cellGridMinMaxObject.zMin 
+        }
+        limitsMaxGrid = {
+            x: cellGridMinMaxObject.xMax, y: cellGridMinMaxObject.yMax, z: cellGridMinMaxObject.zMax 
+        }
+        log("limitsmingrid:", limitsMinGrid)
+        log("limitsMaxGrid:", limitsMaxGrid)
+    
     }
 
     startup();
-
 // Liquid
     function getGridMiddle(){
         // log("cellGridMinMaxObject22", cellGridMinMaxObject);
@@ -756,7 +880,8 @@
 
     var LIQUID_POSITION = getGridMiddle();
     // log("liquidPosition", LIQUID_POSITION);
-    var LIQUID_DIMENSIONS_SCALER = 1.5;
+    var LIQUID_DIMENSIONS_SCALER = vecMagnitude(getGridDimensions()) * 0.15;
+    log("LIQUIDDIMENSIONS SCALAR", LIQUID_DIMENSIONS_SCALER)
     var LIQUID_DIMENSIONS = {
         x: CELL_DIMENSIONS * LIQUID_DIMENSIONS_SCALER, 
         y: CELL_DIMENSIONS * LIQUID_DIMENSIONS_SCALER, 
@@ -767,11 +892,11 @@
         type: "Box",
         dimensions: LIQUID_DIMENSIONS,
         position: LIQUID_POSITION,
-        color: [0,255,0],
-        alpha: 0.8,
+        color: [10,50,255],
+        alpha: 0.35,
         collisionless: true
     })
-    DRAG_COEFFICIENT = 10;
+    var DRAG_COEFFICIENT = CELL_DIMENSIONS * 1;
     var liquid = new Liquid(LIQUID_POSITION, LIQUID_DIMENSIONS, DRAG_COEFFICIENT);
 
     function tearDown(){
@@ -784,6 +909,10 @@
         if (gridBox) {
             Entities.deleteEntity(gridBox);
         }
+        if (vectorAverageTestBox){
+            Entities.deleteEntity(vectorAverageTestBox);
+        }
+
         maybeClearNextGenerationTimer();
         Controller.keyPressEvent.disconnect(keyPressHandler);
     }
